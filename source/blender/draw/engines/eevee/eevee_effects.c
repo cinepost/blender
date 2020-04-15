@@ -26,6 +26,8 @@
 
 #include "BKE_global.h" /* for G.debug_value */
 
+#include "DEG_depsgraph_query.h"
+
 #include "GPU_extensions.h"
 #include "GPU_platform.h"
 #include "GPU_state.h"
@@ -130,12 +132,16 @@ void EEVEE_effects_init(EEVEE_ViewLayerData *sldata,
                         Object *camera,
                         const bool minimal)
 {
+  printf("%s\n", "EEVEE_effects_init");
   EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_EffectsInfo *effects;
   DefaultTextureList *dtxl = DRW_viewport_texture_list_get();
+
+  const DRWContextState *draw_ctx = DRW_context_state_get();
+  const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
 
   const float *viewport_size = DRW_viewport_size_get();
   int size_fs[2] = {(int)viewport_size[0], (int)viewport_size[1]};
@@ -157,7 +163,13 @@ void EEVEE_effects_init(EEVEE_ViewLayerData *sldata,
   effects->enabled_effects |= EEVEE_bloom_init(sldata, vedata);
   effects->enabled_effects |= EEVEE_depth_of_field_init(sldata, vedata, camera);
   effects->enabled_effects |= EEVEE_temporal_sampling_init(sldata, vedata);
-  effects->enabled_effects |= EEVEE_occlusion_init(sldata, vedata);
+  
+  if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+    effects->enabled_effects |= EEVEE_occlusion_trace_init(sldata, vedata);
+  } else {
+    effects->enabled_effects |= EEVEE_occlusion_init(sldata, vedata);
+  }
+
   effects->enabled_effects |= EEVEE_screen_raytrace_init(sldata, vedata);
 
   if ((effects->enabled_effects & EFFECT_TAA) && effects->taa_current_sample > 1) {
@@ -263,6 +275,7 @@ void EEVEE_effects_init(EEVEE_ViewLayerData *sldata,
 
 void EEVEE_effects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
+  printf("%s\n", "EEVEE_effects_cache_init");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_StorageList *stl = vedata->stl;

@@ -229,6 +229,7 @@ typedef struct EEVEE_PassList {
   struct DRWPass *probe_planar_downsample_ps;
 
   /* Effects */
+  struct DRWPass *ao_trace;
   struct DRWPass *ao_horizon_search;
   struct DRWPass *ao_horizon_search_layer;
   struct DRWPass *ao_horizon_debug;
@@ -1083,6 +1084,20 @@ void EEVEE_occlusion_compute(EEVEE_ViewLayerData *sldata,
                              int layer);
 void EEVEE_occlusion_draw_debug(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 void EEVEE_occlusion_free(void);
+
+/* eevee_occlusion_trace.c */
+int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata,
+                                 EEVEE_Data *vedata,
+                                 uint tot_samples);
+void EEVEE_occlusion_trace_output_accumulate(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *sldata,
+                             EEVEE_Data *vedata,
+                             struct GPUTexture *depth_src,
+                             int layer);
+void EEVEE_occlusion_trace_draw_debug(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+void EEVEE_occlusion_trace_free(void);
 
 /* eevee_screen_raytrace.c */
 int EEVEE_screen_raytrace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);

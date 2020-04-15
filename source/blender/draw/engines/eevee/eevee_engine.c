@@ -42,6 +42,7 @@
 
 static void eevee_engine_init(void *ved)
 {
+  printf("%s\n", "eevee_engine_init");
   EEVEE_Data *vedata = (EEVEE_Data *)ved;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
@@ -95,6 +96,10 @@ static void eevee_engine_init(void *ved)
 
 static void eevee_cache_init(void *vedata)
 {
+  printf("%s\n", "eevee_cache_init");
+  const DRWContextState *draw_ctx = DRW_context_state_get();
+  const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
+
   EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();
 
   EEVEE_bloom_cache_init(sldata, vedata);
@@ -104,7 +109,13 @@ static void eevee_cache_init(void *vedata)
   EEVEE_lights_cache_init(sldata, vedata);
   EEVEE_materials_cache_init(sldata, vedata);
   EEVEE_motion_blur_cache_init(sldata, vedata);
-  EEVEE_occlusion_cache_init(sldata, vedata);
+
+  if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+    EEVEE_occlusion_trace_cache_init(sldata, vedata);
+  }else {
+    EEVEE_occlusion_cache_init(sldata, vedata);
+  }
+
   EEVEE_screen_raytrace_cache_init(sldata, vedata);
   EEVEE_subsurface_cache_init(sldata, vedata);
   EEVEE_temporal_sampling_cache_init(sldata, vedata);
@@ -113,6 +124,7 @@ static void eevee_cache_init(void *vedata)
 
 void EEVEE_cache_populate(void *vedata, Object *ob)
 {
+  printf("%s\n", "EEVEE_cache_populate");
   EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();
 
   const DRWContextState *draw_ctx = DRW_context_state_get();
@@ -156,6 +168,7 @@ void EEVEE_cache_populate(void *vedata, Object *ob)
 
 static void eevee_cache_finish(void *vedata)
 {
+  printf("%s\n", "eevee_cache_finish");
   EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   EEVEE_PrivateData *g_data = stl->g_data;
@@ -191,8 +204,13 @@ static void eevee_cache_finish(void *vedata)
  * the background and the scene pass are visible.
  * Note: we could break it up in two passes using some depth test
  * to reduce the fillrate */
+
+static uint _i = 0;
+
 static void eevee_draw_scene(void *vedata)
 {
+  _i ++;
+  printf("%s %d\n____________________________\n", "eevee_draw_scene", _i);
   EEVEE_PassList *psl = ((EEVEE_Data *)vedata)->psl;
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   EEVEE_FramebufferList *fbl = ((EEVEE_Data *)vedata)->fbl;
@@ -212,6 +230,9 @@ static void eevee_draw_scene(void *vedata)
     const Scene *scene = draw_ctx->scene;
     loop_len = MAX2(1, scene->eevee.taa_samples);
   }
+
+  const DRWContextState *_draw_ctx = DRW_context_state_get();
+  const Scene *_scene = _draw_ctx->scene;
 
   while (loop_len--) {
     float clear_col[4] = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -283,7 +304,12 @@ static void eevee_draw_scene(void *vedata)
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
     DRW_stats_group_end();
 
-    EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
+    if (_scene->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+      EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
+    } else {
+      EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
+    }
+
     EEVEE_volumes_compute(sldata, vedata);
 
     /* Shading pass */
@@ -439,6 +465,7 @@ static void eevee_render_to_image(void *vedata,
 
 static void eevee_engine_free(void)
 {
+  printf("%s\n", "eevee_engine_free");
   EEVEE_shaders_free();
   EEVEE_bloom_free();
   EEVEE_depth_of_field_free();
@@ -449,6 +476,7 @@ static void eevee_engine_free(void)
   EEVEE_mist_free();
   EEVEE_motion_blur_free();
   EEVEE_occlusion_free();
+  EEVEE_occlusion_trace_free();
   EEVEE_screen_raytrace_free();
   EEVEE_subsurface_free();
   EEVEE_volumes_free();

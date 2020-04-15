@@ -582,7 +582,13 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
     DRW_draw_pass(psl->depth_pass_cull);
     /* Create minmax texture */
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
-    EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
+
+    if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+      EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
+    } else {
+      EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
+    }
+
     EEVEE_volumes_compute(sldata, vedata);
     /* Shading pass */
     eevee_render_draw_background(vedata);

@@ -89,6 +89,7 @@ set(SRC
   engines/eevee/eevee_mist.c
   engines/eevee/eevee_motion_blur.c
   engines/eevee/eevee_occlusion.c
+  engines/eevee/eevee_occlusion_trace.c
   engines/eevee/eevee_render.c
   engines/eevee/eevee_renderpasses.c
   engines/eevee/eevee_sampling.c
@@ -185,6 +186,7 @@ set(LIB
 )
 
 data_to_c_simple(engines/eevee/shaders/ambient_occlusion_lib.glsl SRC)
+data_to_c_simple(engines/eevee/shaders/ambient_occlusion_trace_lib.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/default_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/default_world_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/background_vert.glsl SRC)
@@ -212,6 +214,7 @@ data_to_c_simple(engines/eevee/shaders/effect_dof_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/effect_downsample_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/effect_downsample_cube_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/effect_gtao_frag.glsl SRC)
+data_to_c_simple(engines/eevee/shaders/effect_gtao_trace_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/effect_velocity_resolve_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/effect_minmaxz_frag.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/effect_mist_frag.glsl SRC)
@@ -399,5 +402,15 @@ endif()
 if(WITH_XR_OPENXR)
   add_definitions(-DWITH_XR_OPENXR)
 endif()
+
+add_definitions(-DWITH_EMBREE)
+
+list(APPEND LIB
+  ${EMBREE_LIBRARIES}
+)
+
+list(APPEND INC
+  ${EMBREE_INCLUDE_DIRS}
+)
 
 blender_add_lib(bf_draw "${SRC}" "${INC}" "${INC_SYS}" "${LIB}")

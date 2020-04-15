@@ -40,6 +40,7 @@ uniform sampler2D horizonBuffer;
 #define USE_AO 1
 #define USE_BENT_NORMAL 2
 #define USE_DENOISE 4
+#define USE_AO_TRACE 8
 
 vec4 pack_horizons(vec4 v)
 {

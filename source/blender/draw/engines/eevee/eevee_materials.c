@@ -71,12 +71,15 @@ static struct {
 
   uint sss_count;
 
+  bool gtao_trace;
+
   float noise_offsets[3];
 } e_data = {NULL}; /* Engine data */
 
 extern char datatoc_lights_lib_glsl[];
 extern char datatoc_lightprobe_lib_glsl[];
 extern char datatoc_ambient_occlusion_lib_glsl[];
+extern char datatoc_ambient_occlusion_trace_lib_glsl[];
 extern char datatoc_prepass_frag_glsl[];
 extern char datatoc_prepass_vert_glsl[];
 extern char datatoc_default_frag_glsl[];
@@ -609,16 +612,45 @@ void EEVEE_materials_init(EEVEE_ViewLayerData *sldata,
                           EEVEE_StorageList *stl,
                           EEVEE_FramebufferList *fbl)
 {
-  const DRWContextState *draw_ctx = DRW_context_state_get();
+  printf("%s\n", "EEVEE_materials_init");
+  
   EEVEE_PrivateData *g_data = stl->g_data;
 
-  if (!e_data.frag_shader_lib) {
+  const DRWContextState *draw_ctx = DRW_context_state_get();
+  const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
+  
+  /* if gtao type changed we need to rebuild shadres */
+  bool rebuild_materials = false;
+  if ((scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) && (e_data.gtao_trace != true)) {
+    rebuild_materials = true;
+    e_data.gtao_trace = true;
+  } else if (!(scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) && (e_data.gtao_trace == true)) {
+    rebuild_materials = true;
+    e_data.gtao_trace = false;
+  } else {
+    rebuild_materials = false;
+  }
+
+  if(rebuild_materials){
+    EEVEE_materials_free();
+    printf("%s\n", "rebuild");
+  }
+
+  if (!e_data.frag_shader_lib || rebuild_materials) {
+    char *amb_occlusion_lib = datatoc_ambient_occlusion_lib_glsl;
+    if (e_data.gtao_trace) {
+      amb_occlusion_lib = datatoc_ambient_occlusion_trace_lib_glsl;
+      printf("%s\n", "mat gtao trace");
+    } else {
+      printf("%s\n", "mat gtao");
+    }
+    
     /* Shaders */
     e_data.frag_shader_lib = BLI_string_joinN(datatoc_common_view_lib_glsl,
                                               datatoc_common_uniforms_lib_glsl,
                                               datatoc_bsdf_common_lib_glsl,
                                               datatoc_bsdf_sampling_lib_glsl,
-                                              datatoc_ambient_occlusion_lib_glsl,
+                                              amb_occlusion_lib, //datatoc_ambient_occlusion_lib_glsl,
                                               datatoc_raytrace_lib_glsl,
                                               datatoc_ssr_lib_glsl,
                                               datatoc_octahedron_lib_glsl,
@@ -1018,6 +1050,7 @@ static struct DRWShadingGroup *EEVEE_default_shading_group_create(EEVEE_ViewLaye
                                                                   bool use_blend,
                                                                   bool use_ssr)
 {
+  printf("%s\n", "EEVEE_default_shading_group_create");
   static int ssr_id;
   ssr_id = (use_ssr) ? 1 : -1;
   int options = VAR_MAT_MESH;
@@ -1173,6 +1206,7 @@ static struct DRWShadingGroup *EEVEE_default_hair_render_pass_shading_group_get(
 
 void EEVEE_materials_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
+  printf("%s\n", "EEVEE_materials_cache_init");
   EEVEE_PassList *psl = ((EEVEE_Data *)vedata)->psl;
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   const DRWContextState *draw_ctx = DRW_context_state_get();
@@ -2005,6 +2039,7 @@ void EEVEE_materials_cache_populate(EEVEE_Data *vedata,
                                     Object *ob,
                                     bool *cast_shadow)
 {
+  printf("%s\n", "EEVEE_materials_cache_populate");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_StorageList *stl = vedata->stl;
   const DRWContextState *draw_ctx = DRW_context_state_get();
@@ -2216,6 +2251,7 @@ void EEVEE_object_hair_cache_populate(EEVEE_Data *vedata,
 
 void EEVEE_materials_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
+  printf("%s\n", "EEVEE_materials_cache_finish");
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
 
   BLI_ghash_free(stl->g_data->material_hash, NULL, MEM_freeN);
@@ -2228,6 +2264,7 @@ void EEVEE_materials_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedat
 
 void EEVEE_materials_free(void)
 {
+  printf("%s\n", "EEVEE_materials_free");
   for (int i = 0; i < VAR_MAT_MAX; i++) {
     DRW_SHADER_FREE_SAFE(e_data.default_lit[i]);
   }

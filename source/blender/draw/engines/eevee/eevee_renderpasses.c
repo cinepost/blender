@@ -81,6 +81,7 @@ bool EEVEE_renderpasses_only_first_sample_pass_active(EEVEE_Data *vedata)
 
 void EEVEE_renderpasses_init(EEVEE_Data *vedata)
 {
+  printf("%s\n", "EEVEE_renderpasses_init");
   const DRWContextState *draw_ctx = DRW_context_state_get();
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_PrivateData *g_data = stl->g_data;
@@ -175,7 +176,14 @@ void EEVEE_renderpasses_output_init(EEVEE_ViewLayerData *sldata,
     }
 
     if ((g_data->render_passes & EEVEE_RENDER_PASS_AO) != 0) {
-      EEVEE_occlusion_output_init(sldata, vedata, tot_samples);
+      const DRWContextState *_draw_ctx = DRW_context_state_get();
+      const Scene *_scene = _draw_ctx->scene;
+      if (_scene->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+        EEVEE_occlusion_trace_output_init(sldata, vedata, tot_samples);
+      } else {
+        EEVEE_occlusion_output_init(sldata, vedata, tot_samples);
+      }
+      
     }
 
     if ((g_data->render_passes & EEVEE_RENDER_PASS_BLOOM) != 0 &&
@@ -348,7 +356,13 @@ void EEVEE_renderpasses_output_accumulate(EEVEE_ViewLayerData *sldata,
       EEVEE_subsurface_output_accumulate(sldata, vedata);
     }
     if ((render_pass & EEVEE_RENDER_PASS_AO) != 0) {
-      EEVEE_occlusion_output_accumulate(sldata, vedata);
+      const DRWContextState *_draw_ctx = DRW_context_state_get();
+      const Scene *_scene = _draw_ctx->scene;
+      if (_scene->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+        EEVEE_occlusion_trace_output_accumulate(sldata, vedata);
+      } else {
+        EEVEE_occlusion_output_accumulate(sldata, vedata);
+      }
     }
     if ((render_pass & EEVEE_RENDER_PASS_SHADOW) != 0) {
       EEVEE_shadow_output_accumulate(sldata, vedata);
