@@ -609,7 +609,10 @@ typedef struct EEVEE_EffectsInfo {
   struct GPUTexture *ao_src_depth;  /* pointer copy */
   struct GPUTexture *gtao_horizons; /* Textures from pool */
   struct GPUTexture *gtao_horizons_debug;
-  struct GPUTexture *gtao_trace_hits;
+
+  /* Ambient Occlusion RayTrace version (embree) */
+  struct GPUTexture *gtao_trace_hits; /* where embree hits recorded */
+
   /* Motion Blur */
   float current_world_to_ndc[4][4];
   float current_ndc_to_world[4][4];
@@ -1099,6 +1102,10 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *sldata,
                              int layer);
 void EEVEE_occlusion_trace_draw_debug(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 void EEVEE_occlusion_trace_free(void);
+
+void PVZ_occlusion_trace_build_cpu_buffer(uint w, uint h);
+void PVZ_occlusion_trace_testfill_cpu_buffer(void);
+
 
 /* eevee_screen_raytrace.c */
 int EEVEE_screen_raytrace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);

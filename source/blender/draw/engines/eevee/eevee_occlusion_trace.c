@@ -46,8 +46,12 @@ static struct {
   struct GPUShader *gtao_debug_sh;
 
   struct GPUTexture *dummy_horizon_tx;
-  struct GPUTexture *ao_trace_tx;
 } e_data = {NULL}; /* Engine data */
+
+static struct {
+  uint w, h;
+  float *hits;
+} ao_cpu_buff = {NULL}; /* CPU ao data */
 
 extern char datatoc_ambient_occlusion_trace_lib_glsl[];
 extern char datatoc_common_view_lib_glsl[];
@@ -82,7 +86,7 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 
   if (!e_data.dummy_horizon_tx) {
     float pixel[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    e_data.dummy_horizon_tx = DRW_texture_create_2d(1, 1, GPU_RGBA8, DRW_TEX_WRAP, pixel);
+    e_data.dummy_horizon_tx = DRW_texture_create_2d(1, 1, GPU_R32F, DRW_TEX_WRAP, pixel);
   }
 
   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) {
@@ -108,10 +112,8 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 
     common_data->ao_bounce_fac = (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BOUNCE) ? 1.0f : 0.0f;
 
-    effects->gtao_trace_hits = DRW_texture_pool_query_2d(
-        fs_size[0], fs_size[1], GPU_RGBA8, &draw_engine_eevee_type);
-    GPU_framebuffer_ensure_config(
-        &fbl->gtao_fb, {GPU_ATTACHMENT_NONE, GPU_ATTACHMENT_TEXTURE(effects->gtao_trace_hits)});
+    effects->gtao_trace_hits = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_R32F, &draw_engine_eevee_type);
+    GPU_framebuffer_ensure_config(&fbl->gtao_fb, {GPU_ATTACHMENT_NONE, GPU_ATTACHMENT_TEXTURE(effects->gtao_trace_hits)});
 
     if (G.debug_value == 6) {
       effects->gtao_horizons_debug = DRW_texture_pool_query_2d(
@@ -235,6 +237,39 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
   }
 }
 
+void PVZ_occlusion_trace_build_cpu_buffer(uint w, uint h) {
+  /* buffer exist, no size changes*/
+  if((ao_cpu_buff.hits != NULL) && ao_cpu_buff.w == w && ao_cpu_buff.h == h) {
+    printf("%s\n", "reuse cpu buff");
+    return;
+  }
+
+  /* viewport size changed */
+  if(ao_cpu_buff.hits != NULL) {
+    printf("%s\n", "free cpu buff");
+    MEM_freeN(ao_cpu_buff.hits);
+  }  
+
+  ao_cpu_buff.w = w;
+  ao_cpu_buff.h = h;
+  
+  /* (re)create it */
+  printf("%s\n", "create cpu buff");
+  ao_cpu_buff.hits = MEM_mallocN(sizeof(float) * w * h, "ao_hits_buffer");
+  printf("%s\n", "cpu buff created ");
+}
+
+void PVZ_occlusion_trace_testfill_cpu_buffer(void) {
+  printf("%s\n", "fill");
+  for( int x=0; x < ao_cpu_buff.w; x++){
+    for( int y=0; y < ao_cpu_buff.h; y++) {
+      ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = (x % 255) / 255.0;
+    }
+  }
+  printf("%s\n", "filled");
+}
+
+
 void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
                              EEVEE_Data *vedata,
                              struct GPUTexture *depth_src,
@@ -253,36 +288,10 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
     const float *viewport_size = DRW_viewport_size_get();
     const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};
 
-    unsigned char *pixels = MEM_callocN(sizeof(unsigned char) * fs_size[0] * fs_size[1], "test pixels");
+    PVZ_occlusion_trace_build_cpu_buffer(fs_size[0], fs_size[1]);
+    PVZ_occlusion_trace_testfill_cpu_buffer();
 
-    for(int x=0; x <= fs_size[0]; x++ ) {
-      for(int y=0; y <= fs_size[1]; y+=2 ) {         
-        pixels[x + y * fs_size[0]] = x % 255;
-      }
-    }
-    
-    char err[255] = {NULL};
-    effects->ao_src_depth = GPU_texture_create_2d(fs_size[0], fs_size[1], GPU_R8, pixels , err);
-    printf("error: %s\n", err);
-
-    GPU_framebuffer_bind(fbl->gtao_fb);
-
-    DRW_draw_pass(psl->ao_trace);
-
-    if (GPU_mip_render_workaround() ||
-        GPU_type_matches(GPU_DEVICE_INTEL_UHD, GPU_OS_WIN, GPU_DRIVER_ANY)) {
-      /* Fix dot corruption on intel HD5XX/HD6XX series. */
-      GPU_flush();
-    }
-
-    /* Restore */
-    GPU_framebuffer_bind(fbl->main_fb);
-
-    DRW_stats_group_end();
-
-    MEM_freeN(pixels);
-    GPU_texture_free(effects->ao_src_depth);
-    //DRW_TEXTURE_FREE_SAFE(effects->ao_src_depth);
+    GPU_texture_update(effects->gtao_trace_hits, GPU_R32F, ao_cpu_buff.hits);
   }
 }
 
@@ -331,4 +340,5 @@ void EEVEE_occlusion_trace_free(void)
   DRW_SHADER_FREE_SAFE(e_data.gtao_sh);
   DRW_SHADER_FREE_SAFE(e_data.gtao_debug_sh);
   DRW_TEXTURE_FREE_SAFE(e_data.dummy_horizon_tx);
+  MEM_freeN(ao_cpu_buff.hits);
 }
