@@ -35,6 +35,7 @@
 #include "GPU_extensions.h"
 #include "GPU_platform.h"
 #include "GPU_state.h"
+#include "GPU_texture.h"
 
 #include <embree3/rtcore.h>
 #include <embree3/rtcore_scene.h>
@@ -45,6 +46,7 @@ static struct {
   struct GPUShader *gtao_debug_sh;
 
   struct GPUTexture *dummy_horizon_tx;
+  struct GPUTexture *ao_trace_tx;
 } e_data = {NULL}; /* Engine data */
 
 extern char datatoc_ambient_occlusion_trace_lib_glsl[];
@@ -69,6 +71,7 @@ static void eevee_create_shader_occlusion_trace(void)
 
 int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
+  printf("%s\n", "EEVEE_occlusion_trace_init");
   EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_StorageList *stl = vedata->stl;
@@ -105,10 +108,10 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 
     common_data->ao_bounce_fac = (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BOUNCE) ? 1.0f : 0.0f;
 
-    effects->gtao_horizons = DRW_texture_pool_query_2d(
+    effects->gtao_trace_hits = DRW_texture_pool_query_2d(
         fs_size[0], fs_size[1], GPU_RGBA8, &draw_engine_eevee_type);
     GPU_framebuffer_ensure_config(
-        &fbl->gtao_fb, {GPU_ATTACHMENT_NONE, GPU_ATTACHMENT_TEXTURE(effects->gtao_horizons)});
+        &fbl->gtao_fb, {GPU_ATTACHMENT_NONE, GPU_ATTACHMENT_TEXTURE(effects->gtao_trace_hits)});
 
     if (G.debug_value == 6) {
       effects->gtao_horizons_debug = DRW_texture_pool_query_2d(
@@ -125,7 +128,7 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
   }
 
   /* Cleanup */
-  effects->gtao_horizons = e_data.dummy_horizon_tx;
+  effects->gtao_trace_hits = e_data.dummy_horizon_tx;
   GPU_FRAMEBUFFER_FREE_SAFE(fbl->gtao_fb);
   common_data->ao_settings = 0.0f;
 
@@ -134,6 +137,7 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 
 void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, uint tot_samples)
 {
+  printf("%s\n", "EEVEE_occlusion_trace_output_init");
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_StorageList *stl = vedata->stl;
@@ -169,7 +173,7 @@ void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *
     DRW_shgroup_uniform_texture_ref(grp, "maxzBuffer", &txl->maxzbuffer);
     DRW_shgroup_uniform_texture_ref(grp, "depthBuffer", &dtxl->depth);
     DRW_shgroup_uniform_texture_ref(grp, "normalBuffer", &effects->ssr_normal_input);
-    DRW_shgroup_uniform_texture_ref(grp, "horizonBuffer", &effects->gtao_horizons);
+    DRW_shgroup_uniform_texture_ref(grp, "ao_traceBuffer", &effects->gtao_trace_hits);
     DRW_shgroup_uniform_block(grp, "common_block", sldata->common_ubo);
     DRW_shgroup_uniform_block(
         grp, "renderpass_block", EEVEE_material_default_render_pass_ubo_get(sldata));
@@ -184,6 +188,7 @@ void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *
 
 void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
+  printf("%s\n", "EEVEE_occlusion_trace_cache_init");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_TextureList *txl = vedata->txl;
@@ -208,7 +213,7 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
     DRWShadingGroup *grp = DRW_shgroup_create(e_data.gtao_sh, psl->ao_trace);
     DRW_shgroup_uniform_texture(grp, "utilTex", EEVEE_materials_get_util_tex());
     DRW_shgroup_uniform_texture_ref(grp, "maxzBuffer", &txl->maxzbuffer);
-    DRW_shgroup_uniform_texture_ref(grp, "depthBuffer", &effects->ao_src_depth);
+    DRW_shgroup_uniform_texture_ref(grp, "ao_traceBuffer", &effects->ao_src_depth);
     DRW_shgroup_uniform_block(grp, "common_block", sldata->common_ubo);
     DRW_shgroup_uniform_block(
         grp, "renderpass_block", EEVEE_material_default_render_pass_ubo_get(sldata));
@@ -221,7 +226,7 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
       DRW_shgroup_uniform_texture_ref(grp, "maxzBuffer", &txl->maxzbuffer);
       DRW_shgroup_uniform_texture_ref(grp, "depthBuffer", &dtxl->depth);
       DRW_shgroup_uniform_texture_ref(grp, "normalBuffer", &effects->ssr_normal_input);
-      DRW_shgroup_uniform_texture_ref(grp, "horizonBuffer", &effects->gtao_horizons);
+      DRW_shgroup_uniform_texture_ref(grp, "ao_traceBuffer", &effects->ao_src_depth);
       DRW_shgroup_uniform_block(grp, "common_block", sldata->common_ubo);
       DRW_shgroup_uniform_block(
           grp, "renderpass_block", EEVEE_material_default_render_pass_ubo_get(sldata));
@@ -235,6 +240,7 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
                              struct GPUTexture *depth_src,
                              int layer)
 {
+  printf("%s\n", "EEVEE_occlusion_trace_compute");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_StorageList *stl = vedata->stl;
@@ -242,8 +248,22 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
 
   if ((effects->enabled_effects & EFFECT_GTAO) != 0) {
     DRW_stats_group_start("GTAO Horizon Scan");
-    effects->ao_src_depth = depth_src;
-    effects->ao_depth_layer = layer;
+    //effects->ao_src_depth = depth_src;
+
+    const float *viewport_size = DRW_viewport_size_get();
+    const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};
+
+    unsigned char *pixels = MEM_callocN(sizeof(unsigned char) * fs_size[0] * fs_size[1], "test pixels");
+
+    for(int x=0; x <= fs_size[0]; x++ ) {
+      for(int y=0; y <= fs_size[1]; y+=2 ) {         
+        pixels[x + y * fs_size[0]] = x % 255;
+      }
+    }
+    
+    char err[255] = {NULL};
+    effects->ao_src_depth = GPU_texture_create_2d(fs_size[0], fs_size[1], GPU_R8, pixels , err);
+    printf("error: %s\n", err);
 
     GPU_framebuffer_bind(fbl->gtao_fb);
 
@@ -259,6 +279,10 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
     GPU_framebuffer_bind(fbl->main_fb);
 
     DRW_stats_group_end();
+
+    MEM_freeN(pixels);
+    GPU_texture_free(effects->ao_src_depth);
+    //DRW_TEXTURE_FREE_SAFE(effects->ao_src_depth);
   }
 }
 

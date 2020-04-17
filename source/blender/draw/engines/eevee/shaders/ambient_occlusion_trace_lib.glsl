@@ -34,7 +34,7 @@ uniform sampler2DArray utilTex;
 #  define texelfetch_noise_tex(coord) texelFetch(utilTex, ivec3(ivec2(coord) % LUT_SIZE, 2.0), 0)
 #endif /* UTIL_TEX */
 
-uniform sampler2D horizonBuffer;
+uniform sampler2D ao_traceBuffer;
 
 /* aoSettings flags */
 #define USE_AO 1
@@ -189,45 +189,23 @@ void integrate_slice(
   bent_normal += vec3(sin(b_angle) * -t_phi, cos(b_angle)) * vis;
 }
 
+float _gtao()
+{
+  vec4 tx = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy), 0);
+  return tx.x;
+}
+
 void gtao_deferred(
     vec3 normal, vec4 noise, float frag_depth, out float visibility, out vec3 bent_normal)
 {
-  /* Fetch early, hide latency! */
-  vec4 horizons = texelFetch(horizonBuffer, ivec2(gl_FragCoord.xy), 0);
-
-  vec4 dirs;
-  dirs.xy = get_ao_dir(noise.x * 0.5);
-  dirs.zw = get_ao_dir(noise.x * 0.5 + 0.5);
-
-  bent_normal = normal * 1e-8;
-  visibility = 1e-8;
-
-  horizons = unpack_horizons(horizons);
-
-  integrate_slice(normal, dirs.xy, horizons.xy, visibility, bent_normal);
-  integrate_slice(normal, dirs.zw, horizons.zw, visibility, bent_normal);
-
-  bent_normal = normalize(bent_normal / visibility);
-
-  visibility = 0.5;
-  //visibility *= 0.5; /* We integrated 2 slices. */
+  vec4 tx = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy), 0);
+  visibility = tx.x;
 }
 
 void gtao(vec3 normal, vec3 position, vec4 noise, out float visibility, out vec3 bent_normal)
 {
-  vec2 uvs = get_uvs_from_view(position);
-  vec2 max_dir = get_max_dir(position.z);
-  vec2 dir = get_ao_dir(noise.x);
-
-  bent_normal = normal * 1e-8;
-  visibility = 1e-8;
-
-  /* Only trace in 2 directions. May lead to a darker result but since it's mostly for
-   * alpha blended objects that will have overdraw, we limit the performance impact. */
-  vec2 horizons = search_horizon_sweep(dir, position, uvs, noise.y, max_dir);
-  integrate_slice(normal, dir, horizons, visibility, bent_normal);
-
-  bent_normal = normalize(bent_normal / visibility);
+  vec4 tx = texture2D(ao_traceBuffer, ivec2(gl_FragCoord.xy));
+  visibility = tx.x;
 }
 
 /* Multibounce approximation base on surface albedo.

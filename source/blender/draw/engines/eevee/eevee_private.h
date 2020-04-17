@@ -609,6 +609,7 @@ typedef struct EEVEE_EffectsInfo {
   struct GPUTexture *ao_src_depth;  /* pointer copy */
   struct GPUTexture *gtao_horizons; /* Textures from pool */
   struct GPUTexture *gtao_horizons_debug;
+  struct GPUTexture *gtao_trace_hits;
   /* Motion Blur */
   float current_world_to_ndc[4][4];
   float current_ndc_to_world[4][4];
