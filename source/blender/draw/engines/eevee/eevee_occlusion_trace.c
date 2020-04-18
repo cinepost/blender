@@ -37,8 +37,7 @@
 #include "GPU_state.h"
 #include "GPU_texture.h"
 
-#include <embree3/rtcore.h>
-#include <embree3/rtcore_scene.h>
+#include "eevee_embree.h"
 
 static struct {
   /* Ground Truth Ambient Occlusion */
@@ -49,8 +48,8 @@ static struct {
 } e_data = {NULL}; /* Engine data */
 
 static struct {
-  uint w, h;
-  float *hits;
+  uint w, h; /* cpu buffer width, height*/
+  float *hits; /* embree hits buffer */
 } ao_cpu_buff = {NULL}; /* CPU ao data */
 
 extern char datatoc_ambient_occlusion_trace_lib_glsl[];
@@ -282,8 +281,7 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
   EEVEE_EffectsInfo *effects = stl->effects;
 
   if ((effects->enabled_effects & EFFECT_GTAO) != 0) {
-    DRW_stats_group_start("GTAO Horizon Scan");
-    //effects->ao_src_depth = depth_src;
+    DRW_stats_group_start("GTAO Trace Hits");
 
     const float *viewport_size = DRW_viewport_size_get();
     const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};

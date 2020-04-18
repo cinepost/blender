@@ -36,7 +36,11 @@
 
 #include "eevee_engine.h" /* own include */
 
+#include "eevee_embree.h"
+
 #define EEVEE_ENGINE "BLENDER_EEVEE"
+
+extern struct EeveeEmbreeData evem_data;
 
 /* *********** FUNCTIONS *********** */
 
@@ -49,6 +53,10 @@ static void eevee_engine_init(void *ved)
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();
   DefaultTextureList *dtxl = DRW_viewport_texture_list_get();
+
+  /* Embree part */
+  EVEM_init();
+  /***************/
 
   const DRWContextState *draw_ctx = DRW_context_state_get();
   View3D *v3d = draw_ctx->v3d;
@@ -138,6 +146,7 @@ void EEVEE_cache_populate(void *vedata, Object *ob)
   if (DRW_object_is_renderable(ob) && (ob_visibility & OB_VISIBLE_SELF)) {
     if (ELEM(ob->type, OB_MESH, OB_CURVE, OB_SURF, OB_FONT, OB_MBALL)) {
       EEVEE_materials_cache_populate(vedata, sldata, ob, &cast_shadow);
+      EVEM_objects_cache_populate(vedata, sldata, ob, &cast_shadow);
     }
     else if (ob->type == OB_HAIR) {
       EEVEE_object_hair_cache_populate(vedata, sldata, ob, &cast_shadow);
@@ -481,6 +490,8 @@ static void eevee_engine_free(void)
   EEVEE_subsurface_free();
   EEVEE_volumes_free();
   EEVEE_renderpasses_free();
+
+  EVEM_free();
 }
 
 static const DrawEngineDataSize eevee_data_size = DRW_VIEWPORT_DATA_SIZE(EEVEE_Data);

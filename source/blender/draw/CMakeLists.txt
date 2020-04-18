@@ -80,6 +80,7 @@ set(SRC
   engines/eevee/eevee_depth_of_field.c
   engines/eevee/eevee_effects.c
   engines/eevee/eevee_engine.c
+  engines/eevee/eevee_embree.c
   engines/eevee/eevee_lightcache.c
   engines/eevee/eevee_lightprobes.c
   engines/eevee/eevee_lights.c
@@ -166,6 +167,7 @@ set(SRC
   intern/draw_view.h
   intern/smaa_textures.h
   engines/basic/basic_engine.h
+  engines/eevee/eevee_embree.h
   engines/eevee/eevee_engine.h
   engines/eevee/eevee_lightcache.h
   engines/eevee/eevee_lut.h
@@ -404,6 +406,8 @@ if(WITH_XR_OPENXR)
 endif()
 
 add_definitions(-DWITH_EMBREE)
+
+find_package(EMBREE 3.8.0 REQUIRED)
 
 list(APPEND LIB
   ${EMBREE_LIBRARIES}
