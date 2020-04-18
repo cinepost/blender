@@ -41,6 +41,9 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
 			/* object itself */
 			struct Mesh * mesh = (struct Mesh *)ob->data;
 			printf("%d vertices\n", mesh->totvert);
+			printf("%d faces\n", mesh->toface);
+			printf("%d polys\n", mesh->totpoly);
+			printf("%d loops\n", mesh->toloop);
 		} else {
 			/* instance */
 
