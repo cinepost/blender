@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "eevee_embree.h"
+#include "DNA_meshdata_types.h"
+#include "BLI_math_geom.h"
 
+#include "eevee_embree.h"
 
 struct EeveeEmbreeData evem_data = {NULL};
 
@@ -38,12 +40,8 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
 	if (ELEM(ob->type, OB_MESH)) {
 		dupli_parent = DRW_object_get_dupli_parent(ob);
 		if (!dupli_parent){
-			/* object itself */
-			struct Mesh * mesh = (struct Mesh *)ob->data;
-			printf("%d vertices\n", mesh->totvert);
-			printf("%d faces\n", mesh->toface);
-			printf("%d polys\n", mesh->totpoly);
-			printf("%d loops\n", mesh->toloop);
+			EVEM_create_object(ob);
+
 		} else {
 			/* instance */
 
@@ -52,3 +50,31 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
 	}
 
 }
+
+void EVEM_create_object(Object *ob) {
+	uint ob_id = ob->id.session_uuid; // object uuid
+	struct Mesh * mesh = (struct Mesh *)ob->data; // blender object mesh data
+	printf("%d polys\n", mesh->totpoly);
+
+	uint vtc_count = mesh->totvert;
+	uint tri_count = poly_to_tri_count(mesh->totpoly, mesh->totloop );
+	printf("%d tris\n", tri_count);
+	//MPoly *mpoly;
+	//for(int i=0; i < mesh->totpoly; i++ ) {
+	//	mpoly = &mesh->mpoly[i];
+	//	printf("%d poly loops\n", mpoly->totloop);
+	//}
+
+	RTCGeometry geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_TRIANGLE); // embree geometry
+
+	/* map triangle and vertex buffer */
+  EVEM_Vertex3f* vertices  = (EVEM_Vertex3f*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(EVEM_Vertex3f), vtc_count);
+  EVEM_Triangle* triangles = (EVEM_Triangle*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EVEM_Triangle), tri_count);
+	
+	// final steps 
+	rtcCommitGeometry(geometry);
+  rtcAttachGeometryByID(evem_data.scene, geometry, ob_id); // Attach geometry to Embree scene
+  rtcReleaseGeometry(geometry);
+}
+
+// rtcCommitScene(RTCScene scene);

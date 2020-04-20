@@ -52,6 +52,8 @@ static struct {
   float *hits; /* embree hits buffer */
 } ao_cpu_buff = {NULL}; /* CPU ao data */
 
+extern struct EeveeEmbreeData evem_data;
+
 extern char datatoc_ambient_occlusion_trace_lib_glsl[];
 extern char datatoc_common_view_lib_glsl[];
 extern char datatoc_common_uniforms_lib_glsl[];
@@ -268,6 +270,19 @@ void PVZ_occlusion_trace_testfill_cpu_buffer(void) {
   printf("%s\n", "filled");
 }
 
+void PVZ_occlusion_trace_test_trace_occlusion(void) {
+  printf("%s\n", "test trace occlusion");
+  struct RTCRay ray;
+  struct RTCHit hit;
+
+  for( int x=0; x < ao_cpu_buff.w; x++){
+    for( int y=0; y < ao_cpu_buff.h; y++) {
+      //rtcIntersect(evem_data.scene, ray);
+    }
+  }
+
+  printf("%s\n", "test trace occlusion done");
+}
 
 void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
                              EEVEE_Data *vedata,
