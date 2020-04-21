@@ -1103,9 +1103,6 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *sldata,
 void EEVEE_occlusion_trace_draw_debug(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 void EEVEE_occlusion_trace_free(void);
 
-void PVZ_occlusion_trace_build_cpu_buffer(uint w, uint h);
-void PVZ_occlusion_trace_testfill_cpu_buffer(void);
-
 
 /* eevee_screen_raytrace.c */
 int EEVEE_screen_raytrace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);

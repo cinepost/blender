@@ -13,6 +13,7 @@ uniform sampler2D normalBuffer;
 void main()
 {
   FragColor = vec4(1.0) * _gtao();
+  //FragColor = vec4(1.0) * texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0);
 }
 
 #else
@@ -21,8 +22,11 @@ void main()
 #    define gtao_depthBuffer depthBuffer
 #    define gtao_textureLod(a, b, c) textureLod(a, b, c)
 
+uniform sampler2D normalBuffer;
+
 void main()
 {
   FragColor = vec4(1.0) * _gtao();
+  //FragColor = vec4(1.0) * texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0);
 }
 #endif

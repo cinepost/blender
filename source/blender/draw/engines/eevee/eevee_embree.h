@@ -37,7 +37,7 @@ void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow);
 void EVEM_free(void);
 
-void EVEM_create_object(Object *ob);
+void EVEM_create_trimesh_geometry(Object *ob);
 
 #ifdef  __cplusplus
 }

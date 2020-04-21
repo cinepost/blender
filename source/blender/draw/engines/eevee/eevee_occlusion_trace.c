@@ -38,6 +38,7 @@
 #include "GPU_texture.h"
 
 #include "eevee_embree.h"
+#include "eevee_occlusion_trace.h"
 
 static struct {
   /* Ground Truth Ambient Occlusion */
@@ -216,7 +217,8 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
     DRWShadingGroup *grp = DRW_shgroup_create(e_data.gtao_sh, psl->ao_trace);
     DRW_shgroup_uniform_texture(grp, "utilTex", EEVEE_materials_get_util_tex());
     DRW_shgroup_uniform_texture_ref(grp, "maxzBuffer", &txl->maxzbuffer);
-    DRW_shgroup_uniform_texture_ref(grp, "ao_traceBuffer", &effects->ao_src_depth);
+    DRW_shgroup_uniform_texture_ref(grp, "normalBuffer", &effects->ssr_normal_input);
+    DRW_shgroup_uniform_texture_ref(grp, "ao_traceBuffer", &effects->gtao_trace_hits);
     DRW_shgroup_uniform_block(grp, "common_block", sldata->common_ubo);
     DRW_shgroup_uniform_block(
         grp, "renderpass_block", EEVEE_material_default_render_pass_ubo_get(sldata));
@@ -273,15 +275,61 @@ void PVZ_occlusion_trace_testfill_cpu_buffer(void) {
 void PVZ_occlusion_trace_test_trace_occlusion(void) {
   printf("%s\n", "test trace occlusion");
   struct RTCRay ray;
-  struct RTCHit hit;
+  struct RTCIntersectContext context;
 
   for( int x=0; x < ao_cpu_buff.w; x++){
     for( int y=0; y < ao_cpu_buff.h; y++) {
-      //rtcIntersect(evem_data.scene, ray);
+      rtcInitIntersectContext(&context);
+
+      ray.id = x + y*ao_cpu_buff.w;
+
+      ray.mask = 0xFFFFFFFF;
+      ray.org_x = -1000.0;
+      ray.org_y = x * 0.01 - 2.0;
+      ray.org_z = y * 0.01 - 2.0;
+      ray.tnear = 0.0;
+
+      ray.dir_x = 1.0;
+      ray.dir_y = 0.0;
+      ray.dir_z = 0.0;
+      ray.tfar = 100000.0;
+      ray.time = 0.0;
+
+      rtcOccluded1(evem_data.scene, &context, &ray);
+      //rtcOccluded(evem_data.scene, &ray);
+      ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = 1.0;
+      if (ray.tfar >= 0.0f) {
+        ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = 0.0;
+      }
     }
   }
 
   printf("%s\n", "test trace occlusion done");
+}
+
+void PVZ_texture_test(EEVEE_Data *vedata) {
+  EEVEE_StorageList *stl = vedata->stl;
+  EEVEE_EffectsInfo *effects = stl->effects;
+
+  printf("NORMAL TEXTURE WIDTH %d\n", GPU_texture_width(&effects->ssr_normal_input));
+  printf("NORMAL TEXTURE HEIGHT %d\n", GPU_texture_height(&effects->ssr_normal_input));
+
+  //short *tex_data = (short *)GPU_texture_read(&effects->ssr_normal_input, GPU_RG16, 0);
+
+  //if (!tex_data) {
+  //  printf("%s\n", "GPU_texture_read ERROR !!!!!!!!!!!");
+  //  return;
+  //}
+
+  uint i;
+  for( int x=0; x < ao_cpu_buff.w; x++){
+    for( int y=0; y < ao_cpu_buff.h; y++) {
+      i = x + y*ao_cpu_buff.w;
+      //ao_cpu_buff.hits[i] = tex_data[i];
+    }
+  }
+
+  //MEM_freeN(tex_data);
 }
 
 void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
@@ -297,14 +345,23 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
 
   if ((effects->enabled_effects & EFFECT_GTAO) != 0) {
     DRW_stats_group_start("GTAO Trace Hits");
+    //GPU_framebuffer_bind(fbl->main_fb);
+
+    //DRW_draw_pass(psl->ao_trace);
 
     const float *viewport_size = DRW_viewport_size_get();
     const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};
 
     PVZ_occlusion_trace_build_cpu_buffer(fs_size[0], fs_size[1]);
-    PVZ_occlusion_trace_testfill_cpu_buffer();
+    PVZ_occlusion_trace_test_trace_occlusion();
+    //PVZ_texture_test(vedata);
 
     GPU_texture_update(effects->gtao_trace_hits, GPU_R32F, ao_cpu_buff.hits);
+
+    /* Restore */
+    //GPU_framebuffer_bind(fbl->main_fb);
+
+    DRW_stats_group_end();
   }
 }
 

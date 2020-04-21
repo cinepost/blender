@@ -168,6 +168,7 @@ set(SRC
   intern/smaa_textures.h
   engines/basic/basic_engine.h
   engines/eevee/eevee_embree.h
+  engines/eevee/eevee_occlusion_trace.h
   engines/eevee/eevee_engine.h
   engines/eevee/eevee_lightcache.h
   engines/eevee/eevee_lut.h
