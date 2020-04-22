@@ -418,4 +418,11 @@ list(APPEND INC
   ${EMBREE_INCLUDE_DIRS}
 )
 
+find_package(OpenMP)
+if(OpenMP_C_FOUND)
+  list(APPEND LIB
+    OpenMP::OpenMP_C
+  )
+endif()
+
 blender_add_lib(bf_draw "${SRC}" "${INC}" "${INC_SYS}" "${LIB}")

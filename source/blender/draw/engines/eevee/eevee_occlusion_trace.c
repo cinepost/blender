@@ -37,6 +37,12 @@
 #include "GPU_state.h"
 #include "GPU_texture.h"
 
+#include <omp.h>
+#include <time.h>
+
+#include <xmmintrin.h>
+#include <pmmintrin.h>
+
 #include "eevee_embree.h"
 #include "eevee_occlusion_trace.h"
 
@@ -54,6 +60,7 @@ static struct {
 } ao_cpu_buff = {NULL}; /* CPU ao data */
 
 extern struct EeveeEmbreeData evem_data;
+extern struct EeveeEmbreeRaysBuffer evem_prim_rays_buff = {NULL};
 
 extern char datatoc_ambient_occlusion_trace_lib_glsl[];
 extern char datatoc_common_view_lib_glsl[];
@@ -77,7 +84,12 @@ static void eevee_create_shader_occlusion_trace(void)
 
 int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
+  omp_set_num_threads(6);
+
   printf("%s\n", "EEVEE_occlusion_trace_init");
+  printf("OpenMP num threads: %d\n", omp_get_num_threads());
+  printf("OpenMP max threads: %d\n", omp_get_max_threads());
+
   EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_StorageList *stl = vedata->stl;
@@ -262,6 +274,36 @@ void PVZ_occlusion_trace_build_cpu_buffer(uint w, uint h) {
   printf("%s\n", "cpu buff created ");
 }
 
+/* primary rays buffer */
+void PVZ_occlusion_trace_build_rays_buffer(uint w, uint h) {
+  if (ao_cpu_buff.w == w && ao_cpu_buff.h == h)return;
+
+  if(evem_prim_rays_buff.ray16)MEM_freeN(evem_prim_rays_buff.ray16);
+  if(evem_prim_rays_buff.ray8)MEM_freeN(evem_prim_rays_buff.ray8);
+  if(evem_prim_rays_buff.ray4)MEM_freeN(evem_prim_rays_buff.ray4);
+  if(evem_prim_rays_buff.ray)MEM_freeN(evem_prim_rays_buff.ray);
+
+  uint ww = w, hh =h;
+  uint xtiles, ytiles;
+
+  if(evem_data.NATIVE_RAY16_ON) {
+    // 4x4 tiles
+    xtiles = ww / 4; ww = ww % 4; 
+    ytiles = hh / 4; hh = hh % 4;
+    evem_prim_rays_buff.ray16 = MEM_mallocN(sizeof(struct RTCRay16) * xtiles * ytiles, "ray16 buffer");
+  }
+
+  if(evem_data.NATIVE_RAY8_ON) {
+    // 4x2 and 2x4 tiles
+    xtiles = ww / 4; ww = ww % 4; 
+    ytiles = hh / 4; hh = hh % 4;
+    evem_prim_rays_buff.ray8 = MEM_mallocN(sizeof(struct RTCRay8), "ray8 buffer");
+  }
+
+  evem_prim_rays_buff.ray4 = MEM_mallocN(sizeof(struct RTCRay4), "ray4 buffer");
+  evem_prim_rays_buff.ray = MEM_mallocN(sizeof(struct RTCRay), "ray buffer");
+}
+
 void PVZ_occlusion_trace_testfill_cpu_buffer(void) {
   printf("%s\n", "fill");
   for( int x=0; x < ao_cpu_buff.w; x++){
@@ -274,19 +316,32 @@ void PVZ_occlusion_trace_testfill_cpu_buffer(void) {
 
 void PVZ_occlusion_trace_test_trace_occlusion(void) {
   printf("%s\n", "test trace occlusion");
+  clock_t tstart = clock();
+
   struct RTCRay ray;
   struct RTCIntersectContext context;
 
+  _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+  _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+
+  rtcInitIntersectContext(&context);
+
   for( int x=0; x < ao_cpu_buff.w; x++){
+    #pragma omp parallel for
+    // ordered schedule(dynamic)
+    //#pragma omp single
+    //{
+    //  printf("threads %d\n",  omp_get_num_threads());
+    //}
     for( int y=0; y < ao_cpu_buff.h; y++) {
-      rtcInitIntersectContext(&context);
+      //rtcInitIntersectContext(&context);
 
       ray.id = x + y*ao_cpu_buff.w;
 
       ray.mask = 0xFFFFFFFF;
       ray.org_x = -1000.0;
-      ray.org_y = x * 0.01 - 2.0;
-      ray.org_z = y * 0.01 - 2.0;
+      ray.org_y = x * 0.003 - 2.0;
+      ray.org_z = y * 0.003 - 2.0;
       ray.tnear = 0.0;
 
       ray.dir_x = 1.0;
@@ -296,15 +351,12 @@ void PVZ_occlusion_trace_test_trace_occlusion(void) {
       ray.time = 0.0;
 
       rtcOccluded1(evem_data.scene, &context, &ray);
-      //rtcOccluded(evem_data.scene, &ray);
-      ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = 1.0;
-      if (ray.tfar >= 0.0f) {
-        ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = 0.0;
-      }
+      ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = (ray.tfar < 0.0f) ? 0.0 : 1.0;
     }
   }
 
-  printf("%s\n", "test trace occlusion done");
+  clock_t tend = clock();
+  printf("test trace occlusion done in %f seconds with %d rays \n", (double)(tend - tstart) / CLOCKS_PER_SEC, ao_cpu_buff.w*ao_cpu_buff.h);
 }
 
 void PVZ_texture_test(EEVEE_Data *vedata) {
@@ -353,6 +405,7 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
     const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};
 
     PVZ_occlusion_trace_build_cpu_buffer(fs_size[0], fs_size[1]);
+    PVZ_occlusion_trace_build_rays_buffer(fs_size[0], fs_size[1]);
     PVZ_occlusion_trace_test_trace_occlusion();
     //PVZ_texture_test(vedata);
 
@@ -411,4 +464,9 @@ void EEVEE_occlusion_trace_free(void)
   DRW_SHADER_FREE_SAFE(e_data.gtao_debug_sh);
   DRW_TEXTURE_FREE_SAFE(e_data.dummy_horizon_tx);
   MEM_freeN(ao_cpu_buff.hits);
+
+  if(evem_prim_rays_buff.ray16)MEM_freeN(evem_prim_rays_buff.ray16);
+  if(evem_prim_rays_buff.ray8)MEM_freeN(evem_prim_rays_buff.ray8);
+  if(evem_prim_rays_buff.ray4)MEM_freeN(evem_prim_rays_buff.ray4);
+  if(evem_prim_rays_buff.ray)MEM_freeN(evem_prim_rays_buff.ray);
 }
