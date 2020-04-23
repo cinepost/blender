@@ -20,28 +20,34 @@ extern "C" {
 #define EMBREE_TILE_SIZE_Y 8
 
 /* vertex and triangle layout */
-struct EVEM_Vertex3f { float x,y,z;  };
+struct EVEM_Vertex3f { float x,y,z; };
 typedef struct EVEM_Vertex3f EVEM_Vertex3f;
+
 struct EVEM_Triangle { int v0, v1, v2; };
 typedef struct EVEM_Triangle EVEM_Triangle;
 
+struct EVEM_Vec3f { float x,y,z; };
+typedef struct EVEM_Vec3f EVEM_Vec3f;
 
+struct EVEM_Matrix44f { float x[4][4]; };
+typedef struct EVEM_Matrix44f EVEM_Matrix44f;
+
+/* embree rays(packets) buffer*/
 struct EeveeEmbreeRaysBuffer {
-	struct RTCRay16 *ray16;
-	struct RTCRay8  *ray8;
-	struct RTCRay4  *ray4;
-	struct RTCRay   *ray;
+	struct RTCRay16 *rays16;
+	struct RTCRay8  *rays8;
+	struct RTCRay4  *rays4;
+	struct RTCRay   *rays;
 
 	struct RTCIntersectContext context;
+	uint w;
+	uint h;
 };
 
 /* global embree data */
 struct EeveeEmbreeData {
   RTCDevice device; /* embree device */
   RTCScene scene;   /* embree scene */
-
-
-  //RTCRay 
 
   // stats and capabilities
   bool NATIVE_RAY4_ON, NATIVE_RAY8_ON, NATIVE_RAY16_ON;
@@ -61,8 +67,10 @@ void EVEM_add_test_geo(void);
 void EVEM_object_update_transform(Object *ob);
 void EVEM_create_trimesh_geometry(Object *ob);
 
+void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff);
+
 #ifdef  __cplusplus
 }
 #endif
 
-#endif // __EEVEE_PRIVATE_H__
+#endif // __EEVEE_EMBREE_H__

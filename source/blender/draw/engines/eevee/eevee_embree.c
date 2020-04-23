@@ -67,6 +67,13 @@ void EVEM_free(void) {
 	rtcReleaseDevice(evem_data.device);
 }
 
+void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff){
+  if(buff->rays16)MEM_freeN(buff->rays16);
+  if(buff->rays8)MEM_freeN(buff->rays8);
+  if(buff->rays4)MEM_freeN(buff->rays4);
+  if(buff->rays)MEM_freeN(buff->rays);
+}
+
 void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
 	printf("%s\n", "EVEM_objects_cache_init");
 }

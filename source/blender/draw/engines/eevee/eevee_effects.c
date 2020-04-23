@@ -165,7 +165,7 @@ void EEVEE_effects_init(EEVEE_ViewLayerData *sldata,
   effects->enabled_effects |= EEVEE_temporal_sampling_init(sldata, vedata);
   
   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
-    effects->enabled_effects |= EEVEE_occlusion_trace_init(sldata, vedata);
+    effects->enabled_effects |= EEVEE_occlusion_trace_init(sldata, vedata, camera);
   } else {
     effects->enabled_effects |= EEVEE_occlusion_init(sldata, vedata);
   }

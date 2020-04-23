@@ -1090,7 +1090,7 @@ void EEVEE_occlusion_draw_debug(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 void EEVEE_occlusion_free(void);
 
 /* eevee_occlusion_trace.c */
-int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, Object *camera);
 void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata,
                                  EEVEE_Data *vedata,
                                  uint tot_samples);

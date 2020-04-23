@@ -39,6 +39,8 @@
 
 #include <omp.h>
 #include <time.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 #include <xmmintrin.h>
 #include <pmmintrin.h>
@@ -52,15 +54,17 @@ static struct {
   struct GPUShader *gtao_debug_sh;
 
   struct GPUTexture *dummy_horizon_tx;
+  Object *camera;
 } e_data = {NULL}; /* Engine data */
 
 static struct {
   uint w, h; /* cpu buffer width, height*/
   float *hits; /* embree hits buffer */
-} ao_cpu_buff = {NULL}; /* CPU ao data */
+} ao_cpu_buff = {.hits = NULL, .w=0, .h=0}; /* CPU ao data */
 
 extern struct EeveeEmbreeData evem_data;
-extern struct EeveeEmbreeRaysBuffer evem_prim_rays_buff = {NULL};
+
+static struct EeveeEmbreeRaysBuffer prim_rays_buff = {.rays=NULL, .rays16=NULL, .rays8=NULL, .rays4=NULL, .w=0, .h=0};
 
 extern char datatoc_ambient_occlusion_trace_lib_glsl[];
 extern char datatoc_common_view_lib_glsl[];
@@ -82,13 +86,14 @@ static void eevee_create_shader_occlusion_trace(void)
   MEM_freeN(frag_str);
 }
 
-int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
+int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, Object *camera)
 {
-  omp_set_num_threads(6);
+  omp_set_num_threads(8);
 
   printf("%s\n", "EEVEE_occlusion_trace_init");
   printf("OpenMP num threads: %d\n", omp_get_num_threads());
   printf("OpenMP max threads: %d\n", omp_get_max_threads());
+  e_data.camera = camera;
 
   EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
   EEVEE_FramebufferList *fbl = vedata->fbl;
@@ -275,37 +280,20 @@ void PVZ_occlusion_trace_build_cpu_buffer(uint w, uint h) {
 }
 
 /* primary rays buffer */
-void PVZ_occlusion_trace_build_rays_buffer(uint w, uint h) {
-  if (ao_cpu_buff.w == w && ao_cpu_buff.h == h)return;
+void PVZ_occlusion_trace_build_prim_rays_buffer(uint w, uint h) {
+  if (prim_rays_buff.w == w && prim_rays_buff.h == h)return; // buffer size not changed
 
-  if(evem_prim_rays_buff.ray16)MEM_freeN(evem_prim_rays_buff.ray16);
-  if(evem_prim_rays_buff.ray8)MEM_freeN(evem_prim_rays_buff.ray8);
-  if(evem_prim_rays_buff.ray4)MEM_freeN(evem_prim_rays_buff.ray4);
-  if(evem_prim_rays_buff.ray)MEM_freeN(evem_prim_rays_buff.ray);
+  EVEM_rays_buffer_free(&prim_rays_buff); // free previous buffer
 
-  uint ww = w, hh =h;
-  uint xtiles, ytiles;
+  prim_rays_buff.rays = MEM_mallocN(sizeof(struct RTCRay) * w * h , "prim rays buff");
 
-  if(evem_data.NATIVE_RAY16_ON) {
-    // 4x4 tiles
-    xtiles = ww / 4; ww = ww % 4; 
-    ytiles = hh / 4; hh = hh % 4;
-    evem_prim_rays_buff.ray16 = MEM_mallocN(sizeof(struct RTCRay16) * xtiles * ytiles, "ray16 buffer");
-  }
-
-  if(evem_data.NATIVE_RAY8_ON) {
-    // 4x2 and 2x4 tiles
-    xtiles = ww / 4; ww = ww % 4; 
-    ytiles = hh / 4; hh = hh % 4;
-    evem_prim_rays_buff.ray8 = MEM_mallocN(sizeof(struct RTCRay8), "ray8 buffer");
-  }
-
-  evem_prim_rays_buff.ray4 = MEM_mallocN(sizeof(struct RTCRay4), "ray4 buffer");
-  evem_prim_rays_buff.ray = MEM_mallocN(sizeof(struct RTCRay), "ray buffer");
+  prim_rays_buff.w = w;
+  prim_rays_buff.h = h;
 }
 
 void PVZ_occlusion_trace_testfill_cpu_buffer(void) {
   printf("%s\n", "fill");
+  #pragma omp parallel for num_threads(8) collapse(2)
   for( int x=0; x < ao_cpu_buff.w; x++){
     for( int y=0; y < ao_cpu_buff.h; y++) {
       ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = (x % 255) / 255.0;
@@ -314,49 +302,79 @@ void PVZ_occlusion_trace_testfill_cpu_buffer(void) {
   printf("%s\n", "filled");
 }
 
+void E_multDirMatrix(const EVEM_Matrix44f &mat, const EVEM_Vec3f &src, EVEM_Vec3f &dst) const {
+  dst.x = src[0] * mat.x[0][0] + src[1] * mat.x[1][0] + src[2] * mat.x[2][0]; 
+  dst.y = src[0] * mat.x[0][1] + src[1] * mat.x[1][1] + src[2] * mat.x[2][1]; 
+  dst.z = src[0] * mat.x[0][2] + src[1] * mat.x[1][2] + src[2] * mat.x[2][2]; 
+}
+
 void PVZ_occlusion_trace_test_trace_occlusion(void) {
   printf("%s\n", "test trace occlusion");
-  clock_t tstart = clock();
+  struct timeval t_start, t_end;
+  double elapsed_time;
 
-  struct RTCRay ray;
+  // start timer
+  gettimeofday(&t_start, NULL);
+
   struct RTCIntersectContext context;
 
   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
   _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
-  rtcInitIntersectContext(&context);
+  rtcInitIntersectContext(&prim_rays_buff.context);
 
-  for( int x=0; x < ao_cpu_buff.w; x++){
-    #pragma omp parallel for
-    // ordered schedule(dynamic)
-    //#pragma omp single
-    //{
-    //  printf("threads %d\n",  omp_get_num_threads());
-    //}
-    for( int y=0; y < ao_cpu_buff.h; y++) {
-      //rtcInitIntersectContext(&context);
+  struct RTCRay *rays = prim_rays_buff.rays;
 
-      ray.id = x + y*ao_cpu_buff.w;
+  uint width = ao_cpu_buff.w, height = ao_cpu_buff.h;
+  float scale = 1.0;
+  float image_aspect_ratio = width / (float)height;
 
-      ray.mask = 0xFFFFFFFF;
-      ray.org_x = -1000.0;
-      ray.org_y = x * 0.003 - 2.0;
-      ray.org_z = y * 0.003 - 2.0;
-      ray.tnear = 0.0;
+  struct EVEM_Matrix44f xfm;// = {1.0};
+  uint ix, iy; // pixel pos
+  EVEM_Vec3f v = {-1.0};
+  
+  #pragma omp parallel for num_threads(8) private(ix, iy, v)
+  for( int i=0; i < ao_cpu_buff.w * ao_cpu_buff.h; i++){
+      rays[i].id = i;
+      ix = i - ((i / ao_cpu_buff.w) * ao_cpu_buff.w);
+      iy = i / ao_cpu_buff.w;
 
-      ray.dir_x = 1.0;
-      ray.dir_y = 0.0;
-      ray.dir_z = 0.0;
-      ray.tfar = 100000.0;
-      ray.time = 0.0;
+      v.x = (2 * (ix + 0.5) / (float)width - 1) * scale; 
+      v.y = (1 - 2 * (iy + 0.5) / (float)height) * scale * 1 / image_aspect_ratio;
 
-      rtcOccluded1(evem_data.scene, &context, &ray);
-      ao_cpu_buff.hits[x + y*ao_cpu_buff.w] = (ray.tfar < 0.0f) ? 0.0 : 1.0;
-    }
+      EVEM_Vec3f dir;
+      E_multDirMatrix(xfm, v, dir);
+      // normalize(dir); 
+
+      rays[i].mask = 0xFFFFFFFF;
+      rays[i].org_x = -1000.0;
+      rays[i].org_z = v.x;
+      rays[i].org_y = v.y;
+      rays[i].tnear = 0.0;
+
+      rays[i].dir_x = 1.0;
+      rays[i].dir_y = 0.0;
+      rays[i].dir_z = 0.0;
+      rays[i].tfar = 100000.0;
+      rays[i].time = 0.0;
+          
+      //rtcOccluded1(evem_data.scene, &prim_rays_buff.context, &ray);
+      //ao_cpu_buff.hits[i] = ray.tfar;
+      //ao_cpu_buff.hits[i] = (ray.tfar < 0.0f) ? 0.0 : 1.0;
   }
+  
+  //rtcOccluded1M(evem_data.scene, &prim_rays_buff.context, (struct RTCRay*)&prim_rays_buff.rays, 16, sizeof(struct RTCRay));
 
-  clock_t tend = clock();
-  printf("test trace occlusion done in %f seconds with %d rays \n", (double)(tend - tstart) / CLOCKS_PER_SEC, ao_cpu_buff.w*ao_cpu_buff.h);
+  #pragma omp parallel for num_threads(8)
+  for( int i=0; i < ao_cpu_buff.w * ao_cpu_buff.h; i++){
+    ao_cpu_buff.hits[rays[i].id] = rays[i].org_z;
+  }
+  
+  // stop timer
+  gettimeofday(&t_end, NULL);
+  elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
+
+  printf("test trace occlusion done in %f seconds with %d rays \n", elapsed_time, ao_cpu_buff.w*ao_cpu_buff.h);
 }
 
 void PVZ_texture_test(EEVEE_Data *vedata) {
@@ -405,7 +423,7 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
     const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};
 
     PVZ_occlusion_trace_build_cpu_buffer(fs_size[0], fs_size[1]);
-    PVZ_occlusion_trace_build_rays_buffer(fs_size[0], fs_size[1]);
+    PVZ_occlusion_trace_build_prim_rays_buffer(fs_size[0], fs_size[1]);
     PVZ_occlusion_trace_test_trace_occlusion();
     //PVZ_texture_test(vedata);
 
@@ -465,8 +483,5 @@ void EEVEE_occlusion_trace_free(void)
   DRW_TEXTURE_FREE_SAFE(e_data.dummy_horizon_tx);
   MEM_freeN(ao_cpu_buff.hits);
 
-  if(evem_prim_rays_buff.ray16)MEM_freeN(evem_prim_rays_buff.ray16);
-  if(evem_prim_rays_buff.ray8)MEM_freeN(evem_prim_rays_buff.ray8);
-  if(evem_prim_rays_buff.ray4)MEM_freeN(evem_prim_rays_buff.ray4);
-  if(evem_prim_rays_buff.ray)MEM_freeN(evem_prim_rays_buff.ray);
+  EVEM_rays_buffer_free(&prim_rays_buff);
 }
