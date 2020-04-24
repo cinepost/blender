@@ -7,6 +7,8 @@
 
 void PVZ_occlusion_trace_buffers_init(uint w, uint h);
 void PVZ_occlusion_trace_compute_embree(void);
+void PVZ_occlusion_trace_build_prim_rays_cpu(void);
+void PVZ_occlusion_trace_build_prim_rays_gpu(void);
 void PVZ_read_gpu_buffers(EEVEE_Data *vedata);
 void PVZ_occlusion_trace_buffers_free(void);
 

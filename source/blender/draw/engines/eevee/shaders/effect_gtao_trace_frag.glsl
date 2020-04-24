@@ -10,6 +10,7 @@ uniform float rotationOffset;
 layout(location = 0) out vec3 outWNrm;
 layout(location = 1) out vec3 outWPos;
 
+in vec4 rand;
 in vec4 uvcoordsvar;
 in vec3 viewPosition;
 in vec3 worldNormal;
@@ -20,7 +21,11 @@ void main()
   vec3 V = viewCameraVec;
   vec3 N = normal_decode(texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0).rg, V);
 
-  outWNrm = normalize(transform_direction(ViewMatrixInverse, N));
+  vec4 noise = texelfetch_noise_tex(gl_FragCoord.xy);
+  //float rnd = random(gl_FragCoord.xy, noise.y);
+
+  //outWNrm = normalize(transform_direction(ViewMatrixInverse, N));
+  outWNrm = randomCosineWeightedHemispherePoint(noise.xyz, normalize(transform_direction(ViewMatrixInverse, N)));
   outWPos = get_world_space_from_depth(uvcoordsvar.xy, texelFetch(depthBuffer, ivec2(gl_FragCoord.xy), 0).r);
 }
 

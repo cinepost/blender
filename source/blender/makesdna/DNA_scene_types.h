@@ -2382,6 +2382,7 @@ enum {
   SCE_EEVEE_OVERSCAN = (1 << 21),
 
   SCE_EEVEE_GTAO_TRACE = (1 << 22),
+  SCE_EEVEE_GTAO_GPUBUFF = (1 << 23),
 };
 
 /* SceneEEVEE->shadow_method */

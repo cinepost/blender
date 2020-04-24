@@ -151,9 +151,7 @@ bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *
    * `EEVEE_effects_init` needs to go second for TAA. */
   EEVEE_renderpasses_init(vedata);
   EEVEE_effects_init(sldata, vedata, ob_camera_eval, false);
-  printf("111\n");
   EEVEE_materials_init(sldata, stl, fbl);
-  printf("222\n");
   EEVEE_shadows_init(sldata);
   EEVEE_lightprobes_init(sldata, vedata);
 
@@ -563,11 +561,9 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
 
     /* Refresh Probes
      * Shadows needs to be updated for correct probes */
-    printf("_1\n");
     EEVEE_shadows_update(sldata, vedata);
     EEVEE_lightprobes_refresh(sldata, vedata);
     EEVEE_lightprobes_refresh_planar(sldata, vedata);
-    printf("_2\n");
     /* Refresh Shadows */
     EEVEE_shadows_draw(sldata, vedata, stl->effects->taa_view);
 
@@ -586,55 +582,46 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
     DRW_draw_pass(psl->depth_pass_cull);
     /* Create minmax texture */
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
-printf("_3\n");
     if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
     }
-printf("_4\n");
     EEVEE_volumes_compute(sldata, vedata);
     /* Shading pass */
     eevee_render_draw_background(vedata);
     GPU_framebuffer_bind(fbl->main_fb);
     printf("_44_1\n");
-    EEVEE_materials_draw_opaque(sldata, psl);
+    //EEVEE_materials_draw_opaque(sldata, psl);
     printf("_44_1.1\n");
     EEVEE_subsurface_data_render(sldata, vedata);
-    printf("_44_2\n");
     /* Effects pre-transparency */
     EEVEE_subsurface_compute(sldata, vedata);
     EEVEE_reflection_compute(sldata, vedata);
     EEVEE_refraction_compute(sldata, vedata);
     /* Opaque refraction */
-    printf("_55\n");
     DRW_draw_pass(psl->refract_depth_pass);
     DRW_draw_pass(psl->refract_depth_pass_cull);
     DRW_draw_pass(psl->refract_pass);
     /* Result NORMAL */
-    printf("_66\n");
     eevee_render_result_normal(rl, viewname, rect, vedata, sldata);
     /* Volumetrics Resolve Opaque */
     EEVEE_volumes_resolve(sldata, vedata);
     /* Subsurface output, Occlusion output, Mist output */
     EEVEE_renderpasses_output_accumulate(sldata, vedata, false);
     /* Transparent */
-    printf("_77\n");
     GPU_framebuffer_texture_attach(fbl->main_color_fb, dtxl->depth, 0, 0);
     GPU_framebuffer_bind(fbl->main_color_fb);
     DRW_draw_pass(psl->transparent_pass);
     GPU_framebuffer_bind(fbl->main_fb);
     GPU_framebuffer_texture_detach(fbl->main_color_fb, dtxl->depth);
     /* Result Z */
-    printf("_88\n");
     eevee_render_result_z(rl, viewname, rect, vedata, sldata);
     /* Post Process */
-    printf("_99\n");
     EEVEE_draw_effects(sldata, vedata);
 
     /* XXX Seems to fix TDR issue with NVidia drivers on linux. */
     GPU_finish();
-printf("_5\n");
     RE_engine_update_progress(engine, (float)(render_samples++) / (float)tot_sample);
   }
 
