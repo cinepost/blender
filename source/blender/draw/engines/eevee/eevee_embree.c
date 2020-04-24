@@ -17,7 +17,7 @@ void EVEM_init(void) {
 
   if (!evem_data.device) {
     printf("%s\n", "create embree device");
-    evem_data.device = rtcNewDevice("threads=6");
+    evem_data.device = rtcNewDevice("threads=8");
     assert(evem_data.device && "Unable to create embree device !!!");
   }
 
@@ -68,10 +68,11 @@ void EVEM_free(void) {
 }
 
 void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff){
-  if(buff->rays16)MEM_freeN(buff->rays16);
-  if(buff->rays8)MEM_freeN(buff->rays8);
-  if(buff->rays4)MEM_freeN(buff->rays4);
-  if(buff->rays)MEM_freeN(buff->rays);
+	if(!buff->rays && !buff->rays4 && !buff->rays8 && !buff->rays16) return;
+  if(buff->rays16)free(buff->rays16);
+  if(buff->rays8)free(buff->rays8);
+  if(buff->rays4)free(buff->rays4);
+  if(buff->rays)free(buff->rays);
 }
 
 void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
@@ -213,5 +214,13 @@ void EVEM_object_update_transform(Object *ob) {
 
   printf("%s\n", "embree object updated");
 }
+
+//inline EVEM_Vec3f EVEM_mult_dir_matrix(EVEM_Matrix44f mat, EVEM_Vec3f vec) {
+//	return EVEM_Vec3f(
+//  	vec[0] * mat[0][0] + vec[1] * mat[1][0] + vec[2] * mat[2][0], 
+//  	vec[0] * mat[0][1] + vec[1] * mat[1][1] + vec[2] * mat[2][1], 
+//  	vec[0] * mat[0][2] + vec[1] * mat[1][2] + vec[2] * mat[2][2] 
+//  );
+//}
 
 // rtcCommitScene(RTCScene scene);

@@ -202,7 +202,7 @@ void EEVEE_effects_init(EEVEE_ViewLayerData *sldata,
   }
   else {
     DRW_texture_ensure_2d(
-        &txl->maxzbuffer, size[0], size[1], GPU_DEPTH_COMPONENT24, DRW_TEX_MIPMAP);
+        &txl->maxzbuffer, size[0], size[1], GPU_DEPTH_COMPONENT32F, DRW_TEX_MIPMAP);
   }
 
   if (fbl->downsample_fb == NULL) {

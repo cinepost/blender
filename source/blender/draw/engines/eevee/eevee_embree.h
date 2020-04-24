@@ -26,11 +26,15 @@ typedef struct EVEM_Vertex3f EVEM_Vertex3f;
 struct EVEM_Triangle { int v0, v1, v2; };
 typedef struct EVEM_Triangle EVEM_Triangle;
 
-struct EVEM_Vec3f { float x,y,z; };
-typedef struct EVEM_Vec3f EVEM_Vec3f;
+//struct EVEM_Vec3f { float x,y,z; };
+//typedef struct EVEM_Vec3f EVEM_Vec3f;
+typedef float EVEM_Vec3f[3];
+typedef double EVEM_Vec3d[3];
 
-struct EVEM_Matrix44f { float x[4][4]; };
-typedef struct EVEM_Matrix44f EVEM_Matrix44f;
+//struct EVEM_Matrix44f { float x[4][4]; };
+//typedef struct EVEM_Matrix44f EVEM_Matrix44f;
+typedef float EVEM_Matrix44f[4][4];
+typedef double EVEM_Matrix44d[4][4];
 
 /* embree rays(packets) buffer*/
 struct EeveeEmbreeRaysBuffer {
@@ -68,6 +72,8 @@ void EVEM_object_update_transform(Object *ob);
 void EVEM_create_trimesh_geometry(Object *ob);
 
 void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff);
+
+//inline EVEM_Vec3f EVEM_mult_dir_matrix(EVEM_Matrix44f mat, EVEM_Vec3f vec);
 
 #ifdef  __cplusplus
 }

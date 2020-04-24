@@ -230,6 +230,7 @@ typedef struct EEVEE_PassList {
 
   /* Effects */
   struct DRWPass *ao_trace;
+  struct DRWPASS *ao_trace_pos;
   struct DRWPass *ao_horizon_search;
   struct DRWPass *ao_horizon_search_layer;
   struct DRWPass *ao_horizon_debug;
@@ -299,6 +300,7 @@ typedef struct EEVEE_PassList {
 typedef struct EEVEE_FramebufferList {
   /* Effects */
   struct GPUFrameBuffer *gtao_fb;
+  struct GPUFrameBuffer *gtao_nd_fb;
   struct GPUFrameBuffer *gtao_debug_fb;
   struct GPUFrameBuffer *downsample_fb;
   struct GPUFrameBuffer *bloom_blit_fb;
@@ -611,6 +613,8 @@ typedef struct EEVEE_EffectsInfo {
   struct GPUTexture *gtao_horizons_debug;
 
   /* Ambient Occlusion RayTrace version (embree) */
+  struct GPUTexture *gtao_pos; /* world position for ambient occlusion trace*/
+  struct GPUTexture *gtao_nrm; /* worls normals for ambient occlusion trace */
   struct GPUTexture *gtao_trace_hits; /* where embree hits recorded */
 
   /* Motion Blur */
