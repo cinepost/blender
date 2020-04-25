@@ -1582,6 +1582,19 @@ void GPU_texture_clear(GPUTexture *tex, eGPUDataFormat gpu_data_format, const vo
   }
 }
 
+void PVZ_hits_texture_update(GPUTexture *tex, eGPUDataFormat data_format, const void *pixels)
+{
+  GLint alignment;
+  glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  glBindTexture(tex->target, tex->bindcode);
+  glTexSubImage2D(tex->target, 0, 0, 0, tex->w, tex->h, GL_RED, GL_UNSIGNED_BYTE, pixels);
+
+  glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+  glBindTexture(tex->target, 0);
+}
+
 void GPU_texture_update(GPUTexture *tex, eGPUDataFormat data_format, const void *pixels)
 {
   GPU_texture_update_sub(tex, data_format, pixels, 0, 0, 0, tex->w, tex->h, tex->d);

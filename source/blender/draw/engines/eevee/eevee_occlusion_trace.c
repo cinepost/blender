@@ -51,7 +51,8 @@
 #include "eevee_occlusion_trace.h"
 
 #define RAYS_STREAM_SIZE 256
-#define TRACE_BIAS 0.001
+#define EMBREE_TRACE_BIAS 0.001
+#define TRACE_BIAS 0.005
 
 static struct {
   /* Ground Truth Ambient Occlusion */
@@ -68,7 +69,7 @@ static struct {
   uint w, h; /* cpu buffer width, height*/
   struct RTCRay *rays;
   struct RTCRayHit *rayhits;
-  float *hits; /* embree hits buffer */
+  unsigned char *hits; /* embree hits buffer */
   float *norm;   /* world normal */
   float *pos;    /* world pos */
 } ao_cpu_buff = {.hits = NULL, .w=0, .h=0}; /* CPU ao data */
@@ -153,7 +154,7 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
 
     common_data->ao_bounce_fac = (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BOUNCE) ? 1.0f : 0.0f;
 
-    effects->gtao_trace_hits = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_R32F, &draw_engine_eevee_type);
+    effects->gtao_trace_hits = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_R8, &draw_engine_eevee_type);
     GPU_framebuffer_ensure_config(&fbl->gtao_fb, {GPU_ATTACHMENT_NONE, GPU_ATTACHMENT_TEXTURE(effects->gtao_trace_hits)});
 
     effects->gtao_nrm = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_RGBA16F, &draw_engine_eevee_type);
@@ -318,7 +319,7 @@ void PVZ_occlusion_trace_buffers_init(uint w, uint h) {
   ao_cpu_buff.h = h;
   
   /* (re)create buffers  */
-  ao_cpu_buff.hits = malloc(sizeof(float) * w * h);
+  ao_cpu_buff.hits = (unsigned char *)malloc(sizeof(unsigned char) * w * h);
   ao_cpu_buff.norm = malloc(sizeof(float) * w * h * 3);
   ao_cpu_buff.pos = malloc(sizeof(float) * w * h * 3);
   ao_cpu_buff.rays = (struct RTCRay *)malloc(sizeof(struct RTCRay) * w * h);
@@ -445,9 +446,9 @@ void PVZ_occlusion_trace_build_prim_rays_cpu(void) {
       rays[ray->id].dir_y = hit->Ng_y;
       rays[ray->id].dir_z = hit->Ng_z;
       
-      rays[ray->id].org_x = ray->org_x + ray->dir_x * ray->tfar + hit->Ng_x * TRACE_BIAS;
-      rays[ray->id].org_y = ray->org_y + ray->dir_y * ray->tfar + hit->Ng_y * TRACE_BIAS;
-      rays[ray->id].org_z = ray->org_z + ray->dir_z * ray->tfar + hit->Ng_z * TRACE_BIAS;
+      rays[ray->id].org_x = ray->org_x + ray->dir_x * ray->tfar + hit->Ng_x * EMBREE_TRACE_BIAS;
+      rays[ray->id].org_y = ray->org_y + ray->dir_y * ray->tfar + hit->Ng_y * EMBREE_TRACE_BIAS;
+      rays[ray->id].org_z = ray->org_z + ray->dir_z * ray->tfar + hit->Ng_z * EMBREE_TRACE_BIAS;
     }
   }
 }
@@ -492,7 +493,7 @@ void PVZ_occlusion_trace_compute_embree(void) {
     rtcOccluded1M(evem_data.scene, &embree_context, &rays[i*RAYS_STREAM_SIZE], RAYS_STREAM_SIZE, sizeof(struct RTCRay));
     #pragma omp simd
     for(int j=0; j<RAYS_STREAM_SIZE; j++){
-      ao_cpu_buff.hits[rays[j+i*RAYS_STREAM_SIZE].id] = (rays[j+i*RAYS_STREAM_SIZE].tfar < 0.0f) ? 0.0 : 1.0;
+      ao_cpu_buff.hits[rays[j+i*RAYS_STREAM_SIZE].id] = (rays[j+i*RAYS_STREAM_SIZE].tfar < 0.0f) ? 0 : 255;
     }
   }
   
@@ -538,6 +539,8 @@ void PVZ_read_gpu_buffers(EEVEE_Data *vedata) {
   printf("GPU_framebuffer read in %f seconds\n", elapsed_time);
 }
 
+struct GPUTexture;
+
 void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
                              EEVEE_Data *vedata,
                              struct GPUTexture *depth_src,
@@ -566,7 +569,8 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
 
     PVZ_occlusion_trace_compute_embree();
 
-    GPU_texture_update(effects->gtao_trace_hits, GPU_R32F, ao_cpu_buff.hits); // send ray hits back to gpu
+    PVZ_hits_texture_update(effects->gtao_trace_hits, GPU_R8, ao_cpu_buff.hits); // send ray hits back to gpu
+    //glTexSubImage2D(effects->gtao_trace_hits->target, 0, 0, 0, ao_cpu_buff.w, ao_cpu_buff.h, GL_RED, GL_UNSIGNED_BYTE, ao_cpu_buff.hits);
 
     /* Restore */
     GPU_framebuffer_bind(fbl->main_fb);

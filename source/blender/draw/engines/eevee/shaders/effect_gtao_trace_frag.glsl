@@ -7,6 +7,7 @@ uniform float rotationOffset;
 
 #ifdef AO_TRACE_POS
 
+// prepas for embree tracer
 layout(location = 0) out vec3 outWNrm;
 layout(location = 1) out vec3 outWPos;
 
@@ -20,12 +21,10 @@ void main()
 {
   vec3 V = viewCameraVec;
   vec3 N = normal_decode(texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0).rg, V);
-
+  vec3 nN = normalize(transform_direction(ViewMatrixInverse, N));
   vec4 noise = texelfetch_noise_tex(gl_FragCoord.xy);
-  //float rnd = random(gl_FragCoord.xy, noise.y);
-
-  //outWNrm = normalize(transform_direction(ViewMatrixInverse, N));
-  outWNrm = randomCosineWeightedHemispherePoint(noise.xyz, normalize(transform_direction(ViewMatrixInverse, N)));
+  
+  outWNrm = randomCosineWeightedHemispherePoint(noise.xyz, nN);
   outWPos = get_world_space_from_depth(uvcoordsvar.xy, texelFetch(depthBuffer, ivec2(gl_FragCoord.xy), 0).r);
 }
 
@@ -34,12 +33,13 @@ void main()
 out vec4 FragColor;
 
 #ifdef DEBUG_AO
+
+in vec4 uvcoordsvar;
 uniform sampler2D normalBuffer;
 
 void main()
 {
-  FragColor = vec4(1.0) * _gtao();
-  //FragColor = vec4(1.0) * texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0);
+  FragColor = vec4(1.0) * gtao_embree(uvcoordsvar.xy);
 }
 
 #else
@@ -47,12 +47,12 @@ void main()
 #    define gtao_depthBuffer depthBuffer
 #    define gtao_textureLod(a, b, c) textureLod(a, b, c)
 
+in vec4 uvcoordsvar;
 uniform sampler2D normalBuffer;
 
 void main()
 {
-  FragColor = vec4(1.0) * _gtao();
-  //FragColor = vec4(1.0) * texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0);
+  FragColor = vec4(1.0) * gtao_embree(uvcoordsvar.xy);
 }
 #endif
 #endif

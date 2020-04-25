@@ -214,6 +214,7 @@ void GPU_texture_add_mipmap(GPUTexture *tex,
                             int miplvl,
                             const void *pixels);
 
+void PVZ_hits_texture_update(GPUTexture *tex, eGPUDataFormat data_format, const void *pixels);
 void GPU_texture_update(GPUTexture *tex, eGPUDataFormat data_format, const void *pixels);
 void GPU_texture_update_sub(GPUTexture *tex,
                             eGPUDataFormat gpu_data_format,
