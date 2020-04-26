@@ -69,7 +69,7 @@ static struct {
   uint w, h; /* cpu buffer width, height*/
   struct RTCRay *rays;
   struct RTCRayHit *rayhits;
-  unsigned char *hits; /* embree hits buffer */
+  unsigned char *hits; /* embree occlusion hits buffer */ // TODO: try pack 4or8 hits in one byte
   float *norm;   /* world normal */
   float *pos;    /* world pos */
 } ao_cpu_buff = {.hits = NULL, .w=0, .h=0}; /* CPU ao data */
@@ -176,7 +176,7 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
       effects->gtao_horizons_debug = NULL;
     }
 
-    return EFFECT_GTAO | EFFECT_NORMAL_BUFFER;
+    return EFFECT_GTAO | EFFECT_NORMAL_BUFFER | EFFECT_GTAO_TRACE;
   }
 
   /* Cleanup */
@@ -601,6 +601,7 @@ void EEVEE_occlusion_trace_draw_debug(EEVEE_ViewLayerData *UNUSED(sldata), EEVEE
 
 void EEVEE_occlusion_trace_output_accumulate(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
+  printf("EEVEE_occlusion_trace_output_accumulate\n");
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_PassList *psl = vedata->psl;
 

@@ -193,22 +193,20 @@ float gtao_embree(vec2 uv)
 {
   vec4 tx = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy), 0);
   return tx.r;
-  //return texture2D(ao_traceBuffer, uv).r;
-  //return uv.x * uv.y;
 }
 
-void gtao_deferred(
-    vec3 normal, vec4 noise, float frag_depth, out float visibility, out vec3 bent_normal)
+void gtao_deferred(vec3 normal, vec4 noise, float frag_depth, out float visibility, out vec3 bent_normal)
 {
   vec4 tx = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy), 0);
   visibility = tx.x;
+  bent_normal = normal;
 }
 
 void gtao(vec3 normal, vec3 position, vec4 noise, out float visibility, out vec3 bent_normal)
 {
-  //vec4 tx = texture2D(ao_traceBuffer, ivec2(gl_FragCoord.xy));
   vec4 tx = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy), 0);
   visibility = tx.x;
+  bent_normal = normal;
 }
 
 /* Multibounce approximation base on surface albedo.

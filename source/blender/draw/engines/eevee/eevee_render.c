@@ -163,7 +163,13 @@ bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *
   EEVEE_lights_cache_init(sldata, vedata);
   EEVEE_materials_cache_init(sldata, vedata);
   EEVEE_motion_blur_cache_init(sldata, vedata);
-  EEVEE_occlusion_cache_init(sldata, vedata);
+
+  if (scene->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+    EEVEE_occlusion_trace_cache_init(sldata, vedata);
+  }else {
+    EEVEE_occlusion_cache_init(sldata, vedata);
+  }
+  
   EEVEE_screen_raytrace_cache_init(sldata, vedata);
   EEVEE_subsurface_cache_init(sldata, vedata);
   EEVEE_temporal_sampling_cache_init(sldata, vedata);
@@ -582,18 +588,18 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
     DRW_draw_pass(psl->depth_pass_cull);
     /* Create minmax texture */
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
+
     if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
     }
+    
     EEVEE_volumes_compute(sldata, vedata);
     /* Shading pass */
     eevee_render_draw_background(vedata);
     GPU_framebuffer_bind(fbl->main_fb);
-    printf("_44_1\n");
-    //EEVEE_materials_draw_opaque(sldata, psl);
-    printf("_44_1.1\n");
+    EEVEE_materials_draw_opaque(sldata, psl);
     EEVEE_subsurface_data_render(sldata, vedata);
     /* Effects pre-transparency */
     EEVEE_subsurface_compute(sldata, vedata);

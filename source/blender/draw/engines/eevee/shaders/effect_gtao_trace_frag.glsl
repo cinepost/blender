@@ -15,6 +15,7 @@ in vec4 rand;
 in vec4 uvcoordsvar;
 in vec3 viewPosition;
 in vec3 worldNormal;
+
 uniform sampler2D normalBuffer;
 
 void main()
@@ -22,9 +23,11 @@ void main()
   vec3 V = viewCameraVec;
   vec3 N = normal_decode(texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0).rg, V);
   vec3 nN = normalize(transform_direction(ViewMatrixInverse, N));
-  vec4 noise = texelfetch_noise_tex(gl_FragCoord.xy);
+  //vec4 noise = texelfetch_noise_tex(gl_FragCoord.xy);
+  vec4 rand = texelFetch(utilTex, ivec3(ivec2(gl_FragCoord.xy) % LUT_SIZE, 2.0), 0);
   
-  outWNrm = randomCosineWeightedHemispherePoint(noise.xyz, nN);
+  //outWNrm = randomCosineWeightedHemispherePoint(rand.xyz, nN);
+  outWNrm = randomHemispherePoint(rand.xyz, nN);
   outWPos = get_world_space_from_depth(uvcoordsvar.xy, texelFetch(depthBuffer, ivec2(gl_FragCoord.xy), 0).r);
 }
 

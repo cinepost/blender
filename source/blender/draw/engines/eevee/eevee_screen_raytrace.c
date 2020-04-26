@@ -206,7 +206,7 @@ void EEVEE_screen_raytrace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
 
   if ((effects->enabled_effects & EFFECT_SSR) != 0) {
     int options = (effects->reflection_trace_full) ? SSR_FULL_TRACE : 0;
-    options |= ((effects->enabled_effects & EFFECT_GTAO) != 0) ? SSR_AO : 0;
+    options |= (((effects->enabled_effects & EFFECT_GTAO) != 0) && ((effects->enabled_effects & EFFECT_GTAO_TRACE) == 0)) ? SSR_AO : 0; // normal screen space GTAO
 
     struct GPUShader *trace_shader = eevee_effects_screen_raytrace_shader_get(options);
     struct GPUShader *resolve_shader = eevee_effects_screen_raytrace_shader_get(SSR_RESOLVE |
@@ -262,10 +262,13 @@ void EEVEE_screen_raytrace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
     DRW_shgroup_uniform_block(
         grp, "renderpass_block", EEVEE_material_default_render_pass_ubo_get(sldata));
     DRW_shgroup_uniform_int(grp, "neighborOffset", &effects->ssr_neighbor_ofs, 1);
-    if ((effects->enabled_effects & EFFECT_GTAO) != 0) {
-      DRW_shgroup_uniform_texture(grp, "utilTex", EEVEE_materials_get_util_tex());
-      DRW_shgroup_uniform_texture_ref(grp, "horizonBuffer", &effects->gtao_horizons);
-    }
+
+    //if ((effects->enabled_effects & EFFECT_GTAO_TRACE == 0)){ // no textures needed/provided for raytrace case
+      if ((effects->enabled_effects & EFFECT_GTAO) != 0) {
+        DRW_shgroup_uniform_texture(grp, "utilTex", EEVEE_materials_get_util_tex());
+        DRW_shgroup_uniform_texture_ref(grp, "horizonBuffer", &effects->gtao_horizons);
+      }
+    //}
 
     DRW_shgroup_call(grp, quad, NULL);
   }
