@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
+#include <search.h>
 
+#include <omp.h>
+
+#include "DNA_scene_types.h"
+#include "DNA_mesh_types.h"
 #include "DNA_meshdata_types.h"
 #include "BLI_math_geom.h"
 
+#include "GPU_batch.h"
+
+#include "draw_cache_extract.h"
+#include "draw_cache_impl.h"
+
 #include "eevee_embree.h"
 
+/* embree scene */
 
 struct EeveeEmbreeData evem_data = {NULL};
 static bool _scene_is_empty = true; // HACK for being able to test geometry already sent to embree device.
@@ -37,6 +48,8 @@ void EVEM_init(void) {
 
   _evem_inited = true;
   EVEM_print_capabilities();
+
+  EVEM_objects_map_init();
 }
 
 void EVEM_print_capabilities(void) {
@@ -63,6 +76,7 @@ void EVEM_print_capabilities(void) {
 }
 
 void EVEM_free(void) {
+  EVEM_objects_map_free();
 	rtcReleaseScene(evem_data.scene);
 	rtcReleaseDevice(evem_data.device);
 }
@@ -76,79 +90,95 @@ void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff){
 }
 
 void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
-	printf("%s\n", "EVEM_objects_cache_init");
+	printf("EVEM_objects_cache_init\n");
 }
 
 void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow) {
+  printf("EVEM_objects_cache_populate\n");
+
 	if (!cast_shadow)
 		return;
 
-	printf("%s\n", "EVEM_objects_cache_populate");
-	Object *dupli_parent;
-	if (ELEM(ob->type, OB_MESH)) {
-		dupli_parent = DRW_object_get_dupli_parent(ob);
-		if (!dupli_parent){
-			EVEM_create_trimesh_geometry(ob);
-
-		} else {
-			/* instance */
-			//RTCGeometry geometry = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_INSTANCE);
-		}
-		printf("%s %s\n", "MEEAASH!!!!", dupli_parent);
-	}
+  ObjectInfo *ob_info = EVEM_find_object_info(ob);
+  if(!ob_info) {
+    ob_info = EVEM_insert_object(ob);
+    EVEM_create_object(ob, ob_info);
+  } else {
+    EVEM_update_object(ob, ob_info);
+  }
 	rtcCommitScene(evem_data.scene);
 }
 
-void EVEM_add_test_geo(void) {
-	RTCGeometry geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_TRIANGLE);
-
-	EVEM_Vertex3f* vertices  = (EVEM_Vertex3f*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(EVEM_Vertex3f), 4);
-  EVEM_Triangle* triangles = (EVEM_Triangle*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EVEM_Triangle), 2);
-
-  vertices[0].x = 0.0; vertices[1].x = 0.0; vertices[2].x = 0.0; vertices[3].x = 0.0;
-  vertices[0].y = 0.0; vertices[1].y = 1.0; vertices[2].y = 1.0; vertices[3].y = 0.0;
-  vertices[0].z = 0.0; vertices[1].z = 0.0; vertices[2].z = 1.0; vertices[3].z = 1.0;
-
-  triangles[0].v0 = 0; triangles[0].v1 = 1; triangles[0].v2 = 2;
-  triangles[1].v0 = 0; triangles[1].v1 = 2; triangles[1].v2 = 3;
-
-  rtcCommitGeometry(geometry);
-  rtcAttachGeometry(evem_data.scene, geometry);
- }
-
-void EVEM_create_trimesh_geometry(Object *ob) {
-	clock_t tstart = clock();
-	uint ob_id = ob->id.session_uuid; // object uuid
-
-	if(!_scene_is_empty) {
-		if (rtcGetGeometry(evem_data.scene, ob_id)) {
-			EVEM_object_update_transform(ob); // update object transform
-			printf("%s\n", "Geometry already exist in Embree scene !");
-			return;
-		}
+void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
+	printf("EVEM_create_object: %s\n", ob->id.name);
+  struct Mesh *mesh_eval = NULL;
+	switch (ob->type) {
+    case OB_MESH:
+      EVEM_mesh_object_create((Mesh *)ob->data, ob_info);
+      break;
+    case OB_CURVE:
+    case OB_FONT:
+    case OB_SURF:
+      mesh_eval = BKE_object_get_evaluated_mesh(ob);
+      if (mesh_eval != NULL) {
+        EVEM_mesh_object_create(mesh_eval, ob_info);
+      }
+      //EVEM_curve_cache_validate((Curve *)ob->data);
+      break;
+    case OB_MBALL:
+      //EVEM_mball_cache_validate((MetaBall *)ob->data);
+      break;
+    case OB_LATTICE:
+      //EVEM_lattice_cache_validate((Lattice *)ob->data);
+      break;
+    case OB_HAIR:
+      //EVEM_hair_cache_validate((Hair *)ob->data);
+      break;
+    default:
+      break;
 	}
+}
 
-	struct Mesh * mesh = (struct Mesh *)ob->data; // blender object mesh data
-	//printf("%d polys\n", mesh->totpoly);
+void EVEM_update_object(Object *ob, ObjectInfo *ob_info) {
 
-	uint vtc_count = mesh->totvert;
-	uint tri_count = poly_to_tri_count(mesh->totpoly, mesh->totloop );
-	printf("%d tris\n", tri_count);
+}
+
+
+void EVEM_mesh_object_clear(Mesh *me) {
+
+}
+
+void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
+  printf("EVEM_mesh_object_create\n");
+	clock_t tstart = clock();
+
+
+	//if(!_scene_is_empty) {
+	//	if (rtcGetGeometry(evem_data.scene, ob_info->id)) {
+	//		printf("Mesh geometry with embree id %u for object %s already exist in Embree scene !\n", ob_info->id, ob_info->ob->id.name);
+	//		return;
+	//	}
+	//}
+
+
+	uint vtc_count = me->totvert;
+	uint tri_count = poly_to_tri_count(me->totpoly, me->totloop );
 
 	RTCGeometry geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_TRIANGLE); // embree geometry
 	rtcSetGeometryBuildQuality(geometry, RTC_BUILD_QUALITY_HIGH);
 	//rtcSetGeometryTimeStepCount(geometry, 0);
-	rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT3X4_ROW_MAJOR, (const float *)&ob->obmat); // set transform
+	//rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT3X4_ROW_MAJOR, (const float *)&ob->obmat); // set transform
 
 	/* map triangle and vertex buffer */
   EVEM_Vertex3f* vertices  = (EVEM_Vertex3f*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(EVEM_Vertex3f), vtc_count);
   EVEM_Triangle* triangles = (EVEM_Triangle*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EVEM_Triangle), tri_count);
 
   // fill vertex buffer
+  #pragma omp parallel for num_threads(8)
   for (int i = 0; i < vtc_count; i++) {
-  	vertices[i].x = mesh->mvert[i].co[0];
-  	vertices[i].y = mesh->mvert[i].co[1];
-  	vertices[i].z = mesh->mvert[i].co[2];
+  	vertices[i].x = me->mvert[i].co[0];
+  	vertices[i].y = me->mvert[i].co[1];
+  	vertices[i].z = me->mvert[i].co[2];
   }
 	
   // fill triangles buffer
@@ -156,31 +186,46 @@ void EVEM_create_trimesh_geometry(Object *ob) {
   
   MPoly *curr_mpoly;
 
-  for (int i = 0; i < mesh->totpoly; i++) {
-  	curr_mpoly = &mesh->mpoly[i];
+  //#pragma omp parallel for num_threads(8) private(curr_mpoly)  reduction(+:ti)
+  for (int i = 0; i < me->totpoly; i++) {
+  	uint curr_idx = ti;
+  	curr_mpoly = &me->mpoly[i];
   	
-  	if (curr_mpoly->totloop == 3) {
-  		// triangle ...
-  		triangles[ti].v0 = mesh->mloop[curr_mpoly->loopstart].v;
-  		triangles[ti].v1 = mesh->mloop[curr_mpoly->loopstart+1].v;
-  		triangles[ti].v2 = mesh->mloop[curr_mpoly->loopstart+2].v;
-  		ti++;
-  	} else if(curr_mpoly->totloop > 3) {
-  		// ngon ...
-  	
+  	switch(curr_mpoly->totloop) {
+  		case 3:
+  			// triangle
+  			ti+=1;
+  			triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+  			triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+1].v;
+  			triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+2].v;
+  			break;
+  		case 4:
+  			// quad
+  		  ti+=2;
+  			triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+  			triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+1].v;
+  			triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+2].v;
+				curr_idx++;
+				triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+  			triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+2].v;
+  			triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+3].v;
+  			break;
+  		default:
+  			// ngon
+  			break; 
   	}
   }
 
 	// final steps 
 	//rtcEnableGeometry(geometry);
 	rtcCommitGeometry(geometry);
-  rtcAttachGeometryByID(evem_data.scene, geometry, ob_id); // Attach geometry to Embree scene
+  ob_info->id = rtcAttachGeometry(evem_data.scene, geometry); // Attach geometry to Embree scene
   //rtcReleaseGeometry(geometry);
 
   _scene_is_empty = false;
 
   clock_t tend = clock();
-  printf("Geoemtry synced in %f seconds\n", (double)(tend - tstart) / CLOCKS_PER_SEC);
+  printf("Mesh geometry for object %s with embree id %u added in %f seconds\n",  ob_info->ob->id.name, ob_info->id, (double)(tend - tstart) / CLOCKS_PER_SEC);
 }
 
 void EVEM_object_update_transform(Object *ob) {

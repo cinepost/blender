@@ -10,6 +10,7 @@
 #include "DNA_mesh_types.h"
 
 #include "eevee_private.h"
+#include "eevee_embree_objects.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -35,6 +36,7 @@ typedef double EVEM_Vec3d[3];
 //typedef struct EVEM_Matrix44f EVEM_Matrix44f;
 typedef float EVEM_Matrix44f[4][4];
 typedef double EVEM_Matrix44d[4][4];
+
 
 /* embree rays(packets) buffer*/
 struct EeveeEmbreeRaysBuffer {
@@ -67,9 +69,11 @@ void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow);
 void EVEM_free(void);
 
-void EVEM_add_test_geo(void);
-void EVEM_object_update_transform(Object *ob);
-void EVEM_create_trimesh_geometry(Object *ob);
+void EVEM_create_object(Object *ob, ObjectInfo *ob_info);
+void EVEM_update_object(Object *ob, ObjectInfo *ob_info);
+
+void EVEM_mesh_object_clear(Mesh *me);
+void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info);
 
 void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff);
 

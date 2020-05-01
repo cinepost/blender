@@ -81,6 +81,7 @@ set(SRC
   engines/eevee/eevee_effects.c
   engines/eevee/eevee_engine.c
   engines/eevee/eevee_embree.c
+  engines/eevee/eevee_embree_objects.c
   engines/eevee/eevee_lightcache.c
   engines/eevee/eevee_lightprobes.c
   engines/eevee/eevee_lights.c
@@ -168,6 +169,7 @@ set(SRC
   intern/smaa_textures.h
   engines/basic/basic_engine.h
   engines/eevee/eevee_embree.h
+  engines/eevee/eevee_embree_objects.h
   engines/eevee/eevee_occlusion_trace.h
   engines/eevee/eevee_engine.h
   engines/eevee/eevee_lightcache.h

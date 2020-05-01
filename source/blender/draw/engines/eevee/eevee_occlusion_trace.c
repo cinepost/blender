@@ -501,7 +501,7 @@ void PVZ_occlusion_trace_compute_embree(void) {
   gettimeofday(&t_end, NULL);
   elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
 
-  printf("test trace occlusion done in %f seconds with %d rays \n", elapsed_time, ao_cpu_buff.w*ao_cpu_buff.h);
+  printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, ao_cpu_buff.w*ao_cpu_buff.h);
 }
 
 #pragma GCC pop_options
