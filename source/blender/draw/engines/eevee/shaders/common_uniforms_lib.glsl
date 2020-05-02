@@ -5,7 +5,7 @@ layout(std140) uniform common_block
   vec4 viewVecs[2];
   vec2 mipRatio[10]; /* To correct mip level texel misalignment */
   /* Ambient Occlusion */
-  vec4 aoParameters[2];
+  vec4 aoParameters[3];
   /* Volumetric */
   ivec4 volTexSize;
   vec4 volDepthParameters; /* Parameters to the volume Z equation */

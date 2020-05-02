@@ -46,6 +46,8 @@
 
 #include "eevee_private.h"
 
+#include "eevee_embree.h"
+
 /* Return true if init properly. */
 bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *depsgraph)
 {
@@ -215,6 +217,7 @@ void EEVEE_render_cache(void *vedata,
 
   if (ob_visibility & OB_VISIBLE_SELF) {
     if (ELEM(ob->type, OB_MESH, OB_CURVE, OB_SURF, OB_FONT, OB_MBALL)) {
+      EVEM_objects_cache_populate(vedata, sldata, ob, &cast_shadow);
       EEVEE_materials_cache_populate(vedata, sldata, ob, &cast_shadow);
     }
     else if (ob->type == OB_HAIR) {

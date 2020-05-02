@@ -80,6 +80,7 @@ extern struct EeveeEmbreeData evem_data;
 
 static struct EeveeEmbreeRaysBuffer prim_rays_buff = {.rays=NULL, .rays16=NULL, .rays8=NULL, .rays4=NULL, .w=0, .h=0};
 
+extern char datatoc_ambient_occlusion_lib_glsl[];
 extern char datatoc_ambient_occlusion_trace_lib_glsl[];
 extern char datatoc_common_view_lib_glsl[];
 extern char datatoc_common_uniforms_lib_glsl[];
@@ -91,6 +92,7 @@ static void eevee_create_shader_occlusion_trace(void)
   char *frag_str = BLI_string_joinN(datatoc_common_view_lib_glsl,
                                     datatoc_common_uniforms_lib_glsl,
                                     datatoc_bsdf_common_lib_glsl,
+                                    datatoc_ambient_occlusion_lib_glsl,
                                     datatoc_ambient_occlusion_trace_lib_glsl,
                                     datatoc_effect_gtao_trace_frag_glsl);
 

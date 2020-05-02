@@ -619,43 +619,16 @@ void EEVEE_materials_init(EEVEE_ViewLayerData *sldata,
 
   const DRWContextState *draw_ctx = DRW_context_state_get();
   const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
-  
-  /* if gtao type changed we need to rebuild shadres */
-  /*
-  bool rebuild_materials = false;
-  if ((scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) && (e_data.gtao_trace != true)) {
-    rebuild_materials = true;
-    e_data.gtao_trace = true;
-  } else if (!(scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) && (e_data.gtao_trace == true)) {
-    rebuild_materials = true;
-    e_data.gtao_trace = false;
-  } else {
-    rebuild_materials = false;
-  }
 
-  rebuild_materials = false;
 
-  if(rebuild_materials){
-    EEVEE_materials_free();
-    printf("%s\n", "rebuild");
-  }
-  */
-
-  if (!e_data.frag_shader_lib){// || rebuild_materials) {
-    char *amb_occlusion_lib = datatoc_ambient_occlusion_trace_lib_glsl;
-    //if (e_data.gtao_trace) {
-    //  printf("%s\n", "mat gtao trace");
-    //} else {
-    //   amb_occlusion_lib = datatoc_ambient_occlusion_lib_glsl;
-    //  printf("%s\n", "mat gtao");
-    //}
-    
+  if (!e_data.frag_shader_lib){
     /* Shaders */
     e_data.frag_shader_lib = BLI_string_joinN(datatoc_common_view_lib_glsl,
                                               datatoc_common_uniforms_lib_glsl,
                                               datatoc_bsdf_common_lib_glsl,
                                               datatoc_bsdf_sampling_lib_glsl,
-                                              amb_occlusion_lib, //datatoc_ambient_occlusion_lib_glsl,
+                                              datatoc_ambient_occlusion_lib_glsl,
+                                              datatoc_ambient_occlusion_trace_lib_glsl,
                                               datatoc_raytrace_lib_glsl,
                                               datatoc_ssr_lib_glsl,
                                               datatoc_octahedron_lib_glsl,
