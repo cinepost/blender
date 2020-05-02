@@ -90,6 +90,7 @@ int EEVEE_occlusion_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
       eevee_create_shader_occlusion();
     }
 
+    common_data->ao_embree = 0.0f;
     common_data->ao_dist = scene_eval->eevee.gtao_distance;
     common_data->ao_factor = scene_eval->eevee.gtao_factor;
     common_data->ao_quality = 1.0f - scene_eval->eevee.gtao_quality;

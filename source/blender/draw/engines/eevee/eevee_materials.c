@@ -71,15 +71,13 @@ static struct {
 
   uint sss_count;
 
-  bool gtao_trace;
-
   float noise_offsets[3];
 } e_data = {NULL}; /* Engine data */
 
 extern char datatoc_lights_lib_glsl[];
 extern char datatoc_lightprobe_lib_glsl[];
 extern char datatoc_ambient_occlusion_lib_glsl[];
-extern char datatoc_ambient_occlusion_trace_lib_glsl[];
+extern char datatoc_ambient_occlusion_embree_lib_glsl[];
 extern char datatoc_prepass_frag_glsl[];
 extern char datatoc_prepass_vert_glsl[];
 extern char datatoc_default_frag_glsl[];
@@ -617,18 +615,19 @@ void EEVEE_materials_init(EEVEE_ViewLayerData *sldata,
   
   EEVEE_PrivateData *g_data = stl->g_data;
 
+  /* if we've changed from ssao to embree or back we need to recompile shaders */
   const DRWContextState *draw_ctx = DRW_context_state_get();
   const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
-
-
+  
   if (!e_data.frag_shader_lib){
     /* Shaders */
+
     e_data.frag_shader_lib = BLI_string_joinN(datatoc_common_view_lib_glsl,
                                               datatoc_common_uniforms_lib_glsl,
                                               datatoc_bsdf_common_lib_glsl,
                                               datatoc_bsdf_sampling_lib_glsl,
                                               datatoc_ambient_occlusion_lib_glsl,
-                                              datatoc_ambient_occlusion_trace_lib_glsl,
+                                              datatoc_ambient_occlusion_embree_lib_glsl,
                                               datatoc_raytrace_lib_glsl,
                                               datatoc_ssr_lib_glsl,
                                               datatoc_octahedron_lib_glsl,

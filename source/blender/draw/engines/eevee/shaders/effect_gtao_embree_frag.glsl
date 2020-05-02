@@ -23,11 +23,11 @@ void main()
   vec3 V = viewCameraVec;
   vec3 N = normal_decode(texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0).rg, V);
   vec3 nN = normalize(transform_direction(ViewMatrixInverse, N));
-  vec4 noise = texelfetch_noise_tex(gl_FragCoord.xy);
+  vec4 rand = texelfetch_noise_tex(gl_FragCoord.xy);
   //vec4 rand = texelFetch(utilTex, ivec3(ivec2(gl_FragCoord.xy) % LUT_SIZE, 2.0), 0);
   
   //outWNrm = randomCosineWeightedHemispherePoint(rand.xyz, nN);
-  outWNrm = randomHemispherePoint(noise.xyz, nN);
+  outWNrm = randomHemispherePoint(rand.xyz, nN);
   outWPos = get_world_space_from_depth(uvcoordsvar.xy, texelFetch(depthBuffer, ivec2(gl_FragCoord.xy), 0).r);
 }
 
@@ -37,24 +37,32 @@ out vec4 FragColor;
 
 #ifdef DEBUG_AO
 
-in vec4 uvcoordsvar;
-uniform sampler2D normalBuffer;
-
-void main()
-{
-  FragColor = vec4(1.0) * embree_occlusion();
-}
-
-#else
-
 #    define gtao_depthBuffer depthBuffer
 #    define gtao_textureLod(a, b, c) textureLod(a, b, c)
 
 in vec4 uvcoordsvar;
 uniform sampler2D normalBuffer;
 
-void main()
-{
+void main() {
+  vec2 uvs = saturate(gl_FragCoord.xy / vec2(textureSize(gtao_depthBuffer, 0).xy));
+  float depth = gtao_textureLod(gtao_depthBuffer, uvs, 0.0).r;
+
+  if (depth == 1.0) {
+    /* to look like the builtin one */
+    FragColor = vec4(0.0);
+    return;
+  }
+
+  FragColor = vec4(1.0) * embree_occlusion();
+}
+
+#else
+
+in vec4 uvcoordsvar;
+uniform sampler2D normalBuffer;
+
+void main() {
+
   FragColor = vec4(1.0) * embree_occlusion();
 }
 #endif

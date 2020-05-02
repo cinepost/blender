@@ -231,6 +231,8 @@ typedef struct EEVEE_PassList {
   /* Effects */
   struct DRWPass *ao_trace;
   struct DRWPASS *ao_trace_pos;
+  struct DRWPass *ao_embree_debug;
+
   struct DRWPass *ao_horizon_search;
   struct DRWPass *ao_horizon_search_layer;
   struct DRWPass *ao_horizon_debug;
@@ -299,8 +301,10 @@ typedef struct EEVEE_PassList {
 
 typedef struct EEVEE_FramebufferList {
   /* Effects */
-  struct GPUFrameBuffer *gtao_fb;
+  struct GPUFrameBuffer *gtao_embree_fb;
   struct GPUFrameBuffer *gtao_nd_fb;
+
+  struct GPUFrameBuffer *gtao_fb;
   struct GPUFrameBuffer *gtao_debug_fb;
   struct GPUFrameBuffer *downsample_fb;
   struct GPUFrameBuffer *bloom_blit_fb;

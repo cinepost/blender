@@ -64,13 +64,13 @@ float embree_occlusion_denoised_55() {
 
 void gtao_deferred_embree(vec3 normal, vec4 noise, float frag_depth, out float visibility, out vec3 bent_normal)
 {
-  visibility = embree_occlusion_denoised_55();
+  visibility = embree_occlusion();
   bent_normal = normal;
 }
 
 void gtao_embree(vec3 normal, vec3 position, vec4 noise, out float visibility, out vec3 bent_normal)
 {
-  visibility = embree_occlusion_denoised_55();
+  visibility = embree_occlusion();
   bent_normal = normal;
 }
 

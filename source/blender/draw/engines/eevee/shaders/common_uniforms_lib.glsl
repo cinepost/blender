@@ -66,6 +66,12 @@ layout(std140) uniform common_block
 #define aoQuality aoParameters[1].z
 #define aoSettings aoParameters[1].w
 
+/* embree aoParameters */
+#define aoEmbree aoParameters[2].x
+#define aoEmbreeDenoise aoParameters[2].y 
+#define aoNoop1 aoParameters[2].z /* UNUSED */
+#define aoNoop2 aoParameters[2].w /* UNUSED */
+
 /* ssrParameters */
 #define ssrQuality ssrParameters.x
 #define ssrThickness ssrParameters.y

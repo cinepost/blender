@@ -118,6 +118,9 @@ static void eevee_cache_init(void *vedata)
   EEVEE_materials_cache_init(sldata, vedata);
   EEVEE_motion_blur_cache_init(sldata, vedata);
 
+  //EEVEE_occlusion_cache_init(sldata, vedata);
+  //EEVEE_occlusion_trace_cache_init(sldata, vedata);
+  
   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
