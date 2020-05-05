@@ -149,8 +149,10 @@ class RENDER_PT_eevee_ambient_occlusion(RenderButtonsPanel, Panel):
         col.prop(props, "gtao_quality")
         col.prop(props, "use_gtao_bent_normals")
         col.prop(props, "use_gtao_bounce")
+
         col.prop(props, "use_gtao_trace")
         col.prop(props, "use_gtao_gpubuff")
+        col.prop(props, "use_gtao_denoise")
 
 
 class RENDER_PT_eevee_motion_blur(RenderButtonsPanel, Panel):

@@ -1701,6 +1701,13 @@ static void rna_Scene_mesh_quality_update(Main *bmain, Scene *UNUSED(scene), Poi
   rna_Scene_glsl_update(bmain, scene, ptr);
 }
 
+/* PVZ function... useless for now */
+static void rna_Scene_gtao_mode_update(Main *bmain, Scene *UNUSED(scene), PointerRNA *ptr)
+{
+  Scene *scene = (Scene *)ptr->owner_id;
+  rna_Scene_glsl_update(bmain, scene, ptr);
+}
+
 void rna_Scene_freestyle_update(Main *UNUSED(bmain), Scene *UNUSED(scene), PointerRNA *ptr)
 {
   Scene *scene = (Scene *)ptr->owner_id;
@@ -7037,9 +7044,9 @@ static void rna_def_scene_eevee(BlenderRNA *brna)
   prop = RNA_def_property(srna, "use_gtao_trace", PROP_BOOLEAN, PROP_NONE);
   RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_GTAO_TRACE);
   RNA_def_property_ui_text(
-      prop, "Ray Trace", "Compute ray traced occlusion");
+      prop, "Embree", "Compute ray traced occlusion");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
-  RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
+  RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, "rna_Scene_gtao_mode_update");
 
   prop = RNA_def_property(srna, "use_gtao_gpubuff", PROP_BOOLEAN, PROP_NONE);
   RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_GTAO_GPUBUFF);
@@ -7047,6 +7054,13 @@ static void rna_def_scene_eevee(BlenderRNA *brna)
       prop, "GPU buff", "Use gpu buffer for occlusion");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
+
+  prop = RNA_def_property(srna, "use_gtao_denoise", PROP_BOOLEAN, PROP_NONE);
+  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_GTAO_EMBREE_DENOISE);
+  RNA_def_property_ui_text(
+      prop, "Denoise", "Denoise embree occlusion");
+  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
+  RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, "rna_Scene_gtao_mode_update");
 
   /* Depth of Field */
   prop = RNA_def_property(srna, "bokeh_max_size", PROP_FLOAT, PROP_PIXEL);

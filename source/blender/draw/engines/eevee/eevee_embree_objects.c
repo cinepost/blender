@@ -25,8 +25,8 @@ void _evem_ob_free_item(void *node) {
 }
 
 void _evem_ob_map_grow(void) {
-	if (embree_objects_map.size < embree_objects_map.alloc_size)
-		return; // it's too early to grow 
+	if(!embree_objects_map.items || (embree_objects_map.size < embree_objects_map.alloc_size))
+		return;
 	
 	ObjectsMapItem *tmp = malloc(sizeof(embree_objects_map.items));
 	memcpy(tmp, embree_objects_map.items, sizeof(embree_objects_map.items));
@@ -65,6 +65,9 @@ void EVEM_objects_map_free(void) {
 // The function that inserts an item into the tree.
 //
 ObjectInfo *EVEM_insert_object(const Object *ob) {
+	if(!ob || !embree_objects_map.items)
+		return NULL;
+
 	printf("EVEM_insert_object: %s\n", ob->id.name);
 	//
 	// Create the (new) item
@@ -90,11 +93,9 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
     // The new item is not needed anymore:
     free(new_item);
   }
-
   // We've just inserted element, let's store it in items
   _evem_ob_map_grow();
   embree_objects_map.items[embree_objects_map.size++] = new_item;
-
   return &(*item_in_tree)->info;
 }
 

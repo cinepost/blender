@@ -192,6 +192,7 @@ set(LIB
 
 data_to_c_simple(engines/eevee/shaders/ambient_occlusion_embree_lib.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/effect_gtao_embree_frag.glsl SRC)
+data_to_c_simple(engines/eevee/shaders/effect_gtao_embree_denoise_frag.glsl SRC)
 
 data_to_c_simple(engines/eevee/shaders/ambient_occlusion_lib.glsl SRC)
 data_to_c_simple(engines/eevee/shaders/default_frag.glsl SRC)

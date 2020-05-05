@@ -592,6 +592,8 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
     /* Create minmax texture */
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
 
+
+    /* Ambient occlusion */
     if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {

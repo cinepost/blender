@@ -47,16 +47,13 @@ extern struct EeveeEmbreeData evem_data;
 static void eevee_engine_init(void *ved)
 {
   printf("%s\n", "eevee_engine_init");
+  
   EEVEE_Data *vedata = (EEVEE_Data *)ved;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();
   DefaultTextureList *dtxl = DRW_viewport_texture_list_get();
-
-  /* Embree part */
-  EVEM_init();
-  /***************/
 
   const DRWContextState *draw_ctx = DRW_context_state_get();
   View3D *v3d = draw_ctx->v3d;
@@ -118,10 +115,10 @@ static void eevee_cache_init(void *vedata)
   EEVEE_materials_cache_init(sldata, vedata);
   EEVEE_motion_blur_cache_init(sldata, vedata);
 
-  //EEVEE_occlusion_cache_init(sldata, vedata);
-  //EEVEE_occlusion_trace_cache_init(sldata, vedata);
-  
+  //EEVEE_screen_raytrace_cache_init(sldata, vedata);
+
   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+    EVEM_init();
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
     EEVEE_occlusion_cache_init(sldata, vedata);
@@ -275,7 +272,6 @@ static void eevee_draw_scene(void *vedata)
     EEVEE_lightprobes_refresh(sldata, vedata);
     EEVEE_lightprobes_refresh_planar(sldata, vedata);
     DRW_stats_group_end();
-
     /* Refresh shadows */
     DRW_stats_group_start("Shadows");
     EEVEE_shadows_draw(sldata, vedata, stl->effects->taa_view);
@@ -304,7 +300,6 @@ static void eevee_draw_scene(void *vedata)
     SET_FLAG_FROM_TEST(clear_bits, !DRW_state_draw_background(), GPU_COLOR_BIT);
     SET_FLAG_FROM_TEST(clear_bits, (stl->effects->enabled_effects & EFFECT_SSS), GPU_STENCIL_BIT);
     GPU_framebuffer_clear(fbl->main_fb, clear_bits, clear_col, clear_depth, clear_stencil);
-
     /* Depth prepass */
     DRW_stats_group_start("Prepass");
     DRW_draw_pass(psl->depth_pass);
@@ -315,13 +310,11 @@ static void eevee_draw_scene(void *vedata)
     DRW_stats_group_start("Main MinMax buffer");
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
     DRW_stats_group_end();
-
     if (_scene->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
     }
-
     EEVEE_volumes_compute(sldata, vedata);
 
     /* Shading pass */
@@ -332,7 +325,6 @@ static void eevee_draw_scene(void *vedata)
     EEVEE_materials_draw_opaque(sldata, psl);
     EEVEE_subsurface_data_render(sldata, vedata);
     DRW_stats_group_end();
-
     /* Effects pre-transparency */
     EEVEE_subsurface_compute(sldata, vedata);
     EEVEE_reflection_compute(sldata, vedata);
@@ -341,20 +333,16 @@ static void eevee_draw_scene(void *vedata)
       DRW_draw_pass(psl->probe_display);
     }
     EEVEE_refraction_compute(sldata, vedata);
-
     /* Opaque refraction */
     DRW_stats_group_start("Opaque Refraction");
     DRW_draw_pass(psl->refract_depth_pass);
     DRW_draw_pass(psl->refract_depth_pass_cull);
     DRW_draw_pass(psl->refract_pass);
     DRW_stats_group_end();
-
     /* Volumetrics Resolve Opaque */
     EEVEE_volumes_resolve(sldata, vedata);
-
     /* Renderpasses */
     EEVEE_renderpasses_output_accumulate(sldata, vedata, false);
-
     /* Transparent */
     /* TODO(fclem): should be its own Framebuffer.
      * This is needed because dualsource blending only works with 1 color buffer. */
@@ -363,7 +351,6 @@ static void eevee_draw_scene(void *vedata)
     DRW_draw_pass(psl->transparent_pass);
     GPU_framebuffer_bind(fbl->main_fb);
     GPU_framebuffer_texture_detach(fbl->main_color_fb, dtxl->depth);
-
     /* Post Process */
     DRW_stats_group_start("Post FX");
     EEVEE_draw_effects(sldata, vedata);

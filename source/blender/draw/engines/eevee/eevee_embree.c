@@ -42,7 +42,7 @@ void EVEM_init(void) {
     printf("%s\n", "create embree scene");
     evem_data.scene = rtcNewScene(evem_data.device);
     assert(evem_data.scene);
-    rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_DYNAMIC);
+    rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_DYNAMIC);
     rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
   }
 
@@ -102,6 +102,9 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
   ObjectInfo *ob_info = EVEM_find_object_info(ob);
   if(!ob_info) {
     ob_info = EVEM_insert_object(ob);
+    if (!ob_info)
+      return; // trying to insert object into unitialized map
+
     EVEM_create_object(ob, ob_info);
   } else {
     EVEM_update_object(ob, ob_info);

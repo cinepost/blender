@@ -443,7 +443,7 @@ GPUMaterial *DRW_shader_create_from_material(struct Scene *scene,
   if (DRW_state_is_image_render()) {
     mat = GPU_material_from_nodetree_find(&ma->gpumaterial, engine_type, options);
   }
-
+  
   if (mat == NULL) {
     scene = (Scene *)DEG_get_original_id(&DST.draw_ctx.scene->id);
     mat = GPU_material_from_nodetree(scene,

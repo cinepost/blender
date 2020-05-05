@@ -2383,6 +2383,7 @@ enum {
 
   SCE_EEVEE_GTAO_TRACE = (1 << 22),
   SCE_EEVEE_GTAO_GPUBUFF = (1 << 23),
+  SCE_EEVEE_GTAO_EMBREE_DENOISE = (1 << 24),
 };
 
 /* SceneEEVEE->shadow_method */

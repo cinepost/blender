@@ -440,7 +440,7 @@ static void add_standard_uniforms(DRWShadingGroup *shgrp,
   }
   if ((use_diffuse || use_glossy) && !use_ssrefraction) {
     DRW_shgroup_uniform_texture_ref(shgrp, "horizonBuffer", &effects->gtao_horizons);
-    DRW_shgroup_uniform_texture_ref(shgrp, "ao_traceBuffer", &effects->gtao_trace_hits);
+    DRW_shgroup_uniform_texture_ref(shgrp, "aoEmbreeBuffer", &effects->gtao_embree_final);
   }
   if (use_diffuse) {
     DRW_shgroup_uniform_texture_ref(shgrp, "irradianceGrid", &lcache->grid_tx.tex);
@@ -618,7 +618,7 @@ void EEVEE_materials_init(EEVEE_ViewLayerData *sldata,
   /* if we've changed from ssao to embree or back we need to recompile shaders */
   const DRWContextState *draw_ctx = DRW_context_state_get();
   const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
-  
+
   if (!e_data.frag_shader_lib){
     /* Shaders */
 

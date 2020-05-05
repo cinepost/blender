@@ -1,65 +1,10 @@
 /* aoSettings flags */
 #define USE_AO_TRACE 8
 
-uniform sampler2D ao_traceBuffer;
+uniform sampler2D aoEmbreeBuffer;
 
 float embree_occlusion() {
-  return texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy), 0).r;
-}
-
-float embree_occlusion_denoised_33() { 
-  float ao[9];
-
-  ao[0] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,-1), 0).r * 0.0625;
-  ao[1] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(0,-1), 0).r * 0.125;
-  ao[2] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,-1), 0).r * 0.0625;
-
-  ao[3] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,0), 0).r * 0.125;
-  ao[4] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy), 0).r * 0.25;
-  ao[5] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,0), 0).r * 0.125;
-
-  ao[6] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,1), 0).r * 0.0625;
-  ao[7] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(0,1), 0).r * 0.125;
-  ao[8] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,1), 0).r * 0.0625;
-
-  return ao[0] + ao[1] + ao[2] + ao[3] + ao[4] + ao[5] + ao[6] + ao[7] + ao[8];
-}
-
-float embree_occlusion_denoised_55() { 
-  float ao[25];
-
-  ao[0] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-2,-2), 0).r * 0.0030;
-  ao[1] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,-2), 0).r * 0.0133;
-  ao[2] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(0,-2), 0).r * 0.0219;
-  ao[3] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,-2), 0).r * 0.0133;
-  ao[4] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(2,-2), 0).r * 0.0030;
-
-  ao[5] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-2,-1), 0).r * 0.0133;
-  ao[6] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,-1), 0).r * 0.0596;
-  ao[7] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(0,-1), 0).r * 0.0983;
-  ao[8] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,-1), 0).r * 0.0596;
-  ao[9] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(2,-1), 0).r * 0.0133;
-
-  ao[10] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-2,0), 0).r * 0.0219;
-  ao[11] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,0), 0).r * 0.0983;
-  ao[12] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(0,0), 0).r * 0.1621;
-  ao[13] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,0), 0).r * 0.0983;
-  ao[14] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(2,0), 0).r * 0.0219;
-
-  ao[15] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-2,1), 0).r * 0.0133;
-  ao[16] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,1), 0).r * 0.0596;
-  ao[17] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(0,1), 0).r * 0.0983;
-  ao[18] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,1), 0).r * 0.0596;
-  ao[19] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(2,1), 0).r * 0.0133;
-
-  ao[20] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-2,2), 0).r * 0.0030;
-  ao[21] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(-1,2), 0).r * 0.0133;
-  ao[22] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(0,2), 0).r * 0.0219;
-  ao[23] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(1,2), 0).r * 0.0133;
-  ao[24] = texelFetch(ao_traceBuffer, ivec2(gl_FragCoord.xy) + ivec2(2,2), 0).r * 0.0030;
-
-  return ao[0] + ao[1] + ao[2] + ao[3] + ao[4] + ao[5] + ao[6] + ao[7] + ao[8] + ao[9] + ao[10] + ao[11] + ao[12] + ao[13] + ao[14] + ao[15] +
-    ao[16] + ao[17] + ao[18] + ao[19] + ao[20] + ao[21] + ao[22] + ao[23] + ao[24];
+  return texelFetch(aoEmbreeBuffer, ivec2(gl_FragCoord.xy), 0).r;
 }
 
 void gtao_deferred_embree(vec3 normal, vec4 noise, float frag_depth, out float visibility, out vec3 bent_normal)

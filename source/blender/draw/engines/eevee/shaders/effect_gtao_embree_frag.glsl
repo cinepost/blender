@@ -8,8 +8,8 @@ uniform float rotationOffset;
 #ifdef AO_TRACE_POS
 
 // prepas for embree tracer
-layout(location = 0) out vec3 outWNrm;
-layout(location = 1) out vec3 outWPos;
+layout(location = 0) out mediump vec3 outWNrm;
+layout(location = 1) out highp vec3 outWPos;
 
 in vec4 rand;
 in vec4 uvcoordsvar;

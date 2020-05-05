@@ -2246,8 +2246,11 @@ void blo_do_versions_280(FileData *fd, Library *UNUSED(lib), Main *bmain)
         EEVEE_GET_BOOL(props, gtao_enable, SCE_EEVEE_GTAO_ENABLED);
         EEVEE_GET_BOOL(props, gtao_use_bent_normals, SCE_EEVEE_GTAO_BENT_NORMALS);
         EEVEE_GET_BOOL(props, gtao_bounce, SCE_EEVEE_GTAO_BOUNCE);
+        
         EEVEE_GET_BOOL(props, gtao_trace, SCE_EEVEE_GTAO_TRACE);
         EEVEE_GET_BOOL(props, gtao_gpubuff, SCE_EEVEE_GTAO_GPUBUFF);
+        EEVEE_GET_BOOL(props, gtao_denoise, SCE_EEVEE_GTAO_EMBREE_DENOISE);
+
         EEVEE_GET_BOOL(props, dof_enable, SCE_EEVEE_DOF_ENABLED);
         EEVEE_GET_BOOL(props, bloom_enable, SCE_EEVEE_BLOOM_ENABLED);
         EEVEE_GET_BOOL(props, motion_blur_enable, SCE_EEVEE_MOTION_BLUR_ENABLED);
