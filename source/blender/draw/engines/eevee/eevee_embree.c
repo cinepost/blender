@@ -19,9 +19,10 @@
 
 /* embree scene */
 
-struct EeveeEmbreeData evem_data = {NULL};
+struct EeveeEmbreeData evem_data = {NULL, .update_tlas = false, .update_blas = false};
 static bool _scene_is_empty = true; // HACK for being able to test geometry already sent to embree device.
 static bool _evem_inited = false;
+
 
 void EVEM_init(void) {
 	if (_evem_inited) return;
@@ -37,14 +38,6 @@ void EVEM_init(void) {
   evem_data.NATIVE_RAY16_ON = rtcGetDeviceProperty(evem_data.device, RTC_DEVICE_PROPERTY_NATIVE_RAY16_SUPPORTED);
   evem_data.RAY_STREAM_ON = rtcGetDeviceProperty(evem_data.device, RTC_DEVICE_PROPERTY_RAY_STREAM_SUPPORTED);
   evem_data.TASKING_SYSTEM = rtcGetDeviceProperty(evem_data.device, RTC_DEVICE_PROPERTY_TASKING_SYSTEM);
-
-  if (!evem_data.scene) {
-    printf("%s\n", "create embree scene");
-    evem_data.scene = rtcNewScene(evem_data.device);
-    assert(evem_data.scene);
-    rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_DYNAMIC);
-    rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
-  }
 
   _evem_inited = true;
   EVEM_print_capabilities();
@@ -106,10 +99,38 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
       return; // trying to insert object into unitialized map
 
     EVEM_create_object(ob, ob_info);
+    evem_data.update_tlas = true; // we've added geometry object, tlas needs to be updated
   } else {
     EVEM_update_object(ob, ob_info);
   }
-	rtcCommitScene(evem_data.scene);
+}
+
+/* here we acutally upate tlas */
+void EVEM_objects_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
+  if(!evem_data.update_tlas) return;
+
+  printf("EVEM_objects_cache_finish (update BLAS)\n");
+
+  if(evem_data.scene) rtcReleaseScene(evem_data.scene);
+  evem_data.scene = rtcNewScene(evem_data.device);
+  rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST); // rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_DYNAMIC);
+  rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
+
+  ObjectsMapItem *item;
+  RTCGeometry geometry; 
+  for (uint i=0; i<embree_objects_map.size; i++) {
+    item = embree_objects_map.items[i];
+    geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_INSTANCE);
+    rtcSetGeometryInstancedScene(geometry, item->info.escene);
+
+    rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, (const float *)&item->info.ob->obmat[0]);
+    
+    rtcCommitGeometry(geometry);
+    item->info.id = rtcAttachGeometry(evem_data.scene, geometry);
+  }
+
+  rtcCommitScene(evem_data.scene);
+  evem_data.update_tlas = false; // tlas already updated
 }
 
 void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
@@ -143,7 +164,13 @@ void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
 }
 
 void EVEM_update_object(Object *ob, ObjectInfo *ob_info) {
-
+  switch (ob->type) {
+    case OB_MESH:
+      EVEM_object_update_transform(ob, ob_info);
+      break;
+    default:
+      break;
+  }
 }
 
 
@@ -156,12 +183,10 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 	clock_t tstart = clock();
 
 
-	//if(!_scene_is_empty) {
-	//	if (rtcGetGeometry(evem_data.scene, ob_info->id)) {
-	//		printf("Mesh geometry with embree id %u for object %s already exist in Embree scene !\n", ob_info->id, ob_info->ob->id.name);
-	//		return;
-	//	}
-	//}
+	if (ob_info->escene) rtcReleaseScene(ob_info->escene);
+  ob_info->escene = rtcNewScene(evem_data.device);
+  rtcSetSceneFlags(ob_info->escene, RTC_SCENE_FLAG_ROBUST);
+  rtcSetSceneBuildQuality(ob_info->escene, RTC_BUILD_QUALITY_HIGH);
 
 
 	uint vtc_count = me->totvert;
@@ -169,8 +194,6 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 
 	RTCGeometry geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_TRIANGLE); // embree geometry
 	rtcSetGeometryBuildQuality(geometry, RTC_BUILD_QUALITY_HIGH);
-	//rtcSetGeometryTimeStepCount(geometry, 0);
-	//rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT3X4_ROW_MAJOR, (const float *)&ob->obmat); // set transform
 
 	/* map triangle and vertex buffer */
   EVEM_Vertex3f* vertices  = (EVEM_Vertex3f*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(EVEM_Vertex3f), vtc_count);
@@ -219,11 +242,9 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   	}
   }
 
-	// final steps 
-	//rtcEnableGeometry(geometry);
 	rtcCommitGeometry(geometry);
-  ob_info->id = rtcAttachGeometry(evem_data.scene, geometry); // Attach geometry to Embree scene
-  //rtcReleaseGeometry(geometry);
+  rtcAttachGeometryByID(ob_info->escene, geometry, 0);
+  rtcCommitScene(ob_info->escene);
 
   _scene_is_empty = false;
 
@@ -231,34 +252,21 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   printf("Mesh geometry for object %s with embree id %u added in %f seconds\n",  ob_info->ob->id.name, ob_info->id, (double)(tend - tstart) / CLOCKS_PER_SEC);
 }
 
-void EVEM_object_update_transform(Object *ob) {
+void EVEM_object_update_transform(Object *ob, ObjectInfo *ob_info) {
+  if(_scene_is_empty)return;
 	printf("%s\n", "embree update object");
 
-	if(_scene_is_empty)return;
+	RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
+  
+  if (!geometry) {
+    printf("%s\n", "Error can't update missing Embree geometry !");
+    return;
+  }
 
-	uint ob_id = ob->id.session_uuid; // object uuid
-	RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_id);
+  rtcSetGeometryInstancedScene(geometry, ob_info->escene);
 
-	if (!geometry) {
-		printf("%s\n", "Geometry already exist in Embree scene !");
-		return;
-	}
-
-	//float xfm[16] = {1.0f};
-  //xfm[0] = ob->loc[0];
-  //xfm[1] = ob->loc[1];
-  //xfm[2] = ob->loc[2];
-
-  //xfm[4] = ob->scale[0];
-  //xfm[5] = ob->scale[1];
-  //xfm[6] = ob->scale[2];
-
-  //printf("object location %f %f %f\n", ob->loc[0], ob->loc[1], ob->loc[2]);
-
-  //rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, xfm);
-  rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT3X4_ROW_MAJOR, (const float *)&ob->obmat); // set transform
-  //rtcCommitGeometry(geometry);
-  rtcCommitScene(evem_data.scene);
+  rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, (const float *)&ob->obmat[0]);
+  rtcCommitGeometry(geometry);
 
   printf("%s\n", "embree object updated");
 }

@@ -188,6 +188,7 @@ static void eevee_cache_finish(void *vedata)
   EEVEE_materials_cache_finish(sldata, vedata);
   EEVEE_lights_cache_finish(sldata, vedata);
   EEVEE_lightprobes_cache_finish(sldata, vedata);
+  EVEM_objects_cache_finish(sldata, vedata);
 
   EEVEE_effects_draw_init(sldata, vedata);
   EEVEE_volumes_draw_init(sldata, vedata);

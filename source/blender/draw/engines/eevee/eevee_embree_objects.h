@@ -30,6 +30,7 @@ typedef struct {
   Object *ob;
 	uint id; // embree geometry id
 	bool is_visible;
+  RTCScene escene;
 } ObjectInfo;
 
 typedef struct {
@@ -37,15 +38,15 @@ typedef struct {
   ObjectInfo  info; 
 } ObjectsMapItem;
 
-struct ObjectsMap {
-  void            *root;
-  ObjectsMapItem  **items;
-  uint size;        // used items size
-  uint alloc_size;  // allocated size in items count
-};
+typedef struct {
+  void           *root;
+  ObjectsMapItem **items;
+  uint size;       // used items size
+  uint alloc_size; // allocated size in items count
+} ObjectsMap;
 
 /* "private" functions */
-int   _evem_ob_map_compare(const void *l, const void *r);
+int _evem_ob_map_compare(const void *l, const void *r);
 void _evem_ob_free_item(void *node);
 
 /* Functions */
@@ -55,6 +56,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob);
 ObjectInfo *EVEM_find_object_info(const Object *ob);
 bool EVEM_object_exist(const Object *ob);
 
+extern ObjectsMap embree_objects_map;
 
 #ifdef  __cplusplus
 }

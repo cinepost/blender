@@ -10,7 +10,7 @@
 
 /* embree scene */
 
-static struct ObjectsMap embree_objects_map = {.root=NULL, .items=NULL, .size=0, .alloc_size=0};
+ObjectsMap embree_objects_map = {.root=NULL, .items=NULL, .size=0, .alloc_size=0};
 
 /* objects map */
 int _evem_ob_map_compare(const void *l, const void *r) {
@@ -76,6 +76,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
   new_item->key.ob = ob;
   new_item->info.ob = ob;
   new_item->info.is_visible = false;
+  new_item->info.escene = NULL;
 
 	//
 	// tsearch searches for a node with a specific key.

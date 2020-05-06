@@ -59,6 +59,9 @@ struct EeveeEmbreeData {
   bool NATIVE_RAY4_ON, NATIVE_RAY8_ON, NATIVE_RAY16_ON;
   bool RAY_STREAM_ON;
   uint TASKING_SYSTEM;
+
+  bool update_tlas; // top level acceleration structure need to be updated
+  bool update_blas; // bottom level acceleration structure need to be updated
 };
 
 
@@ -67,6 +70,8 @@ void EVEM_init(void);
 void EVEM_print_capabilities(void);
 void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow);
+void EVEM_objects_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+
 void EVEM_free(void);
 
 void EVEM_create_object(Object *ob, ObjectInfo *ob_info);
@@ -74,6 +79,7 @@ void EVEM_update_object(Object *ob, ObjectInfo *ob_info);
 
 void EVEM_mesh_object_clear(Mesh *me);
 void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info);
+void EVEM_object_update_transform(Object *ob, ObjectInfo *ob_info);
 
 void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff);
 
