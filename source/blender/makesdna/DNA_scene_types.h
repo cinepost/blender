@@ -1619,6 +1619,14 @@ typedef struct SceneEEVEE {
   float gtao_factor;
   float gtao_quality;
 
+  /* Embree rtao*/
+  int rtao_denoise_iterations;
+  float rtao_denoise_c_phi;
+  float rtao_denoise_n_phi;
+  float rtao_denoise_p_phi;
+  float rtao_gpubuff_bias;
+  char  _pad2[4];
+
   float bokeh_max_size;
   float bokeh_threshold;
 
@@ -2381,9 +2389,9 @@ enum {
   SCE_EEVEE_SHADOW_SOFT = (1 << 20),
   SCE_EEVEE_OVERSCAN = (1 << 21),
 
-  SCE_EEVEE_GTAO_TRACE = (1 << 22),
-  SCE_EEVEE_GTAO_GPUBUFF = (1 << 23),
-  SCE_EEVEE_GTAO_EMBREE_DENOISE = (1 << 24),
+  SCE_EEVEE_RTAO_TRACE = (1 << 22),
+  SCE_EEVEE_RTAO_GPUBUFF = (1 << 23),
+  SCE_EEVEE_RTAO_DENOISE = (1 << 24),
 };
 
 /* SceneEEVEE->shadow_method */

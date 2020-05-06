@@ -166,7 +166,7 @@ bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *
   EEVEE_materials_cache_init(sldata, vedata);
   EEVEE_motion_blur_cache_init(sldata, vedata);
 
-  if (scene->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+  if (scene->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
     EEVEE_occlusion_cache_init(sldata, vedata);
@@ -594,7 +594,7 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
 
 
     /* Ambient occlusion */
-    if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+    if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);

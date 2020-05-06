@@ -139,6 +139,7 @@ class RENDER_PT_eevee_ambient_occlusion(RenderButtonsPanel, Panel):
     def draw(self, context):
         layout = self.layout
         layout.use_property_split = True
+        
         scene = context.scene
         props = scene.eevee
 
@@ -150,9 +151,55 @@ class RENDER_PT_eevee_ambient_occlusion(RenderButtonsPanel, Panel):
         col.prop(props, "use_gtao_bent_normals")
         col.prop(props, "use_gtao_bounce")
 
-        col.prop(props, "use_gtao_trace")
-        col.prop(props, "use_gtao_gpubuff")
-        col.prop(props, "use_gtao_denoise")
+# Embree RTAO
+class RENDER_PT_eevee_rtao(RenderButtonsPanel, Panel):
+    bl_label = "Embree"
+    bl_options = {'DEFAULT_CLOSED'}
+    bl_parent_id = "RENDER_PT_eevee_ambient_occlusion"
+    COMPAT_ENGINES = {'BLENDER_EEVEE'}
+
+    def draw_header(self, context):
+        scene = context.scene
+        props = scene.eevee
+        self.layout.prop(props, "use_rtao_trace", text="")
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+
+        scene = context.scene
+        props = scene.eevee
+
+        layout.active = props.use_rtao_trace
+        layout.prop(props, "use_rtao_gpubuff", text="Use gpu buffers")
+        layout.prop(props, "rtao_gpubuff_bias", text="Bias")
+
+class RENDER_PT_eevee_rtao_denoise(RenderButtonsPanel, Panel):
+    bl_label = "Denoise"
+    bl_options = {'DEFAULT_CLOSED'}
+    bl_parent_id = "RENDER_PT_eevee_rtao"
+    COMPAT_ENGINES = {'BLENDER_EEVEE'}
+
+    def draw_header(self, context):
+        scene = context.scene
+        props = scene.eevee
+        self.layout.prop(props, "use_rtao_denoise", text="")
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+
+        scene = context.scene
+        props = scene.eevee
+
+        layout.active = props.use_rtao_denoise
+        col = layout.column()
+        col.prop(props, "rtao_denoise_iterations")
+
+        col = layout.column(align=True)
+        col.prop(props, "rtao_denoise_c_phi")
+        col.prop(props, "rtao_denoise_n_phi")
+        col.prop(props, "rtao_denoise_p_phi")
 
 
 class RENDER_PT_eevee_motion_blur(RenderButtonsPanel, Panel):
@@ -686,6 +733,8 @@ classes = (
     RENDER_PT_context,
     RENDER_PT_eevee_sampling,
     RENDER_PT_eevee_ambient_occlusion,
+    RENDER_PT_eevee_rtao,
+    RENDER_PT_eevee_rtao_denoise,
     RENDER_PT_eevee_bloom,
     RENDER_PT_eevee_depth_of_field,
     RENDER_PT_eevee_subsurface_scattering,

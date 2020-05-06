@@ -1,9 +1,9 @@
 layout(std140) uniform denoise_block
 {
+  float stepwidth;
   float c_phi;
   float n_phi;
   float p_phi;
-  float stepwidth;
 };
 
 uniform sampler2D aoEmbreeRawBuffer;

@@ -2166,6 +2166,13 @@ void blo_do_versions_280(FileData *fd, Library *UNUSED(lib), Main *bmain)
         scene->eevee.gtao_factor = 1.0f;
         scene->eevee.gtao_quality = 0.25f;
 
+        /* Embree rtao */
+        scene->eevee.rtao_denoise_iterations = 5;
+        scene->eevee.rtao_denoise_c_phi = 1.0f;
+        scene->eevee.rtao_denoise_n_phi = 0.1f;
+        scene->eevee.rtao_denoise_p_phi = 1.0f;
+        scene->eevee.rtao_gpubuff_bias = 0.005f;
+
         scene->eevee.bokeh_max_size = 100.0f;
         scene->eevee.bokeh_threshold = 1.0f;
 
@@ -2246,10 +2253,7 @@ void blo_do_versions_280(FileData *fd, Library *UNUSED(lib), Main *bmain)
         EEVEE_GET_BOOL(props, gtao_enable, SCE_EEVEE_GTAO_ENABLED);
         EEVEE_GET_BOOL(props, gtao_use_bent_normals, SCE_EEVEE_GTAO_BENT_NORMALS);
         EEVEE_GET_BOOL(props, gtao_bounce, SCE_EEVEE_GTAO_BOUNCE);
-        
-        EEVEE_GET_BOOL(props, gtao_trace, SCE_EEVEE_GTAO_TRACE);
-        EEVEE_GET_BOOL(props, gtao_gpubuff, SCE_EEVEE_GTAO_GPUBUFF);
-        EEVEE_GET_BOOL(props, gtao_denoise, SCE_EEVEE_GTAO_EMBREE_DENOISE);
+      
 
         EEVEE_GET_BOOL(props, dof_enable, SCE_EEVEE_DOF_ENABLED);
         EEVEE_GET_BOOL(props, bloom_enable, SCE_EEVEE_BLOOM_ENABLED);
@@ -2290,6 +2294,16 @@ void blo_do_versions_280(FileData *fd, Library *UNUSED(lib), Main *bmain)
         EEVEE_GET_FLOAT(props, gtao_distance);
         EEVEE_GET_FLOAT(props, gtao_factor);
         EEVEE_GET_FLOAT(props, gtao_quality);
+
+        /* Embree rtao */
+        EEVEE_GET_BOOL(props, rtao_trace, SCE_EEVEE_RTAO_TRACE);
+        EEVEE_GET_BOOL(props, rtao_gpubuff, SCE_EEVEE_RTAO_GPUBUFF);
+        EEVEE_GET_BOOL(props, rtao_denoise, SCE_EEVEE_RTAO_DENOISE);
+        EEVEE_GET_INT(props,  rtao_denoise_iterations);
+        EEVEE_GET_FLOAT(props, rtao_denoise_c_phi);
+        EEVEE_GET_FLOAT(props, rtao_denoise_n_phi);
+        EEVEE_GET_FLOAT(props, rtao_denoise_p_phi);
+        EEVEE_GET_FLOAT(props, rtao_gpubuff_bias);
 
         EEVEE_GET_FLOAT(props, bokeh_max_size);
         EEVEE_GET_FLOAT(props, bokeh_threshold);

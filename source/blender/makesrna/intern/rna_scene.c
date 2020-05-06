@@ -7041,47 +7041,59 @@ static void rna_def_scene_eevee(BlenderRNA *brna)
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
 
-  prop = RNA_def_property(srna, "use_gtao_trace", PROP_BOOLEAN, PROP_NONE);
-  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_GTAO_TRACE);
+  /* Embree RTAO */
+  prop = RNA_def_property(srna, "use_rtao_trace", PROP_BOOLEAN, PROP_NONE);
+  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_RTAO_TRACE);
   RNA_def_property_ui_text(
       prop, "Embree", "Compute ray traced occlusion");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, "rna_Scene_gtao_mode_update");
 
-  prop = RNA_def_property(srna, "use_gtao_gpubuff", PROP_BOOLEAN, PROP_NONE);
-  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_GTAO_GPUBUFF);
+  prop = RNA_def_property(srna, "use_rtao_gpubuff", PROP_BOOLEAN, PROP_NONE);
+  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_RTAO_GPUBUFF);
   RNA_def_property_ui_text(
       prop, "GPU buff", "Use gpu buffer for occlusion");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
 
-  prop = RNA_def_property(srna, "use_gtao_denoise", PROP_BOOLEAN, PROP_NONE);
-  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_GTAO_EMBREE_DENOISE);
+  prop = RNA_def_property(srna, "rtao_gpubuff_bias", PROP_FLOAT, PROP_NONE);
+  RNA_def_property_range(prop, 0.0f, 1.0f);
+  RNA_def_property_ui_range(prop, 0.0f, 1.0f, 0.01f, 5);
+  RNA_def_property_ui_text(prop, "Bias", "");
+  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
+  RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
+
+  prop = RNA_def_property(srna, "use_rtao_denoise", PROP_BOOLEAN, PROP_NONE);
+  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_RTAO_DENOISE);
   RNA_def_property_ui_text(
       prop, "Denoise", "Denoise embree occlusion");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
 
-  prop = RNA_def_property(srna, "rtao_denoise_iterations", PROP_FLOAT, PROP_NONE);
+  prop = RNA_def_property(srna, "rtao_denoise_iterations", PROP_INT, PROP_UNSIGNED);
   RNA_def_property_range(prop, 1, 10);
-  RNA_def_property_ui_text(prop, "Iterations", "Denoise wavelet iterations");
+  RNA_def_property_ui_range(prop, 0, 10, 1, 1);
+  RNA_def_property_ui_text(prop, "Iterations", "Wavelet denoise iterations");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
 
-  prop = RNA_def_property(srna, "rtao_denoise_c_phi", PROP_INT, PROP_NONE);
+  prop = RNA_def_property(srna, "rtao_denoise_c_phi", PROP_FLOAT, PROP_NONE);
   RNA_def_property_range(prop, 0.0f, 10.0f);
+  RNA_def_property_ui_range(prop, 0.0f, 10.0f, 0.1f, 3);
   RNA_def_property_ui_text(prop, "C_Phi", "");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
 
   prop = RNA_def_property(srna, "rtao_denoise_n_phi", PROP_FLOAT, PROP_NONE);
   RNA_def_property_range(prop, 0.0f, 10.0f);
+  RNA_def_property_ui_range(prop, 0.0f, 10.0f, 0.1f, 3);
   RNA_def_property_ui_text(prop, "N_Phi", "");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
 
   prop = RNA_def_property(srna, "rtao_denoise_p_phi", PROP_FLOAT, PROP_NONE);
   RNA_def_property_range(prop, 0.0f, 10.0f);
+  RNA_def_property_ui_range(prop, 0.0f, 10.0f, 0.1f, 3);
   RNA_def_property_ui_text(prop, "P_Phi", "");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);

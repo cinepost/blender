@@ -60,8 +60,8 @@ static struct EEVEE_EmbreeDenoiseUniformBufferData {
   float stepwidth;
   float c_phi;
   float n_phi;
-  float w_phi;
-} denoise_uniform_buffer_data = {.stepwidth=1.0, .c_phi=2.0, .n_phi=0.1, .w_phi=1.0};
+  float p_phi;
+} denoise_uniform_buffer_data = {.stepwidth=1.0, .c_phi=2.0, .n_phi=0.1, .p_phi=1.0};
 
 static struct {
   /* Ground Truth Ambient Occlusion */
@@ -75,8 +75,9 @@ static struct {
   Object *camera;
   bool use_gpu_buff;
   float ao_dist;
+  float gpu_bias;
   bool denoise;
-} e_data = {NULL, .denoise = false}; /* Engine data */
+} e_data = {NULL, .denoise = false, .gpu_bias=0.005}; /* Engine data */
 
 static struct {
   uint w, h; /* cpu buffer width, height*/
@@ -85,13 +86,16 @@ static struct {
   unsigned char *hits; /* embree occlusion hits buffer */ // TODO: try pack 4or8 hits in one byte
   float *norm;   /* world normal */
   float *pos;    /* world pos */
-} ao_cpu_buff = {.hits = NULL, .w=0, .h=0}; /* CPU ao data */
+} rtao_cpu_buff = {.hits = NULL, .w=0, .h=0}; /* CPU ao data */
 
 static struct {
   float *kernel;
   int   *offset;
 
-} ao_deonise_data = {NULL};
+  unsigned int iterations;
+  float c_phi, n_phi, p_phi;
+
+} rtao_deonise_data = {NULL};
 
 static struct RTCIntersectContext embree_context;
 
@@ -145,15 +149,23 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
   const DRWContextState *draw_ctx = DRW_context_state_get();
   const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
 
-  e_data.denoise = (scene_eval->eevee.flag & SCE_EEVEE_GTAO_EMBREE_DENOISE) ? true : false;
+  e_data.denoise = (scene_eval->eevee.flag & SCE_EEVEE_RTAO_DENOISE) ? true : false;
 
   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) {
     const float *viewport_size = DRW_viewport_size_get();
     const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};
 
+    /* UI data fetch */
+    rtao_deonise_data.iterations = scene_eval->eevee.rtao_denoise_iterations;
+    rtao_deonise_data.c_phi = scene_eval->eevee.rtao_denoise_c_phi;
+    rtao_deonise_data.n_phi = scene_eval->eevee.rtao_denoise_n_phi;
+    rtao_deonise_data.p_phi = scene_eval->eevee.rtao_denoise_p_phi;
+
+    e_data.gpu_bias = scene_eval->eevee.rtao_gpubuff_bias;
+
     /* Some usefull info*/
     e_data.use_gpu_buff = false;
-    if(scene_eval->eevee.flag & SCE_EEVEE_GTAO_GPUBUFF)
+    if(scene_eval->eevee.flag & SCE_EEVEE_RTAO_GPUBUFF)
       e_data.use_gpu_buff = true;
 
     /* CPU buffers*/
@@ -163,9 +175,9 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
     if (!e_data.denoise_ubo) {
       e_data.denoise_ubo = DRW_uniformbuffer_create(sizeof(struct EEVEE_EmbreeDenoiseUniformBufferData), &denoise_uniform_buffer_data);
     }
-    //if (e_data.denoise && !ao_deonise_data.kernel) {
+    //if (e_data.denoise && !rtao_deonise_data.kernel) {
     //  for (uint i = 0; i < 25; i++) {
-    //    ao_deonise_data.kernel[i]
+    //    rtao_deonise_data.kernel[i]
     //  }
     //}
 
@@ -362,35 +374,35 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
  */
 void PVZ_occlusion_trace_buffers_init(uint w, uint h) {
   /* buffers exist and no size changes required */
-  if((ao_cpu_buff.hits != NULL) && ao_cpu_buff.w == w && ao_cpu_buff.h == h) {
+  if((rtao_cpu_buff.hits != NULL) && rtao_cpu_buff.w == w && rtao_cpu_buff.h == h) {
     printf("%s\n", "reuse cpu buff");
     return;
   }
 
   /* viewport size changed */
-  if(ao_cpu_buff.hits != NULL) {
+  if(rtao_cpu_buff.hits != NULL) {
      PVZ_occlusion_trace_buffers_free();
   }  
 
-  ao_cpu_buff.w = w;
-  ao_cpu_buff.h = h;
+  rtao_cpu_buff.w = w;
+  rtao_cpu_buff.h = h;
   
   /* (re)create buffers  */
-  ao_cpu_buff.hits = (unsigned char *)malloc(sizeof(unsigned char) * w * h);
-  ao_cpu_buff.norm = malloc(sizeof(float) * w * h * 3);
-  ao_cpu_buff.pos = malloc(sizeof(float) * w * h * 3);
-  ao_cpu_buff.rays = (struct RTCRay *)malloc(sizeof(struct RTCRay) * w * h);
-  ao_cpu_buff.rayhits = (struct RTCRayHit *)malloc(sizeof(struct RTCRayHit) * w * h);
+  rtao_cpu_buff.hits = (unsigned char *)malloc(sizeof(unsigned char) * w * h);
+  rtao_cpu_buff.norm = malloc(sizeof(float) * w * h * 3);
+  rtao_cpu_buff.pos = malloc(sizeof(float) * w * h * 3);
+  rtao_cpu_buff.rays = (struct RTCRay *)malloc(sizeof(struct RTCRay) * w * h);
+  rtao_cpu_buff.rayhits = (struct RTCRayHit *)malloc(sizeof(struct RTCRayHit) * w * h);
 }
 
 void PVZ_occlusion_trace_buffers_free(void) {
-  ao_cpu_buff.w = 0;
-  ao_cpu_buff.h = 0;
-  MEM_SAFE_FREE(ao_cpu_buff.hits);
-  MEM_SAFE_FREE(ao_cpu_buff.norm);
-  MEM_SAFE_FREE(ao_cpu_buff.pos);
-  MEM_SAFE_FREE(ao_cpu_buff.rays);
-  MEM_SAFE_FREE(ao_cpu_buff.rayhits);
+  rtao_cpu_buff.w = 0;
+  rtao_cpu_buff.h = 0;
+  MEM_SAFE_FREE(rtao_cpu_buff.hits);
+  MEM_SAFE_FREE(rtao_cpu_buff.norm);
+  MEM_SAFE_FREE(rtao_cpu_buff.pos);
+  MEM_SAFE_FREE(rtao_cpu_buff.rays);
+  MEM_SAFE_FREE(rtao_cpu_buff.rayhits);
 }
 
 /* primary rays buffer */
@@ -409,7 +421,7 @@ void PVZ_occlusion_trace_build_prim_rays_buffer(uint w, uint h) {
 #pragma GCC optimize ("unroll-loops")
 
 void PVZ_occlusion_trace_build_prim_rays_cpu(void) {
-  uint width = ao_cpu_buff.w, height = ao_cpu_buff.h;
+  uint width = rtao_cpu_buff.w, height = rtao_cpu_buff.h;
   float scale = 0.5;
   float image_aspect_ratio = width / (float)height;
 
@@ -441,12 +453,12 @@ void PVZ_occlusion_trace_build_prim_rays_cpu(void) {
   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
   _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
-  struct RTCRayHit *rayhits = ao_cpu_buff.rayhits;
+  struct RTCRayHit *rayhits = rtao_cpu_buff.rayhits;
   #pragma omp parallel for num_threads(8) private(ix, iy, v, dir)
-  for( int i=0; i < ao_cpu_buff.w * ao_cpu_buff.h; i++){
+  for( int i=0; i < rtao_cpu_buff.w * rtao_cpu_buff.h; i++){
     rayhits[i].ray.id = i;
-    ix = i - ((i / ao_cpu_buff.w) * ao_cpu_buff.w);
-    iy = ao_cpu_buff.h - i / ao_cpu_buff.w;
+    ix = i - ((i / rtao_cpu_buff.w) * rtao_cpu_buff.w);
+    iy = rtao_cpu_buff.h - i / rtao_cpu_buff.w;
 
     v[0] = (2 * (ix + 0.5) / (float)width - 1) * scale; 
     v[1] = (1 - 2 * (iy + 0.5) / (float)height) * scale * 1 / image_aspect_ratio;
@@ -474,9 +486,9 @@ void PVZ_occlusion_trace_build_prim_rays_cpu(void) {
     rayhits[i].ray.time = 0.0;
   }
 
-  struct RTCRay *rays = ao_cpu_buff.rays;
+  struct RTCRay *rays = rtao_cpu_buff.rays;
   #pragma omp parallel for num_threads(8)// private(ray, hit)
-  for(uint i=0; i < ((ao_cpu_buff.w * ao_cpu_buff.h)/RAYS_STREAM_SIZE); i++) {
+  for(uint i=0; i < ((rtao_cpu_buff.w * rtao_cpu_buff.h)/RAYS_STREAM_SIZE); i++) {
     rtcIntersect1M(evem_data.scene, &context, &rayhits[i*RAYS_STREAM_SIZE], RAYS_STREAM_SIZE, sizeof(struct RTCRayHit));
     
     struct RTCRay *ray;
@@ -489,8 +501,8 @@ void PVZ_occlusion_trace_build_prim_rays_cpu(void) {
     //#pragma omp simd private(ray, hit)
     for(int j=0; j<RAYS_STREAM_SIZE; j++){
       ii = j+i*RAYS_STREAM_SIZE;
-      iix = ii - ((ii / ao_cpu_buff.w) * ao_cpu_buff.w);
-      iiy = ao_cpu_buff.h - ii / ao_cpu_buff.w;
+      iix = ii - ((ii / rtao_cpu_buff.w) * rtao_cpu_buff.w);
+      iiy = rtao_cpu_buff.h - ii / rtao_cpu_buff.w;
 
       ray = &rayhits[ii].ray;
       hit = &rayhits[ii].hit;
@@ -530,20 +542,20 @@ void PVZ_occlusion_trace_build_prim_rays_cpu(void) {
 }
 
 void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
-  struct RTCRay *rays = ao_cpu_buff.rays;
+  struct RTCRay *rays = rtao_cpu_buff.rays;
   #pragma omp parallel for num_threads(8)
-  for( int i=0; i < ao_cpu_buff.w * ao_cpu_buff.h; i++){
+  for( int i=0; i < rtao_cpu_buff.w * rtao_cpu_buff.h; i++){
     rays[i].id = i; // we need this as Embree might rearrange rays for better performance
 
     rays[i].mask = 0xFFFFFFFF;
-    rays[i].org_x = ao_cpu_buff.pos[i*3] + ao_cpu_buff.norm[i*3] * TRACE_BIAS;
-    rays[i].org_y = ao_cpu_buff.pos[i*3+1] + ao_cpu_buff.norm[i*3+1] * TRACE_BIAS;
-    rays[i].org_z = ao_cpu_buff.pos[i*3+2] + ao_cpu_buff.norm[i*3+2] * TRACE_BIAS;
+    rays[i].org_x = rtao_cpu_buff.pos[i*3] + rtao_cpu_buff.norm[i*3] * e_data.gpu_bias;
+    rays[i].org_y = rtao_cpu_buff.pos[i*3+1] + rtao_cpu_buff.norm[i*3+1] * e_data.gpu_bias;
+    rays[i].org_z = rtao_cpu_buff.pos[i*3+2] + rtao_cpu_buff.norm[i*3+2] * e_data.gpu_bias;
     rays[i].tnear = 0.0;
 
-    rays[i].dir_x = ao_cpu_buff.norm[i*3];
-    rays[i].dir_y = ao_cpu_buff.norm[i*3+1];
-    rays[i].dir_z = ao_cpu_buff.norm[i*3+2];
+    rays[i].dir_x = rtao_cpu_buff.norm[i*3];
+    rays[i].dir_y = rtao_cpu_buff.norm[i*3+1];
+    rays[i].dir_z = rtao_cpu_buff.norm[i*3+2];
     rays[i].tfar = e_data.ao_dist;
     rays[i].time = 0.0;
   }
@@ -562,14 +574,14 @@ void PVZ_occlusion_trace_compute_embree(void) {
 
   rtcInitIntersectContext(&embree_context);
 
-  struct RTCRay *rays = ao_cpu_buff.rays;
+  struct RTCRay *rays = rtao_cpu_buff.rays;
 
   #pragma omp parallel for num_threads(8)
-  for(uint i=0; i < ((ao_cpu_buff.w * ao_cpu_buff.h)/RAYS_STREAM_SIZE); i++) {
+  for(uint i=0; i < ((rtao_cpu_buff.w * rtao_cpu_buff.h)/RAYS_STREAM_SIZE); i++) {
     rtcOccluded1M(evem_data.scene, &embree_context, &rays[i*RAYS_STREAM_SIZE], RAYS_STREAM_SIZE, sizeof(struct RTCRay));
     #pragma omp simd
     for(int j=0; j<RAYS_STREAM_SIZE; j++){
-      ao_cpu_buff.hits[rays[j+i*RAYS_STREAM_SIZE].id] = (rays[j+i*RAYS_STREAM_SIZE].tfar < 0.0f) ? 0 : 255;
+      rtao_cpu_buff.hits[rays[j+i*RAYS_STREAM_SIZE].id] = (rays[j+i*RAYS_STREAM_SIZE].tfar < 0.0f) ? 0 : 255;
     }
   }
   
@@ -577,7 +589,7 @@ void PVZ_occlusion_trace_compute_embree(void) {
   gettimeofday(&t_end, NULL);
   elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
 
-  printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, ao_cpu_buff.w*ao_cpu_buff.h);
+  printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buff.w*rtao_cpu_buff.h);
 }
 
 #pragma GCC pop_options
@@ -596,10 +608,10 @@ void PVZ_read_gpu_buffers(EEVEE_Data *vedata) {
   GPUFrameBuffer *fb = fbl->gtao_nd_fb;
   //GPU_framebuffer_bind(fb);
   GPU_framebuffer_read_color(
-    fb, 0, 0,ao_cpu_buff.w, ao_cpu_buff.h, 3, 0, ao_cpu_buff.norm);
+    fb, 0, 0,rtao_cpu_buff.w, rtao_cpu_buff.h, 3, 0, rtao_cpu_buff.norm);
 
   GPU_framebuffer_read_color(
-    fb, 0, 0,ao_cpu_buff.w, ao_cpu_buff.h, 3, 1, ao_cpu_buff.pos);
+    fb, 0, 0,rtao_cpu_buff.w, rtao_cpu_buff.h, 3, 1, rtao_cpu_buff.pos);
 
   // stop timer
   gettimeofday(&t_end, NULL);
@@ -640,8 +652,13 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
 
     if(e_data.denoise) {
       struct GPUTexture *ao_tex; // just a pointer
+      
       denoise_uniform_buffer_data.stepwidth = 1.0; // starting from smallest
-      for(uint ii=0; ii<DENOISE_ITERATIONS; ii++) {
+      denoise_uniform_buffer_data.c_phi = rtao_deonise_data.c_phi;
+      denoise_uniform_buffer_data.n_phi = rtao_deonise_data.n_phi;
+      denoise_uniform_buffer_data.p_phi = rtao_deonise_data.p_phi;
+      
+      for(uint ii=0; ii<rtao_deonise_data.iterations; ii++) {
         DRW_uniformbuffer_update(e_data.denoise_ubo, &denoise_uniform_buffer_data);
 
         if (ii % 2 == 0) {
@@ -656,10 +673,10 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
         denoise_uniform_buffer_data.stepwidth *= 2;
       }
 
-      ao_tex = (DENOISE_ITERATIONS % 2 == 1) ? effects->gtao_embree_final : effects->gtao_embree_raw;
-      PVZ_hits_texture_update(ao_tex, GPU_R8, ao_cpu_buff.hits);
+      ao_tex = (rtao_deonise_data.iterations % 2 == 1) ? effects->gtao_embree_final : effects->gtao_embree_raw;
+      PVZ_hits_texture_update(ao_tex, GPU_R8, rtao_cpu_buff.hits);
     } else {
-      PVZ_hits_texture_update(effects->gtao_embree_final, GPU_R8, ao_cpu_buff.hits); // send ray hits back to gpu
+      PVZ_hits_texture_update(effects->gtao_embree_final, GPU_R8, rtao_cpu_buff.hits); // send ray hits back to gpu
     }
 
     /* Restore */
@@ -717,8 +734,8 @@ void EEVEE_occlusion_trace_free(void)
   DRW_SHADER_FREE_SAFE(e_data.gtao_debug_sh);
   DRW_SHADER_FREE_SAFE(e_data.gtao_denoise_sh);
 
-  MEM_SAFE_FREE(ao_deonise_data.kernel);
-  MEM_SAFE_FREE(ao_deonise_data.offset);
+  MEM_SAFE_FREE(rtao_deonise_data.kernel);
+  MEM_SAFE_FREE(rtao_deonise_data.offset);
   
   DRW_UBO_FREE_SAFE(e_data.denoise_ubo);
   PVZ_occlusion_trace_buffers_free();

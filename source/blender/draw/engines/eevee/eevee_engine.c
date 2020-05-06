@@ -117,7 +117,7 @@ static void eevee_cache_init(void *vedata)
 
   //EEVEE_screen_raytrace_cache_init(sldata, vedata);
 
-  if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+  if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
     EVEM_init();
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
@@ -310,7 +310,7 @@ static void eevee_draw_scene(void *vedata)
     DRW_stats_group_start("Main MinMax buffer");
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
     DRW_stats_group_end();
-    if (_scene->eevee.flag & SCE_EEVEE_GTAO_TRACE) {
+    if (_scene->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);
