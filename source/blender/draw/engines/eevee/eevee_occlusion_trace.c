@@ -54,8 +54,6 @@
 #define EMBREE_TRACE_BIAS 0.001
 #define TRACE_BIAS 0.005
 
-#define DENOISE_ITERATIONS 6
-
 static struct EEVEE_EmbreeDenoiseUniformBufferData {
   float stepwidth;
   float c_phi;
@@ -89,8 +87,8 @@ static struct {
 } rtao_cpu_buff = {.hits = NULL, .w=0, .h=0}; /* CPU ao data */
 
 static struct {
-  float *kernel;
-  int   *offset;
+  //float *kernel;
+  //int   *offset;
 
   unsigned int iterations;
   float c_phi, n_phi, p_phi;
@@ -398,11 +396,11 @@ void PVZ_occlusion_trace_buffers_init(uint w, uint h) {
 void PVZ_occlusion_trace_buffers_free(void) {
   rtao_cpu_buff.w = 0;
   rtao_cpu_buff.h = 0;
-  MEM_SAFE_FREE(rtao_cpu_buff.hits);
-  MEM_SAFE_FREE(rtao_cpu_buff.norm);
-  MEM_SAFE_FREE(rtao_cpu_buff.pos);
-  MEM_SAFE_FREE(rtao_cpu_buff.rays);
-  MEM_SAFE_FREE(rtao_cpu_buff.rayhits);
+  if(rtao_cpu_buff.hits) free(rtao_cpu_buff.hits);
+  if(rtao_cpu_buff.norm) free(rtao_cpu_buff.norm);
+  if(rtao_cpu_buff.pos) free(rtao_cpu_buff.pos);
+  if(rtao_cpu_buff.rays) free(rtao_cpu_buff.rays);
+  if(rtao_cpu_buff.rayhits) free(rtao_cpu_buff.rayhits);
 }
 
 /* primary rays buffer */
@@ -548,9 +546,9 @@ void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
     rays[i].id = i; // we need this as Embree might rearrange rays for better performance
 
     rays[i].mask = 0xFFFFFFFF;
-    rays[i].org_x = rtao_cpu_buff.pos[i*3] + rtao_cpu_buff.norm[i*3] * e_data.gpu_bias;
-    rays[i].org_y = rtao_cpu_buff.pos[i*3+1] + rtao_cpu_buff.norm[i*3+1] * e_data.gpu_bias;
-    rays[i].org_z = rtao_cpu_buff.pos[i*3+2] + rtao_cpu_buff.norm[i*3+2] * e_data.gpu_bias;
+    rays[i].org_x = rtao_cpu_buff.pos[i*3] + rtao_cpu_buff.norm[i*3] * TRACE_BIAS;//e_data.gpu_bias;
+    rays[i].org_y = rtao_cpu_buff.pos[i*3+1] + rtao_cpu_buff.norm[i*3+1] * TRACE_BIAS;//e_data.gpu_bias;
+    rays[i].org_z = rtao_cpu_buff.pos[i*3+2] + rtao_cpu_buff.norm[i*3+2] * TRACE_BIAS;//e_data.gpu_bias;
     rays[i].tnear = 0.0;
 
     rays[i].dir_x = rtao_cpu_buff.norm[i*3];
@@ -560,7 +558,7 @@ void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
     rays[i].time = 0.0;
   }
 }
-
+/*
 void PVZ_occlusion_trace_compute_embree(void) {
   printf("%s\n", "embree trace occlusion");
   struct timeval t_start, t_end;
@@ -573,6 +571,7 @@ void PVZ_occlusion_trace_compute_embree(void) {
   _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
   rtcInitIntersectContext(&embree_context);
+  embree_context.flags = RTC_INTERSECT_CONTEXT_FLAG_INCOHERENT;
 
   struct RTCRay *rays = rtao_cpu_buff.rays;
 
@@ -581,8 +580,37 @@ void PVZ_occlusion_trace_compute_embree(void) {
     rtcOccluded1M(evem_data.scene, &embree_context, &rays[i*RAYS_STREAM_SIZE], RAYS_STREAM_SIZE, sizeof(struct RTCRay));
     #pragma omp simd
     for(int j=0; j<RAYS_STREAM_SIZE; j++){
-      rtao_cpu_buff.hits[rays[j+i*RAYS_STREAM_SIZE].id] = (rays[j+i*RAYS_STREAM_SIZE].tfar < 0.0f) ? 0 : 255;
+      rtao_cpu_buff.hits[rays[j+i*RAYS_STREAM_SIZE].id] = (rays[j+i*RAYS_STREAM_SIZE].tfar >= 0.0f) ? 255 : 0;
     }
+  }
+  
+  // stop timer
+  gettimeofday(&t_end, NULL);
+  elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
+
+  printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buff.w*rtao_cpu_buff.h);
+}
+*/
+void PVZ_occlusion_trace_compute_embree(void) {
+  printf("%s\n", "embree trace occlusion");
+  struct timeval t_start, t_end;
+  double elapsed_time;
+
+  // start timer
+  gettimeofday(&t_start, NULL);
+
+  //_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+  //_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+
+  rtcInitIntersectContext(&embree_context);
+  embree_context.flags = RTC_INTERSECT_CONTEXT_FLAG_INCOHERENT;
+
+  struct RTCRay *rays = rtao_cpu_buff.rays;
+
+  #pragma omp parallel for num_threads(8)
+  for(uint i=0; i < (rtao_cpu_buff.w * rtao_cpu_buff.h); i++) {
+    rtcOccluded1(evem_data.scene, &embree_context, &rays[i]);
+    rtao_cpu_buff.hits[rays[i].id] = (rays[i].tfar >= 0.0f) ? 255 : 0;
   }
   
   // stop timer
@@ -606,7 +634,8 @@ void PVZ_read_gpu_buffers(EEVEE_Data *vedata) {
   EEVEE_EffectsInfo *effects = stl->effects;
 
   GPUFrameBuffer *fb = fbl->gtao_nd_fb;
-  //GPU_framebuffer_bind(fb);
+  
+  GPU_framebuffer_bind(fb);
   GPU_framebuffer_read_color(
     fb, 0, 0,rtao_cpu_buff.w, rtao_cpu_buff.h, 3, 0, rtao_cpu_buff.norm);
 
@@ -734,8 +763,8 @@ void EEVEE_occlusion_trace_free(void)
   DRW_SHADER_FREE_SAFE(e_data.gtao_debug_sh);
   DRW_SHADER_FREE_SAFE(e_data.gtao_denoise_sh);
 
-  MEM_SAFE_FREE(rtao_deonise_data.kernel);
-  MEM_SAFE_FREE(rtao_deonise_data.offset);
+  //MEM_SAFE_FREE(rtao_deonise_data.kernel);
+  //MEM_SAFE_FREE(rtao_deonise_data.offset);
   
   DRW_UBO_FREE_SAFE(e_data.denoise_ubo);
   PVZ_occlusion_trace_buffers_free();
