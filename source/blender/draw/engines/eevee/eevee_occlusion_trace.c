@@ -47,10 +47,12 @@
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 
+#include "pthread.h"
 #include "eevee_embree.h"
 #include "eevee_occlusion_trace.h"
 
-#define RAYS_STREAM_SIZE 256
+#define NUM_THREADS 8
+#define RAYS_STREAM_SIZE 2560
 #define EMBREE_TRACE_BIAS 0.001
 #define TRACE_BIAS 0.005
 
@@ -542,22 +544,106 @@ void PVZ_occlusion_trace_build_prim_rays_cpu(void) {
 void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
   struct RTCRay *rays = rtao_cpu_buff.rays;
   #pragma omp parallel for num_threads(8)
-  for( int i=0; i < rtao_cpu_buff.w * rtao_cpu_buff.h; i++){
+  for( uint i=0; i < rtao_cpu_buff.w * rtao_cpu_buff.h; i++){
     rays[i].id = i; // we need this as Embree might rearrange rays for better performance
 
     rays[i].mask = 0xFFFFFFFF;
-    rays[i].org_x = rtao_cpu_buff.pos[i*3] + rtao_cpu_buff.norm[i*3] * TRACE_BIAS;//e_data.gpu_bias;
-    rays[i].org_y = rtao_cpu_buff.pos[i*3+1] + rtao_cpu_buff.norm[i*3+1] * TRACE_BIAS;//e_data.gpu_bias;
-    rays[i].org_z = rtao_cpu_buff.pos[i*3+2] + rtao_cpu_buff.norm[i*3+2] * TRACE_BIAS;//e_data.gpu_bias;
-    rays[i].tnear = 0.0;
+    rays[i].org_x = rtao_cpu_buff.pos[i*3];//e_data.gpu_bias;
+    rays[i].org_y = rtao_cpu_buff.pos[i*3+1];//e_data.gpu_bias;
+    rays[i].org_z = rtao_cpu_buff.pos[i*3+2];//e_data.gpu_bias;
+    rays[i].tnear = TRACE_BIAS;
 
     rays[i].dir_x = rtao_cpu_buff.norm[i*3];
     rays[i].dir_y = rtao_cpu_buff.norm[i*3+1];
     rays[i].dir_z = rtao_cpu_buff.norm[i*3+2];
     rays[i].tfar = e_data.ao_dist;
-    rays[i].time = 0.0;
+    rays[i].time = 0.0f;
   }
 }
+
+//EmbreeTraceRayStreamWorkerData *ao_thread_data = NULL;
+
+/* calc rays stream in a thread */
+void embree_trace_ray_stream_worker(void *arg) {
+  //EmbreeTraceRayStreamWorkerData *args = (EmbreeTraceRayStreamWorkerData *)arg; 
+  EmbreeTraceRayStreamWorkerData args = *(EmbreeTraceRayStreamWorkerData *)arg;      /* data received by thread */
+  printf("worker - %u, job - %u \n", args.worker_id, args.job_id);
+  rtcOccluded1M(args.scene, args.context, args.rays, args.stream_size, sizeof(struct RTCRay));
+  //pthread_exit(NULL);
+}
+
+void PVZ_occlusion_trace_compute_embree(void) {
+  printf("%s\n", "embree trace occlusion");
+  struct timeval t_start, t_end;
+  double elapsed_time;
+
+  // start timer
+  gettimeofday(&t_start, NULL);
+
+  _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+  _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+
+
+  struct RTCIntersectContext ctx;
+
+  rtcInitIntersectContext(&ctx);
+  ctx.flags = RTC_INTERSECT_CONTEXT_FLAG_INCOHERENT;
+
+  struct RTCRay *rays = rtao_cpu_buff.rays;
+
+  uint num_pixels = rtao_cpu_buff.w * rtao_cpu_buff.h;
+
+  /*
+  pthread_t thread_pool[NUM_THREADS]; // fixed amount of threads for now
+  uint num_jobs = num_pixels / RAYS_STREAM_SIZE;
+  printf("jobs %u \n", num_jobs);
+
+  EmbreeTraceRayStreamWorkerData *ao_thread_data = NULL;
+  if(!ao_thread_data){
+    ao_thread_data = malloc(sizeof(EmbreeTraceRayStreamWorkerData)*num_jobs);
+    for (uint i = 0; i<num_jobs; i++) {
+      ao_thread_data[i].job_id = i+1;
+      ao_thread_data[i].scene = evem_data.scene;
+      ao_thread_data[i].context = &embree_context;
+      ao_thread_data[i].rays = &rays[i*RAYS_STREAM_SIZE];
+      ao_thread_data[i].stream_size = RAYS_STREAM_SIZE;
+    }
+  }
+
+  for (uint j = 0; j < 10; j++) {
+
+    for (uint i = 0 ; i < NUM_THREADS; i++) {
+      ao_thread_data[i].worker_id = i; 
+      pthread_create(&thread_pool[i], NULL, embree_trace_ray_stream_worker, (void *)&ao_thread_data[i + j*NUM_THREADS]);
+    }
+
+    for (uint i = 0; i < NUM_THREADS; i++)  pthread_join(thread_pool[i], 0);
+
+  }
+  */
+  RTCScene scene = evem_data.scene;
+  #pragma omp parallel for num_threads(8) shared(scene, rays, ctx, rtao_cpu_buff)
+  for(uint i=0; i < num_pixels; i+=RAYS_STREAM_SIZE) {
+    rtcOccluded1M(scene, &ctx, &rays[i], RAYS_STREAM_SIZE, sizeof(struct RTCRay));
+    
+    struct RTCRay *ray = NULL;
+    
+    #pragma omp simd //private(i) //shared(rays, rtao_cpu_buff)
+    for(uint j=0; j < RAYS_STREAM_SIZE; j++){
+      ray = &rays[i + j];
+      rtao_cpu_buff.hits[ray->id] = (ray->tfar >= 0.0f) ? 255 : 0;
+    }
+  }
+  
+  // stop timer
+  gettimeofday(&t_end, NULL);
+  elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
+
+  //free(ao_thread_data);
+  printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buff.w*rtao_cpu_buff.h);
+}
+
+
 /*
 void PVZ_occlusion_trace_compute_embree(void) {
   printf("%s\n", "embree trace occlusion");
@@ -575,14 +661,14 @@ void PVZ_occlusion_trace_compute_embree(void) {
 
   struct RTCRay *rays = rtao_cpu_buff.rays;
 
+  uint pixels = rtao_cpu_buff.w * rtao_cpu_buff.h;
+  
+  rtcOccluded1M(evem_data.scene, &embree_context, &rays[0], pixels, sizeof(struct RTCRay));
+  
   #pragma omp parallel for num_threads(8)
-  for(uint i=0; i < ((rtao_cpu_buff.w * rtao_cpu_buff.h)/RAYS_STREAM_SIZE); i++) {
-    rtcOccluded1M(evem_data.scene, &embree_context, &rays[i*RAYS_STREAM_SIZE], RAYS_STREAM_SIZE, sizeof(struct RTCRay));
-    #pragma omp simd
-    for(int j=0; j<RAYS_STREAM_SIZE; j++){
-      rtao_cpu_buff.hits[rays[j+i*RAYS_STREAM_SIZE].id] = (rays[j+i*RAYS_STREAM_SIZE].tfar >= 0.0f) ? 255 : 0;
-    }
-  }
+  for(uint i=0; i<pixels; i++){
+    rtao_cpu_buff.hits[i] = (rays[i].tfar >= 0.0f) ? 255 : 0;
+  }  
   
   // stop timer
   gettimeofday(&t_end, NULL);
@@ -591,34 +677,6 @@ void PVZ_occlusion_trace_compute_embree(void) {
   printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buff.w*rtao_cpu_buff.h);
 }
 */
-void PVZ_occlusion_trace_compute_embree(void) {
-  printf("%s\n", "embree trace occlusion");
-  struct timeval t_start, t_end;
-  double elapsed_time;
-
-  // start timer
-  gettimeofday(&t_start, NULL);
-
-  //_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-  //_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
-
-  rtcInitIntersectContext(&embree_context);
-  embree_context.flags = RTC_INTERSECT_CONTEXT_FLAG_INCOHERENT;
-
-  struct RTCRay *rays = rtao_cpu_buff.rays;
-
-  #pragma omp parallel for num_threads(8)
-  for(uint i=0; i < (rtao_cpu_buff.w * rtao_cpu_buff.h); i++) {
-    rtcOccluded1(evem_data.scene, &embree_context, &rays[i]);
-    rtao_cpu_buff.hits[rays[i].id] = (rays[i].tfar >= 0.0f) ? 255 : 0;
-  }
-  
-  // stop timer
-  gettimeofday(&t_end, NULL);
-  elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
-
-  printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buff.w*rtao_cpu_buff.h);
-}
 
 #pragma GCC pop_options
 
