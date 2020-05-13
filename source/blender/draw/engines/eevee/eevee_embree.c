@@ -102,6 +102,12 @@ void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
 }
 
 void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow) {
+  EEVEE_StorageList *stl = vedata->stl;
+  EEVEE_EffectsInfo *effects = stl->effects;
+
+  int sample = (DRW_state_is_image_render()) ? effects->taa_render_sample : effects->taa_current_sample;
+  if (sample > 1) return; // create/update only on first sample
+
   printf("EVEM_objects_cache_populate\n");
   
 	if (!cast_shadow)
@@ -122,14 +128,9 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
 
 /* here we acutally upate tlas */
 void EVEM_objects_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
+  if(!evem_data.update_tlas) return;
   printf("EVEM_objects_cache_finish (update TLAS)\n");
-  //if(!evem_data.update_tlas) return;
-
-  if(USE_FLAT_SCENE) {
-    rtcCommitScene(evem_data.scene);
-    return;
-  }
-
+  
   //if(!evem_data.scene) { // rtcReleaseScene(evem_data.scene);
   //  evem_data.scene = rtcNewScene(evem_data.device);
   //  rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_DYNAMIC);
@@ -158,6 +159,7 @@ void EVEM_objects_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
 }
 
 void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
+
 	printf("EVEM_create_object: %s\n", ob->id.name);
   struct Mesh *mesh_eval = NULL;
 	switch (ob->type) {
@@ -190,7 +192,11 @@ void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
 void EVEM_update_object(Object *ob, ObjectInfo *ob_info) {
   switch (ob->type) {
     case OB_MESH:
-      EVEM_mesh_object_update(ob, ob_info);
+      if(USE_FLAT_SCENE) {
+        EVEM_mesh_object_update(ob, ob_info);
+      } else {
+        EVEM_instance_update_transform(ob, ob_info);
+      }
       break;
     default:
       break;
@@ -226,8 +232,9 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 
 	RTCGeometry geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_TRIANGLE); // embree geometry
 	rtcSetGeometryBuildQuality(geometry, RTC_BUILD_QUALITY_HIGH);
-  //rtcSetGeometryTimeStepCount(geometry,1);
+  
   if(!USE_FLAT_SCENE) {
+    rtcSetGeometryTimeStepCount(geometry,1);
     rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, (const float *)&ob_info->ob->obmat[0]);
   }
 
@@ -236,13 +243,28 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   EVEM_Triangle* triangles = (EVEM_Triangle*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EVEM_Triangle), tri_count);
 
   // fill vertex buffer
-  #pragma omp parallel for num_threads(8)
-  for (int i = 0; i < vtc_count; i++) {
-  	vertices[i].x = me->mvert[i].co[0];
-  	vertices[i].y = me->mvert[i].co[1];
-  	vertices[i].z = me->mvert[i].co[2];
+  if(!USE_FLAT_SCENE) {
+    #pragma omp parallel for num_threads(8)
+    for (int i = 0; i < vtc_count; i++) {
+  	 vertices[i].x = me->mvert[i].co[0];
+  	 vertices[i].y = me->mvert[i].co[1];
+  	 vertices[i].z = me->mvert[i].co[2];
+    }
+	} else {
+    // pre transformed vertices for flat scene
+    float *m = (const float *)&ob_info->ob->obmat[0];
+    #pragma omp parallel for num_threads(8) shared(m)
+    for (int i = 0; i < vtc_count; i++) {
+      vertices[i].x = m[0] * me->mvert[i].co[0] + m[4] * me->mvert[i].co[1] + m[8] * me->mvert[i].co[2] + m[12];
+      vertices[i].y = m[1] * me->mvert[i].co[0] + m[5] * me->mvert[i].co[1] + m[9] * me->mvert[i].co[2] + m[13];
+      vertices[i].z = m[2] * me->mvert[i].co[0] + m[6] * me->mvert[i].co[1] + m[10] * me->mvert[i].co[2] + m[14];
+    }
   }
-	
+
+//m11 * vector.x + m12 * vector.y + m13 * vector.z,
+//m21 * vector.x + m22 * vector.y + m23 * vector.z,
+//m31 * vector.x + m32 * vector.y + m33 * vector.z
+
   // fill triangles buffer
   int ti = 0; // triangles buffer index
   
@@ -308,7 +330,7 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 
 void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
   if(_scene_is_empty)return;
-	printf("%s\n", "embree update object");
+	printf("%s\n", "EVEM_mesh_object_update");
 
 	RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
   
@@ -317,17 +339,40 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
     return;
   }
 
-  if(USE_FLAT_SCENE) {
-    // in flat scene mode we have to update object geometry mesh
-    rtcReleaseGeometry(geometry);
-    EVEM_create_object(ob, ob_info);
-  } else {
-    rtcSetGeometryTimeStepCount(geometry, 1);
-    rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, (const float *)&ob->obmat[0]);
-    rtcCommitGeometry(geometry);
+  EVEM_Vertex3f* vertices  = (EVEM_Vertex3f*) rtcGetGeometryBufferData(geometry, RTC_BUFFER_TYPE_VERTEX, 0);
+
+  struct Mesh *me = (Mesh *)ob->data;
+  if(!me) return;
+
+
+  float *m = (const float *)&ob_info->ob->obmat[0];
+  #pragma omp parallel for num_threads(8) shared(m)
+  // embree wants our geometry to be pre transformed
+  for (int i = 0; i < me->totvert; i++) {
+    vertices[i].x = m[0] * me->mvert[i].co[0] + m[4] * me->mvert[i].co[1] + m[8] * me->mvert[i].co[2] + m[12];
+    vertices[i].y = m[1] * me->mvert[i].co[0] + m[5] * me->mvert[i].co[1] + m[9] * me->mvert[i].co[2] + m[13];
+    vertices[i].z = m[2] * me->mvert[i].co[0] + m[6] * me->mvert[i].co[1] + m[10] * me->mvert[i].co[2] + m[14];
   }
 
+  /* commit mesh */
+  rtcUpdateGeometryBuffer(geometry,RTC_BUFFER_TYPE_VERTEX,0);
+  rtcCommitGeometry(geometry);
+  
   evem_data.update_tlas = true;
 
   printf("%s\n", "embree object updated");
+}
+
+void EVEM_instance_update_transform(Object *ob, ObjectInfo *ob_info) {
+  if(_scene_is_empty)return;
+  printf("%s\n", "EVEM_instance_update_transform");
+
+  RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
+  if(!geometry) return;
+
+  rtcSetGeometryTimeStepCount(geometry, 1);
+  rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, (const float *)&ob->obmat[0]);
+  rtcCommitGeometry(geometry);
+
+  evem_data.update_tlas = true;
 }

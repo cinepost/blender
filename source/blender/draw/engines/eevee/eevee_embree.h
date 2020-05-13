@@ -80,6 +80,7 @@ void EVEM_update_object(Object *ob, ObjectInfo *ob_info);
 void EVEM_mesh_object_clear(Mesh *me);
 void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info);
 void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info);
+void EVEM_instance_update_transform(Object *ob, ObjectInfo *ob_info);
 
 void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff);
 
