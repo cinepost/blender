@@ -10,6 +10,8 @@
 #include "DNA_meshdata_types.h"
 #include "BLI_math_geom.h"
 
+#include "BKE_editmesh.h"
+
 #include "GPU_batch.h"
 
 #include "draw_cache_extract.h"
@@ -120,9 +122,13 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
       return; // trying to insert object into unitialized map
 
     EVEM_create_object(ob, ob_info);
-    evem_data.update_tlas = true; // we've added geometry object, tlas needs to be updated
   } else {
     EVEM_update_object(ob, ob_info);
+  }
+
+  if(ob_info->cast_shadow != *cast_shadow) {
+    printf("cast shadow: %s\n", *cast_shadow ? "true" : "false");
+    EVEM_toggle_object_visibility(ob, ob_info);
   }
 }
 
@@ -261,10 +267,6 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
     }
   }
 
-//m11 * vector.x + m12 * vector.y + m13 * vector.z,
-//m21 * vector.x + m22 * vector.y + m23 * vector.z,
-//m31 * vector.x + m32 * vector.y + m33 * vector.z
-
   // fill triangles buffer
   int ti = 0; // triangles buffer index
   
@@ -302,7 +304,6 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 
 	rtcCommitGeometry(geometry);
 
-
   if(!USE_FLAT_SCENE) {
     rtcAttachGeometryByID(ob_info->escene, geometry, 0); // local object geometry to local scene scene id
     rtcCommitScene(ob_info->escene);
@@ -318,6 +319,7 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
     rtcReleaseGeometry(inst);
   } else {
     ob_info->id = rtcAttachGeometry(evem_data.scene, geometry);
+    memcpy(ob_info->xform, &ob_info->ob->obmat[0], sizeof(float)*16); 
   }
   rtcReleaseGeometry(geometry);
 
@@ -332,6 +334,14 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
   if(_scene_is_empty)return;
 	printf("%s\n", "EVEM_mesh_object_update");
 
+  // return if object transform not changed and object not in edit mode
+  bool is_edit_mode = false;
+  if(!memcmp((const void *)&ob_info->xform[0], (const void *)&ob->obmat[0], sizeof(float)*16)) {
+    // object thansform is the same. check if we in edit mode
+    is_edit_mode = DRW_object_is_in_edit_mode(ob);
+    if (!is_edit_mode) return; // same transform, not in edit mode. return
+  }
+
 	RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
   
   if (!geometry) {
@@ -341,9 +351,23 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
 
   EVEM_Vertex3f* vertices  = (EVEM_Vertex3f*) rtcGetGeometryBufferData(geometry, RTC_BUFFER_TYPE_VERTEX, 0);
 
-  struct Mesh *me = (Mesh *)ob->data;
+  struct Mesh *me = NULL;
+
+  if (is_edit_mode) {
+    struct Mesh *_me = (Mesh *)ob->data;
+    struct BMEditMesh *embm = _me->edit_mesh;
+    if (embm) me = (Mesh *)embm->mesh_eval_final;
+  } else {
+    me = (Mesh *)ob->data;
+  }
+
   if(!me) return;
 
+  /* Check if the object that we are drawing is modified. */
+  if (!DEG_is_original_id(&me->id)) {
+    // TODO: resync mesh topology !
+    return false;
+  }
 
   float *m = (const float *)&ob_info->ob->obmat[0];
   #pragma omp parallel for num_threads(8) shared(m)
@@ -375,4 +399,18 @@ void EVEM_instance_update_transform(Object *ob, ObjectInfo *ob_info) {
   rtcCommitGeometry(geometry);
 
   evem_data.update_tlas = true;
+}
+
+void EVEM_toggle_object_visibility(Object *ob, ObjectInfo *ob_info) {
+  return;
+  printf("EVEM_toggle_object_visibility\n");
+  RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
+
+  ob_info->cast_shadow = !ob_info->cast_shadow;
+
+  if(ob_info->cast_shadow) {
+    rtcEnableGeometry(geometry);
+  } else {
+    rtcDisableGeometry(geometry);
+  }
 }

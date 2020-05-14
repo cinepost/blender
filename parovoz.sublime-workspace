@@ -4,6 +4,398 @@
 		"selected_items":
 		[
 			[
+				"cas",
+				"cast_shadow"
+			],
+			[
+				"x",
+				"xform"
+			],
+			[
+				"me",
+				"mesh_eval"
+			],
+			[
+				"rtcCo",
+				"rtcCommitScene"
+			],
+			[
+				"RTCG",
+				"RTCGeometry"
+			],
+			[
+				"rt",
+				"rtcReleaseGeometry"
+			],
+			[
+				"RTC",
+				"RTCScene"
+			],
+			[
+				"pi",
+				"pixels"
+			],
+			[
+				"pri",
+				"printf\tprintf …"
+			],
+			[
+				"ra",
+				"ray"
+			],
+			[
+				"num",
+				"num_pixels"
+			],
+			[
+				"ray",
+				"rays"
+			],
+			[
+				"RT",
+				"RTCRay"
+			],
+			[
+				"ma",
+				"malloc"
+			],
+			[
+				"R",
+				"RTCRay"
+			],
+			[
+				"STRE",
+				"RAYS_STREAM_SIZE"
+			],
+			[
+				"job",
+				"job_id"
+			],
+			[
+				"ao",
+				"ao_thread_data"
+			],
+			[
+				"arg",
+				"args"
+			],
+			[
+				"pr",
+				"printf\tprintf …"
+			],
+			[
+				"NU",
+				"NUM_THREADS"
+			],
+			[
+				"stre",
+				"stream_size"
+			],
+			[
+				"embre",
+				"embree_context"
+			],
+			[
+				"rtc",
+				"rtcReleaseScene"
+			],
+			[
+				"update_",
+				"update_tlas"
+			],
+			[
+				"def",
+				"default"
+			],
+			[
+				"gpu",
+				"gpu_bias"
+			],
+			[
+				"rta",
+				"rtao_denoise_p_phi"
+			],
+			[
+				"de",
+				"denoise_uniform_buffer_data"
+			],
+			[
+				"siz",
+				"sizeof"
+			],
+			[
+				"MEM_",
+				"MEM_SAFE_FREE"
+			],
+			[
+				"gtao_embree_",
+				"gtao_embree_final"
+			],
+			[
+				"tr",
+				"true"
+			],
+			[
+				"sce",
+				"scene"
+			],
+			[
+				"MEM",
+				"MEM_SAFE_FREE"
+			],
+			[
+				"e",
+				"e_data"
+			],
+			[
+				"ocll",
+				"datatoc_ambient_occlusion_lib_glsl"
+			],
+			[
+				"em",
+				"embree_objects_map"
+			],
+			[
+				"N",
+				"Ng_x"
+			],
+			[
+				"dir",
+				"dir_x"
+			],
+			[
+				"r",
+				"ray"
+			],
+			[
+				"BLI_str",
+				"BLI_string_joinN"
+			],
+			[
+				"fra",
+				"frag_shader_lib"
+			],
+			[
+				"com",
+				"common_data"
+			],
+			[
+				"ob",
+				"ob_info"
+			],
+			[
+				"im",
+				"items"
+			],
+			[
+				"si",
+				"sizeof"
+			],
+			[
+				"sei",
+				"sizeof"
+			],
+			[
+				"new",
+				"new_item"
+			],
+			[
+				"tmp",
+				"tmp_item"
+			],
+			[
+				"it",
+				"item_in_tree"
+			],
+			[
+				"Objec",
+				"ObjectsMapItem"
+			],
+			[
+				"Obj",
+				"ObjectKey"
+			],
+			[
+				"Ob",
+				"ObjectsMapItem"
+			],
+			[
+				"ObjectMap",
+				"ObjectsMapItem"
+			],
+			[
+				"n",
+				"NULL"
+			],
+			[
+				"re",
+				"return"
+			],
+			[
+				"embe",
+				"embree_objects_map"
+			],
+			[
+				"Object",
+				"ObjectInfo"
+			],
+			[
+				"O",
+				"Object"
+			],
+			[
+				"_eve",
+				"_evem_ob_map_init"
+			],
+			[
+				"emb",
+				"embree_objects_map"
+			],
+			[
+				"ObjectMa",
+				"ObjectsMapEntry"
+			],
+			[
+				"EVE",
+				"EVEM_object_exist"
+			],
+			[
+				"v",
+				"void"
+			],
+			[
+				"s",
+				"struct\tstruct"
+			],
+			[
+				"curr",
+				"curr_idx"
+			],
+			[
+				"en",
+				"enabled_effects"
+			],
+			[
+				"use",
+				"use_gpu_buff"
+			],
+			[
+				"PVZ_oc",
+				"PVZ_occlusion_trace_build_prim_rays_cpu"
+			],
+			[
+				"PVZ_",
+				"PVZ_occlusion_trace_build_prim_rays_buffer"
+			],
+			[
+				"size",
+				"sizeof"
+			],
+			[
+				"EVEM",
+				"EVEM_Matrix44f"
+			],
+			[
+				"ca",
+				"cam_pos"
+			],
+			[
+				"ME",
+				"MEM_freeN"
+			],
+			[
+				"camer",
+				"camera"
+			],
+			[
+				"came",
+				"camera"
+			],
+			[
+				"prim",
+				"prim_rays_buff"
+			],
+			[
+				"prm",
+				"prim_rays_buff"
+			],
+			[
+				"eve",
+				"evem_data"
+			],
+			[
+				"st",
+				"static"
+			],
+			[
+				"tri",
+				"triangles"
+			],
+			[
+				"GPU",
+				"GPU_texture"
+			],
+			[
+				"tex",
+				"tex_data"
+			],
+			[
+				"ver",
+				"vertices"
+			],
+			[
+				"embr",
+				"embree_data"
+			],
+			[
+				"eev",
+				"eevee_private"
+			],
+			[
+				"PVZ",
+				"PVZ_occlusion_trace_build_cpu_buffer"
+			],
+			[
+				"apo",
+				"ao_cpu_buff"
+			],
+			[
+				"au",
+				"ao_cpu_buff"
+			],
+			[
+				"ao_",
+				"ao_cpu_buff"
+			],
+			[
+				"ao_s",
+				"ao_src_depth"
+			],
+			[
+				"effe",
+				"effects"
+			],
+			[
+				"dep",
+				"depth_src"
+			],
+			[
+				"rebu",
+				"rebuild_materials"
+			],
+			[
+				"reb",
+				"rebuild_materials"
+			],
+			[
+				"gta",
+				"gtao_trace"
+			],
+			[
+				"data",
+				"datatoc_ambient_occlusion_lib_glsl"
+			],
+			[
 				"export_",
 				"export_Session"
 			],
@@ -104,10 +496,6 @@
 				"height"
 			],
 			[
-				"s",
-				"success"
-			],
-			[
 				"VER",
 				"vertex_shader"
 			],
@@ -126,19 +514,783 @@
 			[
 				"seq",
 				"seq"
-			],
-			[
-				"ROP_",
-				"ROP_Node"
-			],
-			[
-				"re",
-				"return"
 			]
 		]
 	},
 	"buffers":
 	[
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/effect_gtao_embree_frag.glsl",
+			"settings":
+			{
+				"buffer_size": 1658,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_occlusion_trace.c",
+			"settings":
+			{
+				"buffer_size": 29584,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_embree_objects.c",
+			"settings":
+			{
+				"buffer_size": 3379,
+				"encoding": "UTF-8",
+				"line_ending": "Unix",
+				"name": "/* size of screen tiles */"
+			}
+		},
+		{
+			"file": "intern/cycles/blender/blender_object.cpp",
+			"settings":
+			{
+				"buffer_size": 15602,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "intern/cycles/blender/blender_util.h",
+			"settings":
+			{
+				"buffer_size": 19467,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "intern/cycles/blender/blender_id_map.h",
+			"settings":
+			{
+				"buffer_size": 6462,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenkernel/BKE_object.h",
+			"settings":
+			{
+				"buffer_size": 19926,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_object_enums.h",
+			"settings":
+			{
+				"buffer_size": 2395,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenkernel/BKE_mesh.h",
+			"settings":
+			{
+				"buffer_size": 34251,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenkernel/intern/object.c",
+			"settings":
+			{
+				"buffer_size": 131140,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_cache_extract.h",
+			"settings":
+			{
+				"buffer_size": 8552,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_mesh_types.h",
+			"settings":
+			{
+				"buffer_size": 8015,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_object_types.h",
+			"settings":
+			{
+				"buffer_size": 18759,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_ID.h",
+			"settings":
+			{
+				"buffer_size": 25630,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/gpu/intern/gpu_texture.c",
+			"settings":
+			{
+				"buffer_size": 58465,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/gpu/GPU_texture.h",
+			"settings":
+			{
+				"buffer_size": 9505,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_manager_shader.c",
+			"settings":
+			{
+				"buffer_size": 18958,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/gpu/GPU_framebuffer.h",
+			"settings":
+			{
+				"buffer_size": 7873,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/gpu/intern/gpu_framebuffer.c",
+			"settings":
+			{
+				"buffer_size": 31799,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_select_buffer.c",
+			"settings":
+			{
+				"buffer_size": 16090,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_view3d_types.h",
+			"settings":
+			{
+				"buffer_size": 16921,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 10370 files for \"gtao_enable\"\n\n/home/max/dev/blender/source/blender/blenloader/intern/versioning_280.c:\n 2253          EEVEE_GET_BOOL(props, volumetric_lights, SCE_EEVEE_VOLUMETRIC_LIGHTS);\n 2254          EEVEE_GET_BOOL(props, volumetric_shadows, SCE_EEVEE_VOLUMETRIC_SHADOWS);\n 2255:         EEVEE_GET_BOOL(props, gtao_enable, SCE_EEVEE_GTAO_ENABLED);\n 2256          EEVEE_GET_BOOL(props, gtao_use_bent_normals, SCE_EEVEE_GTAO_BENT_NORMALS);\n 2257          EEVEE_GET_BOOL(props, gtao_bounce, SCE_EEVEE_GTAO_BOUNCE);\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_occlusion.c:\n   82    }\n   83  \n   84:   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) {\n   85      const float *viewport_size = DRW_viewport_size_get();\n   86      const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};\n   ..\n  144    const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);\n  145  \n  146:   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) {\n  147      const eGPUTextureFormat texture_format = (tot_samples > 128) ? GPU_R32F : GPU_R16F;\n  148  \n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_occlusion_trace.c:\n  148    e_data.denoise = (scene_eval->eevee.flag & SCE_EEVEE_RTAO_DENOISE) ? true : false;\n  149  \n  150:   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) {\n  151      const float *viewport_size = DRW_viewport_size_get();\n  152      const int fs_size[2] = {(int)viewport_size[0], (int)viewport_size[1]};\n  ...\n  240    const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);\n  241  \n  242:   if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) {\n  243      const eGPUTextureFormat texture_format = (tot_samples > 128) ? GPU_R32F : GPU_R16F;\n  244  \n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_renderpasses.c:\n   93      eViewLayerEEVEEPassType render_pass = v3d->shading.render_pass;\n   94      if (render_pass == EEVEE_RENDER_PASS_AO &&\n   95:         ((scene->eevee.flag & SCE_EEVEE_GTAO_ENABLED) == 0)) {\n   96        render_pass = EEVEE_RENDER_PASS_COMBINED;\n   97      }\n   ..\n  413    /* When SSS isn't available, but the pass is requested, we mark it as invalid */\n  414    if ((render_pass & EEVEE_RENDER_PASS_AO) != 0 &&\n  415:       (scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) == 0) {\n  416      is_valid = false;\n  417    }\n\n/home/max/dev/blender/source/blender/makesdna/DNA_scene_types.h:\n 2369    SCE_EEVEE_VOLUMETRIC_SHADOWS = (1 << 2),\n 2370    //  SCE_EEVEE_VOLUMETRIC_COLORED    = (1 << 3), /* Unused */\n 2371:   SCE_EEVEE_GTAO_ENABLED = (1 << 4),\n 2372    SCE_EEVEE_GTAO_BENT_NORMALS = (1 << 5),\n 2373    SCE_EEVEE_GTAO_BOUNCE = (1 << 6),\n\n/home/max/dev/blender/source/blender/makesrna/intern/rna_scene.c:\n 6998    /* Ambient Occlusion */\n 6999    prop = RNA_def_property(srna, \"use_gtao\", PROP_BOOLEAN, PROP_NONE);\n 7000:   RNA_def_property_boolean_sdna(prop, NULL, \"flag\", SCE_EEVEE_GTAO_ENABLED);\n 7001    RNA_def_property_ui_text(prop,\n 7002                             \"Ambient Occlusion\",\n\n/home/max/dev/blender/source/blender/makesrna/intern/rna_space.c:\n 1283    Scene *scene = CTX_data_scene(C);\n 1284  \n 1285:   const bool ao_enabled = scene->eevee.flag & SCE_EEVEE_GTAO_ENABLED;\n 1286    const bool bloom_enabled = scene->eevee.flag & SCE_EEVEE_BLOOM_ENABLED;\n 1287  \n ....\n 1307    Scene *scene = rna_3DViewShading_scene(ptr);\n 1308  \n 1309:   if (result == EEVEE_RENDER_PASS_AO && ((scene->eevee.flag & SCE_EEVEE_GTAO_ENABLED) == 0)) {\n 1310      result = EEVEE_RENDER_PASS_COMBINED;\n 1311    }\n\n12 matches across 7 files\n\n\nSearching 10370 files for \"SceneEEVEE\"\n\n/home/max/dev/blender/release/datafiles/preview_grease_pencil.blend:\n    <binary>\n\n/home/max/dev/blender/release/datafiles/startup.blend:\n    <binary>\n\n/home/max/dev/blender/release/scripts/modules/rna_manual_reference.py:\n  228  \t(\"bpy.types.rendersettings.use_render_cache*\", \"render/output/settings.html#bpy-types-rendersettings-use-render-cache\"),\n  229  \t(\"bpy.types.rendersettings_simplify_gpencil*\", \"render/cycles/render_settings/simplify.html#bpy-types-rendersettings-simplify-gpencil\"),\n  230: \t(\"bpy.types.sceneeevee.use_taa_reprojection*\", \"render/eevee/render_settings/sampling.html#bpy-types-sceneeevee-use-taa-reprojection\"),\n  231  \t(\"bpy.types.sequenceeditor.use_overlay_lock*\", \"video_editing/preview/properties.html#bpy-types-sequenceeditor-use-overlay-lock\"),\n  232  \t(\"bpy.types.spaceuveditor.show_pixel_coords*\", \"editors/uv/display_panel.html#bpy-types-spaceuveditor-show-pixel-coords\"),\n  ...\n  274  \t(\"bpy.types.fmodifierenvelopecontrolpoint*\", \"editors/graph_editor/fcurves/modifiers.html#bpy-types-fmodifierenvelopecontrolpoint\"),\n  275  \t(\"bpy.types.material.use_sss_translucency*\", \"render/eevee/materials/settings.html#bpy-types-material-use-sss-translucency\"),\n  276: \t(\"bpy.types.sceneeevee.taa_render_samples*\", \"render/eevee/render_settings/sampling.html#bpy-types-sceneeevee-taa-render-samples\"),\n  277  \t(\"bpy.types.spaceuveditor.pixel_snap_mode*\", \"modeling/meshes/uv/editing.html#bpy-types-spaceuveditor-pixel-snap-mode\"),\n  278  \t(\"bpy.types.spaceuveditor.use_live_unwrap*\", \"modeling/meshes/uv/editing.html#bpy-types-spaceuveditor-use-live-unwrap\"),\n  ...\n  287  \t(\"bpy.types.materialgpencilstyle.texture*\", \"grease_pencil/materials/grease_pencil_shader.html#bpy-types-materialgpencilstyle-texture\"),\n  288  \t(\"bpy.types.rendersettings.use_overwrite*\", \"render/output/settings.html#bpy-types-rendersettings-use-overwrite\"),\n  289: \t(\"bpy.types.sceneeevee.volumetric_shadow*\", \"render/eevee/render_settings/volumetrics.html#bpy-types-sceneeevee-volumetric-shadow\"),\n  290  \t(\"bpy.types.shadernodebsdfhairprincipled*\", \"render/shader_nodes/shader/hair_principled.html#bpy-types-shadernodebsdfhairprincipled\"),\n  291  \t(\"bpy.types.shadernodevectordisplacement*\", \"render/shader_nodes/vector/vector_displacement.html#bpy-types-shadernodevectordisplacement\"),\n  ...\n  309  \t(\"bpy.types.particlesettingstextureslot*\", \"physics/particles/texture_influence.html#bpy-types-particlesettingstextureslot\"),\n  310  \t(\"bpy.types.posebone.ik_rotation_weight*\", \"animation/armatures/posing/bone_constraints/inverse_kinematics/introduction.html#bpy-types-posebone-ik-rotation-weight\"),\n  311: \t(\"bpy.types.sceneeevee.volumetric_light*\", \"render/eevee/render_settings/volumetrics.html#bpy-types-sceneeevee-volumetric-light\"),\n  312  \t(\"bpy.types.sequenceeditor.show_overlay*\", \"video_editing/preview/properties.html#bpy-types-sequenceeditor-show-overlay\"),\n  313  \t(\"bpy.types.spline.radius_interpolation*\", \"modeling/curves/properties/active_spline.html#bpy-types-spline-radius-interpolation\"),\n  ...\n  358  \t(\"bpy.types.materialgpencilstyle.mode*\", \"grease_pencil/materials/grease_pencil_shader.html#bpy-types-materialgpencilstyle-mode\"),\n  359  \t(\"bpy.types.rendersettings.use_border*\", \"render/output/settings.html#bpy-types-rendersettings-use-border\"),\n  360: \t(\"bpy.types.sceneeevee.bokeh_max_size*\", \"render/eevee/render_settings/depth_of_field.html#bpy-types-sceneeevee-bokeh-max-size\"),\n  361  \t(\"bpy.types.shadernodebsdfanisotropic*\", \"render/shader_nodes/shader/anisotropic.html#bpy-types-shadernodebsdfanisotropic\"),\n  362  \t(\"bpy.types.shadernodebsdftranslucent*\", \"render/shader_nodes/shader/translucent.html#bpy-types-shadernodebsdftranslucent\"),\n  ...\n  442  \t(\"bpy.types.multiplygpencilmodifier*\", \"grease_pencil/modifiers/generate/multiple_strokes.html#bpy-types-multiplygpencilmodifier\"),\n  443  \t(\"bpy.types.rendersettings.filepath*\", \"render/output/settings.html#bpy-types-rendersettings-filepath\"),\n  444: \t(\"bpy.types.sceneeevee.use_overscan*\", \"render/eevee/render_settings/film.html#bpy-types-sceneeevee-use-overscan\"),\n  445  \t(\"bpy.types.shadernodeeeveespecular*\", \"render/shader_nodes/shader/specular_bsdf.html#bpy-types-shadernodeeeveespecular\"),\n  446  \t(\"bpy.types.shadernodehuesaturation*\", \"render/shader_nodes/color/hue_saturation.html#bpy-types-shadernodehuesaturation\"),\n  ...\n  491  \t(\"bpy.types.opacitygpencilmodifier*\", \"grease_pencil/modifiers/color/opacity.html#bpy-types-opacitygpencilmodifier\"),\n  492  \t(\"bpy.types.particlesystemmodifier*\", \"physics/particles/index.html#bpy-types-particlesystemmodifier\"),\n  493: \t(\"bpy.types.sceneeevee.motion_blur*\", \"render/eevee/render_settings/motion_blur.html#bpy-types-sceneeevee-motion-blur\"),\n  494: \t(\"bpy.types.sceneeevee.taa_samples*\", \"render/eevee/render_settings/sampling.html#bpy-types-sceneeevee-taa-samples\"),\n  495  \t(\"bpy.types.sequenceeditor.overlay*\", \"video_editing/preview/properties.html#bpy-types-sequenceeditor-overlay\"),\n  496  \t(\"bpy.types.shadernodedisplacement*\", \"render/shader_nodes/vector/displacement.html#bpy-types-shadernodedisplacement\"),\n  ...\n  542  \t(\"bpy.types.offsetgpencilmodifier*\", \"grease_pencil/modifiers/deform/offset.html#bpy-types-offsetgpencilmodifier\"),\n  543  \t(\"bpy.types.particlefluidsettings*\", \"physics/particles/emitter/physics/fluid.html#bpy-types-particlefluidsettings\"),\n  544: \t(\"bpy.types.sceneeevee.volumetric*\", \"render/eevee/render_settings/volumetrics.html#bpy-types-sceneeevee-volumetric\"),\n  545  \t(\"bpy.types.shadernodebsdfdiffuse*\", \"render/shader_nodes/shader/diffuse.html#bpy-types-shadernodebsdfdiffuse\"),\n  546  \t(\"bpy.types.shadernodelayerweight*\", \"render/shader_nodes/input/layer_weight.html#bpy-types-shadernodelayerweight\"),\n  ...\n  795  \t(\"bpy.types.preferencessystem*\", \"editors/preferences/system.html#bpy-types-preferencessystem\"),\n  796  \t(\"bpy.types.scene.active_clip*\", \"scene_layout/scene/properties.html#bpy-types-scene-active-clip\"),\n  797: \t(\"bpy.types.sceneeevee.shadow*\", \"render/eevee/render_settings/shadows.html#bpy-types-sceneeevee-shadow\"),\n  798  \t(\"bpy.types.shadernodecombine*\", \"render/shader_nodes/converter/combine_separate.html#bpy-types-shadernodecombine\"),\n  799  \t(\"bpy.types.shadernodefresnel*\", \"render/shader_nodes/input/fresnel.html#bpy-types-shadernodefresnel\"),\n  ...\n  858  \t(\"bpy.types.particlesettings*\", \"physics/particles/index.html#bpy-types-particlesettings\"),\n  859  \t(\"bpy.types.preferencesinput*\", \"editors/preferences/input.html#bpy-types-preferencesinput\"),\n  860: \t(\"bpy.types.sceneeevee.bloom*\", \"render/eevee/render_settings/bloom.html#bpy-types-sceneeevee-bloom\"),\n  861  \t(\"bpy.types.scenerenderlayer*\", \"render/layers/layers.html#bpy-types-scenerenderlayer\"),\n  862  \t(\"bpy.types.sculpt.show_mask*\", \"sculpt_paint/sculpting/hide_mask.html#bpy-types-sculpt-show-mask\"),\n  ...\n  921  \t(\"bpy.types.preferencesview*\", \"editors/preferences/interface.html#bpy-types-preferencesview\"),\n  922  \t(\"bpy.types.rigidbodyobject*\", \"physics/rigid_body/index.html#bpy-types-rigidbodyobject\"),\n  923: \t(\"bpy.types.sceneeevee.gtao*\", \"render/eevee/render_settings/ambient_occlusion.html#bpy-types-sceneeevee-gtao\"),\n  924  \t(\"bpy.types.shadernodebevel*\", \"render/shader_nodes/input/bevel.html#bpy-types-shadernodebevel\"),\n  925  \t(\"bpy.types.shadernodeclamp*\", \"render/shader_nodes/converter/clamp.html#bpy-types-shadernodeclamp\"),\n  ...\n  965  \t(\"bpy.types.rendersettings*\", \"render/index.html#bpy-types-rendersettings\"),\n  966  \t(\"bpy.types.rigidbodyworld*\", \"physics/rigid_body/world.html#bpy-types-rigidbodyworld\"),\n  967: \t(\"bpy.types.sceneeevee.ssr*\", \"render/eevee/render_settings/screen_space_reflections.html#bpy-types-sceneeevee-ssr\"),\n  968: \t(\"bpy.types.sceneeevee.sss*\", \"render/eevee/render_settings/subsurface_scattering.html#bpy-types-sceneeevee-sss\"),\n  969  \t(\"bpy.types.shaderfxshadow*\", \"grease_pencil/visual_effects/shadow.html#bpy-types-shaderfxshadow\"),\n  970  \t(\"bpy.types.shadernodebump*\", \"render/shader_nodes/vector/bump.html#bpy-types-shadernodebump\"),\n  ...\n 1027  \t(\"bpy.types.particlebrush*\", \"physics/particles/mode.html#bpy-types-particlebrush\"),\n 1028  \t(\"bpy.types.scene.gravity*\", \"physics/forces/gravity.html#bpy-types-scene-gravity\"),\n 1029: \t(\"bpy.types.sceneeevee.gi*\", \"render/eevee/render_settings/indirect_lighting.html#bpy-types-sceneeevee-gi\"),\n 1030  \t(\"bpy.types.scenesequence*\", \"video_editing/sequencer/strips/scene.html#bpy-types-scenesequence\"),\n 1031  \t(\"bpy.types.screwmodifier*\", \"modeling/modifiers/generate/screw.html#bpy-types-screwmodifier\"),\n ....\n 1149  \t(\"bpy.types.pointlight*\", \"render/lights/light_object.html#bpy-types-pointlight\"),\n 1150  \t(\"bpy.types.renderview*\", \"render/output/stereoscopy/index.html#bpy-types-renderview\"),\n 1151: \t(\"bpy.types.sceneeevee*\", \"render/eevee/index.html#bpy-types-sceneeevee\"),\n 1152  \t(\"bpy.types.vectorfont*\", \"modeling/texts/index.html#bpy-types-vectorfont\"),\n 1153  \t(\"bpy.ops.curve.split*\", \"modeling/curves/editing/curve.html#bpy-ops-curve-split\"),\n\n/home/max/dev/blender/release/scripts/startup/bl_app_templates_system/2D_Animation/startup.blend:\n    <binary>\n\n/home/max/dev/blender/release/scripts/startup/bl_app_templates_system/Sculpting/startup.blend:\n    <binary>\n\n/home/max/dev/blender/release/scripts/startup/bl_app_templates_system/VFX/startup.blend:\n    <binary>\n\n/home/max/dev/blender/release/scripts/startup/bl_app_templates_system/Video_Editing/startup.blend:\n    <binary>\n\n/home/max/dev/blender/source/blender/blenloader/intern/versioning_280.c:\n 2135      }\n 2136  \n 2137:     if (!DNA_struct_find(fd->filesdna, \"SceneEEVEE\")) {\n 2138        for (Scene *scene = bmain->scenes.first; scene; scene = scene->id.next) {\n 2139          /* First set the default for all the properties. */\n ....\n 2587      }\n 2588  \n 2589:     if (!DNA_struct_elem_find(fd->filesdna, \"SceneEEVEE\", \"float\", \"gi_cubemap_draw_size\")) {\n 2590        for (Scene *scene = bmain->scenes.first; scene; scene = scene->id.next) {\n 2591          scene->eevee.gi_irradiance_draw_size = 0.1f;\n ....\n 3029    if (!MAIN_VERSION_ATLEAST(bmain, 280, 33)) {\n 3030  \n 3031:     if (!DNA_struct_elem_find(fd->filesdna, \"SceneEEVEE\", \"float\", \"overscan\")) {\n 3032        for (Scene *scene = bmain->scenes.first; scene; scene = scene->id.next) {\n 3033          scene->eevee.overscan = 3.0f;\n ....\n 3042      }\n 3043  \n 3044:     if (!DNA_struct_elem_find(fd->filesdna, \"SceneEEVEE\", \"float\", \"light_threshold\")) {\n 3045        for (Scene *scene = bmain->scenes.first; scene; scene = scene->id.next) {\n 3046          scene->eevee.light_threshold = 0.01f;\n ....\n 3048      }\n 3049  \n 3050:     if (!DNA_struct_elem_find(fd->filesdna, \"SceneEEVEE\", \"float\", \"gi_irradiance_smoothing\")) {\n 3051        for (Scene *scene = bmain->scenes.first; scene; scene = scene->id.next) {\n 3052          scene->eevee.gi_irradiance_smoothing = 0.1f;\n ....\n 3054      }\n 3055  \n 3056:     if (!DNA_struct_elem_find(fd->filesdna, \"SceneEEVEE\", \"float\", \"gi_filter_quality\")) {\n 3057        for (Scene *scene = bmain->scenes.first; scene; scene = scene->id.next) {\n 3058          scene->eevee.gi_filter_quality = 1.0f;\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_lightcache.c:\n  218  }\n  219  \n  220: void EEVEE_lightcache_info_update(SceneEEVEE *eevee)\n  221  {\n  222    LightCache *lcache = eevee->light_cache_data;\n  ...\n  565  {\n  566    Scene *scene_eval = DEG_get_evaluated_scene(lbake->depsgraph);\n  567:   SceneEEVEE *eevee = &scene_eval->eevee;\n  568  \n  569    lbake->bounce_len = eevee->gi_diffuse_bounces;\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_lightcache.h:\n   30  struct LightCache;\n   31  struct Scene;\n   32: struct SceneEEVEE;\n   33  struct ViewLayer;\n   34  \n   ..\n   62  void EEVEE_lightcache_free(struct LightCache *lcache);\n   63  bool EEVEE_lightcache_load(struct LightCache *lcache);\n   64: void EEVEE_lightcache_info_update(struct SceneEEVEE *eevee);\n   65  \n   66  #endif /* __EEVEE_LIGHTCACHE_H__ */\n\n/home/max/dev/blender/source/blender/editors/space_view3d/space_view3d.c:\n 1053    }\n 1054  \n 1055:   WM_msg_subscribe_rna_anon_type(mbus, SceneEEVEE, &msg_sub_value_region_tag_redraw);\n 1056    WM_msg_subscribe_rna_anon_type(mbus, SceneDisplay, &msg_sub_value_region_tag_redraw);\n 1057    WM_msg_subscribe_rna_anon_type(mbus, ObjectDisplay, &msg_sub_value_region_tag_redraw);\n\n/home/max/dev/blender/source/blender/makesdna/DNA_scene_defaults.h:\n  175    }\n  176  \n  177: #define _DNA_DEFAULT_SceneEEVEE \\\n  178    { \\\n  179      .gi_diffuse_bounces = 3, \\\n  ...\n  247      .safe_areas = _DNA_DEFAULT_DisplaySafeAreas, \\\n  248   \\\n  249:     .eevee = _DNA_DEFAULT_SceneEEVEE, \\\n  250    }\n  251  \n\n/home/max/dev/blender/source/blender/makesdna/DNA_scene_types.h:\n 1584  } SceneDisplay;\n 1585  \n 1586: typedef struct SceneEEVEE {\n 1587    int flag;\n 1588    int gi_diffuse_bounces;\n ....\n 1649    float overscan;\n 1650    float light_threshold;\n 1651: } SceneEEVEE;\n 1652  \n 1653  /* *************************************************************** */\n ....\n 1781  \n 1782    struct SceneDisplay display;\n 1783:   struct SceneEEVEE eevee;\n 1784  } Scene;\n 1785  \n ....\n 2363  #define USER_UNIT_ROT_RADIANS 2\n 2364  \n 2365: /* SceneEEVEE->flag */\n 2366  enum {\n 2367    // SCE_EEVEE_VOLUMETRIC_ENABLED = (1 << 0), /* Unused */\n ....\n 2393  };\n 2394  \n 2395: /* SceneEEVEE->shadow_method */\n 2396  enum {\n 2397    SHADOW_ESM = 1,\n\n/home/max/dev/blender/source/blender/makesdna/intern/dna_defaults.c:\n  250      SDNA_DEFAULT_DECL_EX(PhysicsSettings, Scene.physics_settings),\n  251      SDNA_DEFAULT_DECL_EX(SceneDisplay, Scene.display),\n  252:     SDNA_DEFAULT_DECL_EX(SceneEEVEE, Scene.eevee),\n  253  \n  254      SDNA_DEFAULT_DECL(ToolSettings),\n\n/home/max/dev/blender/source/blender/makesrna/intern/rna_scene.c:\n 1133  }\n 1134  \n 1135: static char *rna_SceneEEVEE_path(PointerRNA *UNUSED(ptr))\n 1136  {\n 1137    return BLI_strdup(\"eevee\");\n ....\n 6758    };\n 6759  \n 6760:   srna = RNA_def_struct(brna, \"SceneEEVEE\", NULL);\n 6761:   RNA_def_struct_path_func(srna, \"rna_SceneEEVEE_path\");\n 6762    RNA_def_struct_ui_text(srna, \"Scene Display\", \"Scene display settings for 3d viewport\");\n 6763  \n ....\n 7710    /* EEVEE */\n 7711    prop = RNA_def_property(srna, \"eevee\", PROP_POINTER, PROP_NONE);\n 7712:   RNA_def_property_struct_type(prop, \"SceneEEVEE\");\n 7713    RNA_def_property_ui_text(prop, \"EEVEE\", \"EEVEE settings for the scene\");\n 7714  \n\n/home/max/dev/blender/source/blender/makesrna/RNA_access.h:\n  489  extern StructRNA RNA_Scene;\n  490  extern StructRNA RNA_SceneDisplay;\n  491: extern StructRNA RNA_SceneEEVEE;\n  492  extern StructRNA RNA_SceneObjects;\n  493  extern StructRNA RNA_SceneRenderLayer;\n\n62 matches across 16 files\n\n\nSearching 10370 files for \"EVEM_objects_cache_populate\"\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_embree.c:\n   94  }\n   95  \n   96: void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow) {\n   97:   printf(\"EVEM_objects_cache_populate\\n\");\n   98  \n   99  \tif (!cast_shadow)\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_embree.h:\n   67  void EVEM_print_capabilities(void);\n   68  void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);\n   69: void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow);\n   70  void EVEM_free(void);\n   71  \n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_engine.c:\n  146    if (DRW_object_is_renderable(ob) && (ob_visibility & OB_VISIBLE_SELF)) {\n  147      if (ELEM(ob->type, OB_MESH, OB_CURVE, OB_SURF, OB_FONT, OB_MBALL)) {\n  148:       EVEM_objects_cache_populate(vedata, sldata, ob, &cast_shadow);\n  149        EEVEE_materials_cache_populate(vedata, sldata, ob, &cast_shadow);\n  150      }\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_render.c:\n  218    if (ob_visibility & OB_VISIBLE_SELF) {\n  219      if (ELEM(ob->type, OB_MESH, OB_CURVE, OB_SURF, OB_FONT, OB_MBALL)) {\n  220:       EVEM_objects_cache_populate(vedata, sldata, ob, &cast_shadow);\n  221        EEVEE_materials_cache_populate(vedata, sldata, ob, &cast_shadow);\n  222      }\n\n5 matches across 4 files\n\n\nSearching 10370 files for \"EEVEE_cache_populate\"\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_engine.c:\n  131  }\n  132  \n  133: void EEVEE_cache_populate(void *vedata, Object *ob)\n  134  {\n  135:   printf(\"%s\\n\", \"EEVEE_cache_populate\");\n  136    EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();\n  137  \n  ...\n  494      &eevee_engine_free,\n  495      &eevee_cache_init,\n  496:     &EEVEE_cache_populate,\n  497      &eevee_cache_finish,\n  498      &eevee_draw_scene,\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_private.h:\n 1248  \n 1249  /** eevee_engine.c */\n 1250: void EEVEE_cache_populate(void *vedata, Object *ob);\n 1251  \n 1252  /* Shadow Matrix */\n\n4 matches across 2 files\n\n\nSearching 10370 files for \"EEVEE_cache_populate\"\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_engine.c:\n  131  }\n  132  \n  133: void EEVEE_cache_populate(void *vedata, Object *ob)\n  134  {\n  135:   printf(\"%s\\n\", \"EEVEE_cache_populate\");\n  136    EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();\n  137  \n  ...\n  495      &eevee_engine_free,\n  496      &eevee_cache_init,\n  497:     &EEVEE_cache_populate,\n  498      &eevee_cache_finish,\n  499      &eevee_draw_scene,\n\n/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_private.h:\n 1248  \n 1249  /** eevee_engine.c */\n 1250: void EEVEE_cache_populate(void *vedata, Object *ob);\n 1251  \n 1252  /* Shadow Matrix */\n\n4 matches across 2 files\n",
+			"settings":
+			{
+				"buffer_size": 21272,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "source/blender/makesrna/intern/rna_rna.c",
+			"settings":
+			{
+				"buffer_size": 119761,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_shaders.c",
+			"settings":
+			{
+				"buffer_size": 12478,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesrna/intern/rna_depsgraph.c",
+			"settings":
+			{
+				"buffer_size": 30590,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/bsdf_common_lib.glsl",
+			"settings":
+			{
+				"buffer_size": 28005,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/common_uniforms_lib.glsl",
+			"settings":
+			{
+				"buffer_size": 2016,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/lightprobe_lib.glsl",
+			"settings":
+			{
+				"buffer_size": 9998,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/prepass_vert.glsl",
+			"settings":
+			{
+				"buffer_size": 1057,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/physics/intern/implicit_blender.c",
+			"settings":
+			{
+				"buffer_size": 66283,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_manager_texture.c",
+			"settings":
+			{
+				"buffer_size": 5381,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/gpu/intern/gpu_viewport.c",
+			"settings":
+			{
+				"buffer_size": 32405,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_manager.h",
+			"settings":
+			{
+				"buffer_size": 16229,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_engine.h",
+			"settings":
+			{
+				"buffer_size": 943,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_meshdata_types.h",
+			"settings":
+			{
+				"buffer_size": 14570,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_camera_types.h",
+			"settings":
+			{
+				"buffer_size": 5380,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_view.h",
+			"settings":
+			{
+				"buffer_size": 1033,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/bmesh/bmesh.h",
+			"settings":
+			{
+				"buffer_size": 9444,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/bmesh/intern/bmesh_mesh.h",
+			"settings":
+			{
+				"buffer_size": 6439,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/bmesh/intern/bmesh_mesh_conv.h",
+			"settings":
+			{
+				"buffer_size": 2680,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenkernel/intern/context.c",
+			"settings":
+			{
+				"buffer_size": 33636,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_occlusion_trace.h",
+			"settings":
+			{
+				"buffer_size": 761,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_manager_exec.c",
+			"settings":
+			{
+				"buffer_size": 46272,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/DRW_render.h",
+			"settings":
+			{
+				"buffer_size": 30659,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenkernel/BKE_duplilist.h",
+			"settings":
+			{
+				"buffer_size": 1920,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_cache_extract_mesh.c",
+			"settings":
+			{
+				"buffer_size": 155819,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenlib/BLI_math_geom.h",
+			"settings":
+			{
+				"buffer_size": 37903,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_manager_data.c",
+			"settings":
+			{
+				"buffer_size": 67055,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/gpu/GPU_batch.h",
+			"settings":
+			{
+				"buffer_size": 9264,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "intern/cycles/render/object.h",
+			"settings":
+			{
+				"buffer_size": 4082,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/depsgraph/DEG_depsgraph.h",
+			"settings":
+			{
+				"buffer_size": 8898,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_renderpasses.c",
+			"settings":
+			{
+				"buffer_size": 18531,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_view.c",
+			"settings":
+			{
+				"buffer_size": 6809,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/ambient_occlusion_embree_lib.glsl",
+			"settings":
+			{
+				"buffer_size": 7051,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/gpu/GPU_state.h",
+			"settings":
+			{
+				"buffer_size": 2548,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/ambient_occlusion_lib.glsl",
+			"settings":
+			{
+				"buffer_size": 8768,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenlib/BLI_string_utils.h",
+			"settings":
+			{
+				"buffer_size": 4094,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenlib/intern/string_utils.c",
+			"settings":
+			{
+				"buffer_size": 14800,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/effect_gtao_embree_denoise_frag.glsl",
+			"settings":
+			{
+				"buffer_size": 2155,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_private.h",
+			"settings":
+			{
+				"buffer_size": 51931,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_shadows.c",
+			"settings":
+			{
+				"buffer_size": 19579,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_render.c",
+			"settings":
+			{
+				"buffer_size": 27487,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_data.c",
+			"settings":
+			{
+				"buffer_size": 6172,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_engine.c",
+			"settings":
+			{
+				"buffer_size": 17808,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_manager.c",
+			"settings":
+			{
+				"buffer_size": 84436,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_cache.c",
+			"settings":
+			{
+				"buffer_size": 111981,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_cache_impl_mesh.c",
+			"settings":
+			{
+				"buffer_size": 54074,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/intern/draw_cache_inline.h",
+			"settings":
+			{
+				"buffer_size": 3574,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_embree_objects.h",
+			"settings":
+			{
+				"buffer_size": 1415,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_embree.h",
+			"settings":
+			{
+				"buffer_size": 2567,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/depsgraph/DEG_depsgraph_query.h",
+			"settings":
+			{
+				"buffer_size": 9753,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/depsgraph/intern/depsgraph_query.cc",
+			"settings":
+			{
+				"buffer_size": 10550,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_effects.c",
+			"settings":
+			{
+				"buffer_size": 23519,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_materials.c",
+			"settings":
+			{
+				"buffer_size": 95484,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenkernel/intern/material.c",
+			"settings":
+			{
+				"buffer_size": 44131,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_occlusion.c",
+			"settings":
+			{
+				"buffer_size": 12334,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 20943,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_embree.c",
+			"settings":
+			{
+				"buffer_size": 13168,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_volumes.c",
+			"settings":
+			{
+				"buffer_size": 40372,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_world_types.h",
+			"settings":
+			{
+				"buffer_size": 3019,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "intern/cycles/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 11109,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_bloom.c",
+			"settings":
+			{
+				"buffer_size": 15789,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/eevee_screen_raytrace.c",
+			"settings":
+			{
+				"buffer_size": 15704,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/draw/engines/eevee/shaders/lit_surface_frag.glsl",
+			"settings":
+			{
+				"buffer_size": 16587,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/max/dev/fasta/shaders/shader.frag",
+			"settings":
+			{
+				"buffer_size": 200,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_scene_types.h",
+			"settings":
+			{
+				"buffer_size": 65627,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "release/scripts/startup/bl_ui/properties_render.py",
+			"settings":
+			{
+				"buffer_size": 22839,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/blenloader/intern/versioning_280.c",
+			"settings":
+			{
+				"buffer_size": 184296,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesrna/intern/rna_scene.c",
+			"settings":
+			{
+				"buffer_size": 337461,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesrna/intern/rna_internal.h",
+			"settings":
+			{
+				"buffer_size": 28904,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesrna/intern/rna_define.c",
+			"settings":
+			{
+				"buffer_size": 131139,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "source/blender/makesdna/DNA_layer_types.h",
+			"settings":
+			{
+				"buffer_size": 6730,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "",
 	"build_system_choices":
@@ -172,10 +1324,47 @@
 	},
 	"expanded_folders":
 	[
-		"/home/max/dev/blender"
+		"/home/max/dev/blender",
+		"/home/max/dev/blender/intern",
+		"/home/max/dev/blender/release",
+		"/home/max/dev/blender/release/bin",
+		"/home/max/dev/blender/release/scripts",
+		"/home/max/dev/blender/release/scripts/addons",
+		"/home/max/dev/blender/release/scripts/addons_contrib",
+		"/home/max/dev/blender/release/scripts/freestyle",
+		"/home/max/dev/blender/release/scripts/modules",
+		"/home/max/dev/blender/release/scripts/startup",
+		"/home/max/dev/blender/release/scripts/startup/bl_ui",
+		"/home/max/dev/blender/source",
+		"/home/max/dev/blender/source/blender",
+		"/home/max/dev/blender/source/blender/draw",
+		"/home/max/dev/blender/source/blender/draw/engines",
+		"/home/max/dev/blender/source/blender/draw/engines/eevee",
+		"/home/max/dev/blender/source/blender/draw/engines/eevee/shaders",
+		"/home/max/dev/blender/source/blender/draw/engines/external",
+		"/home/max/dev/blender/source/blender/draw/intern",
+		"/home/max/dev/blender/source/blender/draw/intern/shaders"
 	],
 	"file_history":
 	[
+		"/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_occlusion_trace.c",
+		"/home/max/dev/blender/release/scripts/startup/bl_ui/__init__.py",
+		"/home/max/dev/blender/source/blender/draw/engines/eevee/shaders/common_fullscreen_embree_vert.glsl",
+		"/home/max/dev/blender/source/blender/draw/engines/eevee/shaders/common_uniforms_embree_lib.glsl",
+		"/home/max/dev/blender/source/blender/draw/engines/eevee/eevee_objects_map.h",
+		"/home/max/dev/blender/source/blender/blenlib/intern/winstuff_dir.c",
+		"/home/max/dev/blender/source/blender/draw/intern/draw_cache_extract.h",
+		"/home/max/dev/blender/source/blender/draw/engines/workbench/workbench_engine.c",
+		"/home/max/dev/blender/source/blender/draw/DRW_engine_types.h",
+		"/home/max/dev/blender/source/blender/blenlib/BLI_hash.h",
+		"/home/max/dev/blender/source/blender/blenlib/BLI_index_range.h",
+		"/home/max/dev/blender/source/blender/bmesh/intern/bmesh_operators_private.h",
+		"/home/max/dev/blender/source/blender/bmesh/intern/bmesh_operators.h",
+		"/home/max/dev/blender/source/blender/python/intern/CMakeLists.txt",
+		"/home/max/dev/blender/source/blender/blenlib/intern/BLI_ghash_utils.c",
+		"/home/max/dev/blender/source/blender/blenlib/intern/BLI_ghash.c",
+		"/home/max/dev/blender/source/blender/blenloader/intern/versioning_280.c",
+		"/home/max/dev/blender/source/blender/draw/engines/eevee/shaders/ambient_occlusion_trace_lib.glsl",
 		"/home/max/dev/bivis/src/blender/addon/ui.py",
 		"/home/max/dev/bivis/src/blender/addon/presets.py",
 		"/home/max/dev/bivis/src/blender/addon/properties.py",
@@ -223,13 +1412,162 @@
 		"height": 101.0,
 		"where_history":
 		[
+			"/home/max/dev/blender/",
+			"/home/max/dev/blender/source",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee",
+			"/home/max/dev/blender/source,/home/max/dev/blender/source/blender/draw/engines/eevee",
+			"/home/max/dev/blender/source,/home/max/dev/blender/source/blender/draw/engines/eevee/shaders",
+			"/home/max/dev/blender/source",
+			"/home/max/dev/blender/source/blender/draw",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee",
+			"/home/max/dev/blender/source/",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee",
+			"/home/max/dev/blender/source",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee",
+			"/home/max/dev/blender/",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee",
+			"/home/max/dev/blender",
+			"/home/max/dev/blender/source/blender",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee/shaders",
+			"/home/max/dev/blender",
+			"/home/max/dev/blender/source/blender",
+			"/home/max/dev/blender/source/blender/draw/engines/eevee"
 		]
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"EEVEE_cache_populate",
+			"EVEM_objects_cache_populate",
+			"SceneEEVEE",
+			"ao_cpu_buff",
+			"ao_deonise_data",
+			"gtao_enable",
+			"SceneEEVEE",
+			"gtao_distance",
+			"PROP_FACTOR",
+			"RNA_def_property_int_default",
+			"RENDER_PT_eevee_ambient_occlusion",
+			"SceneEEVEE",
+			"SCE_EEVEE_GTAO_GPUBUFF",
+			"gtao_trace",
+			"SceneEEVEE",
+			"use_gtao_bent_normals",
+			"use_gtao_denoise",
+			"DRW_uniformbuffer_update",
+			"common_ubo",
+			"ao_trace_pos",
+			"datatoc_effect_gtao_embree_frag_glsl",
+			"SCE_EEVEE_GTAO_GPUBUFF",
+			"DRW_engine_viewport_eevee_type",
+			"use_high_quality_normals",
+			"EFFECT_NORMAL_BUFFER",
+			"ssr_normal_input",
+			"EFFECT_GTAO",
+			"import",
+			"gtao_fb",
+			"ao_horizon_debug",
+			"EEVEE_occlusion_trace_init",
+			"datatoc_common_uniforms_embree_lib_glsl",
+			"VAR_MAT_MESH",
+			"common_uniforms_lib",
+			"datatoc_ambient_occlusion_lib_glsl",
+			"datatoc_bsdf_common_lib_glsl",
+			"USE_AO",
+			" {",
+			"drw_engines_cache_populate",
+			"DrawEngineType",
+			"DepsgraphObjectInstance",
+			"EVEM",
+			"EVEM_objects_cache_populate",
+			"DRW_render_object_iter",
+			"EFFECT_GTAO",
+			"EFFECT_SSR",
+			"SSR_AO",
+			"specular_occlusion",
+			"SSR_AO",
+			"texelFetch",
+			"search_horizon_sweep",
+			"SCE_EEVEE_GTAO_ENABLED",
+			"SCE_EEVEE_GTAO_TRACE",
+			"SCE_EEVEE_GTAO_ENABLED",
+			"SCE_EEVEE_GTAO_TRACE",
+			"use_gtao_trace",
+			"normal_object_to_world",
+			"datatoc_common_fullscreen_vert_glsl",
+			"datatoc_prepass_vert_glsl",
+			"normalBuffer",
+			"GPU_DEPTH_COMPONENT24",
+			"GPU_DEPTH24F_STENCIL8",
+			"GPU_DEPTH32F_STENCIL8",
+			"ao_src_depth",
+			"    #",
+			"uvcoordsvar",
+			"get_world_space_from_depth",
+			"gtao_nrm",
+			"viewPosition",
+			"ssr_normal_input",
+			"gtao_fb",
+			"eevee_render_to_image",
+			"GPU_framebuffer_ensure_config",
+			"gtao_trace_hits",
+			"EEVEE_render_init",
+			"EEVEE_renderpasses_init",
+			"EEVEE_materials_init",
+			"camera",
+			"struct",
+			"OpenMP",
+			"#pragma omp",
+			";\n",
+			"EEVEE_occlusion_trace_init",
+			"EEVEE_occlusion_compute",
+			"ssr_normal_input",
+			"GPU_texture_read",
+			"depth_src",
+			"ao_src_depth",
+			"EFFECT_NORMAL_BUFFER",
+			"ssr_normal_input",
+			"MeshRenderData",
+			"EEVEE_materials_cache_populate",
+			"EEVEE_object_data_ensure",
+			"EEVEE_ObjectEngineData",
+			"eevee_id_object_update",
+			"EEVEE_object_data_get",
+			"eevee_id_object_update",
+			"EEVEE_render_cache",
+			"mesh",
+			"Scene",
+			"embree",
+			"gtao_horizons",
+			"ao_src_depth",
+			"texelFetch",
+			"ao_src_depth",
+			"dummy_horizon_tx",
+			"gtao_horizons",
+			"horizonBuffer",
+			"gtao_fb",
+			"MEM_ma",
+			"main_fb",
+			"ao_src_depth",
+			"DRW_texture",
+			"gtao_horizons",
+			"embree",
+			"EEVEE_materials_cache_",
+			"EEVEE_materials_cache_init",
+			"EEVEE_materials_cac",
+			"EEVEE_materials",
+			"eevee_engine_init",
+			"EEVEE_renderpasses_init",
+			"eevee_engine_init",
+			"EEVEE_materials_init",
+			"ao_horizon_search_layer",
+			"STEP_RESOLVE",
+			"ENABLE_DEFERED_AO",
+			"datatoc_ambient_occlusion_lib_glsl",
+			"DRW_shader_create_fullscreen"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -237,6 +1575,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"rtao_cpu_buff",
+			"rtao_deonise_data"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -247,8 +1587,3095 @@
 	"groups":
 	[
 		{
+			"selected": 77,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "source/blender/draw/engines/eevee/shaders/effect_gtao_embree_frag.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1658,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								210,
+								210
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "source/blender/draw/engines/eevee/eevee_occlusion_trace.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 29584,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1270,
+								1270
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6018.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "source/blender/draw/engines/eevee/eevee_embree_objects.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3379,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2188,
+								2188
+							]
+						],
+						"settings":
+						{
+							"auto_name": "/* size of screen tiles */",
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2
+						},
+						"translation.x": 0.0,
+						"translation.y": 867.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "intern/cycles/blender/blender_object.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15602,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3023,
+								3023
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7810.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 55,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "intern/cycles/blender/blender_util.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19467,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7002,
+								7002
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 9430.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 54,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "intern/cycles/blender/blender_id_map.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6462,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4409,
+								4409
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1044.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 53,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "source/blender/blenkernel/BKE_object.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19926,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15262,
+								15262
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4988.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 61,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "source/blender/makesdna/DNA_object_enums.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2395,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 64,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "source/blender/blenkernel/BKE_mesh.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 34251,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 11220.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 65,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "source/blender/blenkernel/intern/object.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 131140,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								108412,
+								108412
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 64998.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 67,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "source/blender/draw/intern/draw_cache_extract.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8552,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5871,
+								5871
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2581.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 68,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "source/blender/makesdna/DNA_mesh_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8015,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2421,
+								2421
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2744.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 19,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "source/blender/makesdna/DNA_object_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 18759,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11187,
+								11187
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6009.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "source/blender/makesdna/DNA_ID.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25630,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7846,
+								7846
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3560.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 60,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "source/blender/gpu/intern/gpu_texture.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 58465,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2448,
+								2448
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 603.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "source/blender/gpu/GPU_texture.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9505,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6805,
+								6805
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3135.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 40,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "source/blender/draw/intern/draw_manager_shader.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 18958,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14907,
+								14907
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7028.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 45,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "source/blender/gpu/GPU_framebuffer.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7873,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6078,
+								6078
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2489.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 42,
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "source/blender/gpu/intern/gpu_framebuffer.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 31799,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18949,
+								18949
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 10649.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 41,
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"file": "source/blender/draw/intern/draw_select_buffer.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16090,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1094,
+								1094
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 76,
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"file": "source/blender/makesdna/DNA_view3d_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16921,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1415,
+								1415
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 700.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 26,
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 21272,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										325,
+										336
+									],
+									[
+										348,
+										359
+									],
+									[
+										670,
+										681
+									],
+									[
+										976,
+										987
+									],
+									[
+										1325,
+										1336
+									],
+									[
+										1631,
+										1642
+									],
+									[
+										2005,
+										2016
+									],
+									[
+										2299,
+										2310
+									],
+									[
+										2566,
+										2577
+									],
+									[
+										2929,
+										2940
+									],
+									[
+										3220,
+										3231
+									],
+									[
+										3470,
+										3481
+									],
+									[
+										4138,
+										4148
+									],
+									[
+										4227,
+										4237
+									],
+									[
+										4833,
+										4843
+									],
+									[
+										4920,
+										4930
+									],
+									[
+										5505,
+										5515
+									],
+									[
+										5594,
+										5604
+									],
+									[
+										6250,
+										6260
+									],
+									[
+										6338,
+										6348
+									],
+									[
+										6921,
+										6931
+									],
+									[
+										7010,
+										7020
+									],
+									[
+										7584,
+										7594
+									],
+									[
+										7661,
+										7671
+									],
+									[
+										8214,
+										8224
+									],
+									[
+										8297,
+										8307
+									],
+									[
+										8343,
+										8353
+									],
+									[
+										8423,
+										8433
+									],
+									[
+										8974,
+										8984
+									],
+									[
+										9056,
+										9066
+									],
+									[
+										9566,
+										9576
+									],
+									[
+										9640,
+										9650
+									],
+									[
+										10126,
+										10136
+									],
+									[
+										10197,
+										10207
+									],
+									[
+										10652,
+										10662
+									],
+									[
+										10734,
+										10744
+									],
+									[
+										11177,
+										11187
+									],
+									[
+										11265,
+										11275
+									],
+									[
+										11303,
+										11313
+									],
+									[
+										11388,
+										11398
+									],
+									[
+										11830,
+										11840
+									],
+									[
+										11910,
+										11920
+									],
+									[
+										12351,
+										12361
+									],
+									[
+										12400,
+										12410
+									],
+									[
+										13170,
+										13180
+									],
+									[
+										13419,
+										13429
+									],
+									[
+										13735,
+										13745
+									],
+									[
+										13983,
+										13993
+									],
+									[
+										14246,
+										14256
+									],
+									[
+										14524,
+										14534
+									],
+									[
+										14846,
+										14856
+									],
+									[
+										15025,
+										15035
+									],
+									[
+										15267,
+										15277
+									],
+									[
+										15490,
+										15500
+									],
+									[
+										15701,
+										15711
+									],
+									[
+										16055,
+										16065
+									],
+									[
+										16226,
+										16236
+									],
+									[
+										16378,
+										16388
+									],
+									[
+										16515,
+										16525
+									],
+									[
+										16680,
+										16690
+									],
+									[
+										16785,
+										16795
+									],
+									[
+										16919,
+										16929
+									],
+									[
+										17225,
+										17235
+									],
+									[
+										17411,
+										17421
+									],
+									[
+										17562,
+										17572
+									],
+									[
+										17627,
+										17637
+									],
+									[
+										17898,
+										17908
+									],
+									[
+										18168,
+										18178
+									],
+									[
+										18456,
+										18483
+									],
+									[
+										18583,
+										18610
+									],
+									[
+										18864,
+										18891
+									],
+									[
+										19258,
+										19285
+									],
+									[
+										19627,
+										19654
+									],
+									[
+										19961,
+										19981
+									],
+									[
+										20042,
+										20062
+									],
+									[
+										20224,
+										20244
+									],
+									[
+										20431,
+										20451
+									],
+									[
+										20693,
+										20713
+									],
+									[
+										20774,
+										20794
+									],
+									[
+										20956,
+										20976
+									],
+									[
+										21163,
+										21183
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								20542,
+								20542
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 5,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 6749.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				},
+				{
+					"buffer": 22,
+					"file": "source/blender/makesrna/intern/rna_rna.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 119761,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2528,
+								2528
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 552.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 27,
+					"type": "text"
+				},
+				{
+					"buffer": 23,
+					"file": "source/blender/draw/engines/eevee/eevee_shaders.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12478,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3663,
+								3663
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5327.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 31,
+					"type": "text"
+				},
+				{
+					"buffer": 24,
+					"file": "source/blender/makesrna/intern/rna_depsgraph.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 30590,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1413,
+								1413
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 405.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 66,
+					"type": "text"
+				},
+				{
+					"buffer": 25,
+					"file": "source/blender/draw/engines/eevee/shaders/bsdf_common_lib.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 28005,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2895,
+								2895
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 969.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 35,
+					"type": "text"
+				},
+				{
+					"buffer": 26,
+					"file": "source/blender/draw/engines/eevee/shaders/common_uniforms_lib.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2016,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1046,
+								1046
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 36,
+					"type": "text"
+				},
+				{
+					"buffer": 27,
+					"file": "source/blender/draw/engines/eevee/shaders/lightprobe_lib.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9998,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7213,
+								7213
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3237.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 25,
+					"type": "text"
+				},
+				{
+					"buffer": 28,
+					"file": "source/blender/draw/engines/eevee/shaders/prepass_vert.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1057,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								40,
+								40
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 75,
+					"type": "text"
+				},
+				{
+					"buffer": 29,
+					"file": "source/blender/physics/intern/implicit_blender.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 66283,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5977,
+								5977
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2961.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 78,
+					"type": "text"
+				},
+				{
+					"buffer": 30,
+					"file": "source/blender/draw/intern/draw_manager_texture.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5381,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4266,
+								4266
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1741.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 74,
+					"type": "text"
+				},
+				{
+					"buffer": 31,
+					"file": "source/blender/gpu/intern/gpu_viewport.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 32405,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12588,
+								12588
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5923.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 73,
+					"type": "text"
+				},
+				{
+					"buffer": 32,
+					"file": "source/blender/draw/intern/draw_manager.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16229,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 670.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 48,
+					"type": "text"
+				},
+				{
+					"buffer": 33,
+					"file": "source/blender/draw/engines/eevee/eevee_engine.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 943,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								852,
+								852
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 34,
+					"file": "source/blender/makesdna/DNA_meshdata_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14570,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2356,
+								2356
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 716.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 69,
+					"type": "text"
+				},
+				{
+					"buffer": 35,
+					"file": "source/blender/makesdna/DNA_camera_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5380,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1101,
+								1101
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2754.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 71,
+					"type": "text"
+				},
+				{
+					"buffer": 36,
+					"file": "source/blender/draw/intern/draw_view.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1033,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 80,
+					"type": "text"
+				},
+				{
+					"buffer": 37,
+					"file": "source/blender/bmesh/bmesh.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9444,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3162.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 85,
+					"type": "text"
+				},
+				{
+					"buffer": 38,
+					"file": "source/blender/bmesh/intern/bmesh_mesh.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6439,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 714.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 81,
+					"type": "text"
+				},
+				{
+					"buffer": 39,
+					"file": "source/blender/bmesh/intern/bmesh_mesh_conv.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2680,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 306.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 84,
+					"type": "text"
+				},
+				{
+					"buffer": 40,
+					"file": "source/blender/blenkernel/intern/context.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 33636,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2174,
+								2174
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 852.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 87,
+					"type": "text"
+				},
+				{
+					"buffer": 41,
+					"file": "source/blender/draw/engines/eevee/eevee_occlusion_trace.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 761,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								236,
+								236
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 42,
+					"file": "source/blender/draw/intern/draw_manager_exec.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 46272,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								45915,
+								45915
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 25083.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 43,
+					"file": "source/blender/draw/intern/DRW_render.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 30659,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6214,
+								6214
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2676.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 33,
+					"type": "text"
+				},
+				{
+					"buffer": 44,
+					"file": "source/blender/blenkernel/BKE_duplilist.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1920,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1870,
+								1870
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 500.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 72,
+					"type": "text"
+				},
+				{
+					"buffer": 45,
+					"file": "source/blender/draw/intern/draw_cache_extract_mesh.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 155819,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10931,
+								10931
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6426.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 82,
+					"type": "text"
+				},
+				{
+					"buffer": 46,
+					"file": "source/blender/blenlib/BLI_math_geom.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 37903,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								37017,
+								37017
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3011.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 83,
+					"type": "text"
+				},
+				{
+					"buffer": 47,
+					"file": "source/blender/draw/intern/draw_manager_data.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 67055,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2666,
+								2666
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1027.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 34,
+					"type": "text"
+				},
+				{
+					"buffer": 48,
+					"file": "source/blender/gpu/GPU_batch.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9264,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2991,
+								2991
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 860.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 57,
+					"type": "text"
+				},
+				{
+					"buffer": 49,
+					"file": "intern/cycles/render/object.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4082,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1133,
+								1133
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 104.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 70,
+					"type": "text"
+				},
+				{
+					"buffer": 50,
+					"file": "source/blender/depsgraph/DEG_depsgraph.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8898,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								811,
+								811
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3334.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 63,
+					"type": "text"
+				},
+				{
+					"buffer": 51,
+					"file": "source/blender/draw/engines/eevee/eevee_renderpasses.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 18531,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6899,
+								6899
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5038.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 52,
+					"file": "source/blender/draw/intern/draw_view.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6809,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 322.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 77,
+					"type": "text"
+				},
+				{
+					"buffer": 53,
+					"file": "source/blender/draw/engines/eevee/shaders/ambient_occlusion_embree_lib.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7051,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								143,
+								143
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 37,
+					"type": "text"
+				},
+				{
+					"buffer": 54,
+					"file": "source/blender/gpu/GPU_state.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2548,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 79,
+					"type": "text"
+				},
+				{
+					"buffer": 55,
+					"file": "source/blender/draw/engines/eevee/shaders/ambient_occlusion_lib.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8768,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8116,
+								8116
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 561.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 38,
+					"type": "text"
+				},
+				{
+					"buffer": 56,
+					"file": "source/blender/blenlib/BLI_string_utils.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4094,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2778,
+								2778
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 636.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 51,
+					"type": "text"
+				},
+				{
+					"buffer": 57,
+					"file": "source/blender/blenlib/intern/string_utils.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14800,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12838,
+								12838
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7317.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 52,
+					"type": "text"
+				},
+				{
+					"buffer": 58,
+					"file": "source/blender/draw/engines/eevee/shaders/effect_gtao_embree_denoise_frag.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2155,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								41,
+								41
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 24,
+					"type": "text"
+				},
+				{
+					"buffer": 59,
+					"file": "source/blender/draw/engines/eevee/eevee_private.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 51931,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								23153,
+								23153
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3714.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 60,
+					"file": "source/blender/draw/engines/eevee/eevee_shadows.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19579,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15886,
+								15886
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6229.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 32,
+					"type": "text"
+				},
+				{
+					"buffer": 61,
+					"file": "source/blender/draw/engines/eevee/eevee_render.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 27487,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								23643,
+								23643
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 10388.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 62,
+					"file": "source/blender/draw/engines/eevee/eevee_data.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6172,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3265,
+								3265
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 30,
+					"type": "text"
+				},
+				{
+					"buffer": 63,
+					"file": "source/blender/draw/engines/eevee/eevee_engine.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 17808,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4648,
+								4648
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1780.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 64,
+					"file": "source/blender/draw/intern/draw_manager.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 84436,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								77847,
+								77847
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 44666.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 47,
+					"type": "text"
+				},
+				{
+					"buffer": 65,
+					"file": "source/blender/draw/intern/draw_cache.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 111981,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								89102,
+								89102
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 47185.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 59,
+					"type": "text"
+				},
+				{
+					"buffer": 66,
+					"file": "source/blender/draw/intern/draw_cache_impl_mesh.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 54074,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								23824,
+								23824
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 11213.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 58,
+					"type": "text"
+				},
+				{
+					"buffer": 67,
+					"file": "source/blender/draw/intern/draw_cache_inline.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3574,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1768,
+								1768
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 282.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 56,
+					"type": "text"
+				},
+				{
+					"buffer": 68,
+					"file": "source/blender/draw/engines/eevee/eevee_embree_objects.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1415,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								656,
+								656
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 69,
+					"file": "source/blender/draw/engines/eevee/eevee_embree.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2567,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2361,
+								2361
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 476.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 70,
+					"file": "source/blender/depsgraph/DEG_depsgraph_query.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9753,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3021,
+								3021
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 152.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 62,
+					"type": "text"
+				},
+				{
+					"buffer": 71,
+					"file": "source/blender/depsgraph/intern/depsgraph_query.cc",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10550,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4669,
+								4669
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 83.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 88,
+					"type": "text"
+				},
+				{
+					"buffer": 72,
+					"file": "source/blender/draw/engines/eevee/eevee_effects.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 23519,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1721,
+								1721
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 297.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 73,
+					"file": "source/blender/draw/engines/eevee/eevee_materials.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 95484,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								88193,
+								88193
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 37901.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 74,
+					"file": "source/blender/blenkernel/intern/material.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 44131,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13477,
+								13477
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 9238.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 46,
+					"type": "text"
+				},
+				{
+					"buffer": 75,
+					"file": "source/blender/draw/engines/eevee/eevee_occlusion.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12334,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4551,
+								4551
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4488.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 43,
+					"type": "text"
+				},
+				{
+					"buffer": 76,
+					"file": "source/blender/draw/CMakeLists.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 20943,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6055,
+								6055
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2695.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 39,
+					"type": "text"
+				},
+				{
+					"buffer": 77,
+					"file": "source/blender/draw/engines/eevee/eevee_embree.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13168,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12889,
+								12889
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5788.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 78,
+					"file": "source/blender/draw/engines/eevee/eevee_volumes.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 40372,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13570,
+								13570
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4422.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 86,
+					"type": "text"
+				},
+				{
+					"buffer": 79,
+					"file": "source/blender/makesdna/DNA_world_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3019,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2320,
+								2320
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 563.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 50,
+					"type": "text"
+				},
+				{
+					"buffer": 80,
+					"file": "intern/cycles/CMakeLists.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11109,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7422,
+								7422
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3469.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 89,
+					"type": "text"
+				},
+				{
+					"buffer": 81,
+					"file": "source/blender/draw/engines/eevee/eevee_bloom.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15789,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2925,
+								2925
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 562.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 90,
+					"type": "text"
+				},
+				{
+					"buffer": 82,
+					"file": "source/blender/draw/engines/eevee/eevee_screen_raytrace.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15704,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12594,
+								12594
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4583.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 83,
+					"file": "source/blender/draw/engines/eevee/shaders/lit_surface_frag.glsl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16587,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13502,
+								13502
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7287.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 44,
+					"type": "text"
+				},
+				{
+					"buffer": 84,
+					"file": "/home/max/dev/fasta/shaders/shader.frag",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 200,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 29,
+					"type": "text"
+				},
+				{
+					"buffer": 85,
+					"file": "source/blender/makesdna/DNA_scene_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 65627,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								41565,
+								41565
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 26902.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 21,
+					"type": "text"
+				},
+				{
+					"buffer": 86,
+					"file": "release/scripts/startup/bl_ui/properties_render.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 22839,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5115,
+								5115
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2342.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 20,
+					"type": "text"
+				},
+				{
+					"buffer": 87,
+					"file": "source/blender/blenloader/intern/versioning_280.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 184296,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								80799,
+								80799
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 38376.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 22,
+					"type": "text"
+				},
+				{
+					"buffer": 88,
+					"file": "source/blender/makesrna/intern/rna_scene.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 337461,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								302760,
+								302760
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 119650.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 23,
+					"type": "text"
+				},
+				{
+					"buffer": 89,
+					"file": "source/blender/makesrna/intern/rna_internal.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 28904,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12945,
+								12945
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4920.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 49,
+					"type": "text"
+				},
+				{
+					"buffer": 90,
+					"file": "source/blender/makesrna/intern/rna_define.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 131139,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								42739,
+								42739
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 27854.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 28,
+					"type": "text"
+				},
+				{
+					"buffer": 91,
+					"file": "source/blender/makesdna/DNA_layer_types.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6730,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1586,
+								1586
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 86.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 91,
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -290,6 +4717,10 @@
 	"output.find_results":
 	{
 		"height": 0.0
+	},
+	"output.unsaved_changes":
+	{
+		"height": 120.0
 	},
 	"pinned_build_system": "Packages/Makefile/Make.sublime-build",
 	"project": "parovoz.sublime-project",
@@ -333,7 +4764,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 382.0,
+	"side_bar_width": 480.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

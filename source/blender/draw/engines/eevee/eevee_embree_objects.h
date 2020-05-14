@@ -30,7 +30,9 @@ typedef struct {
   Object *ob;
 	uint id; // embree geometry id
 	bool is_visible;
+  bool cast_shadow;
   RTCScene escene;
+  float xform[16];
 } ObjectInfo;
 
 typedef struct {
