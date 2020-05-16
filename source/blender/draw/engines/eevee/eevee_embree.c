@@ -215,7 +215,7 @@ void EVEM_mesh_object_clear(Mesh *me) {
 }
 
 void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
-  printf("EVEM_mesh_object_create\n");
+  printf("EVEM_mesh_object_create for ob_info->id: %u \n", ob_info->id);
 	clock_t tstart = clock();
 
   if (!_scene_is_empty) {
@@ -225,6 +225,13 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
     }
   }
 
+  uint vtc_count = me->totvert;
+  uint tri_count = poly_to_tri_count(me->totpoly, me->totloop );
+  
+  /* unsupported mesh */
+  if((tri_count < 1) || (vtc_count < 3)) return;
+
+
   if(!USE_FLAT_SCENE) {
 	  // geometry goes to local scene
     if (ob_info->escene) rtcReleaseScene(ob_info->escene);
@@ -232,9 +239,6 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
     rtcSetSceneFlags(ob_info->escene, RTC_SCENE_FLAG_ROBUST);// | RTC_SCENE_FLAG_DYNAMIC);
     rtcSetSceneBuildQuality(ob_info->escene, RTC_BUILD_QUALITY_HIGH);
   }
-
-	uint vtc_count = me->totvert;
-	uint tri_count = poly_to_tri_count(me->totpoly, me->totloop );
 
 	RTCGeometry geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_TRIANGLE); // embree geometry
 	rtcSetGeometryBuildQuality(geometry, RTC_BUILD_QUALITY_HIGH);
@@ -271,7 +275,6 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   int ti = 0; // triangles buffer index
   
   MPoly *curr_mpoly;
-
   //#pragma omp parallel for num_threads(8) private(curr_mpoly)  reduction(+:ti)
   for (int i = 0; i < me->totpoly; i++) {
   	uint curr_idx = ti;
@@ -296,8 +299,48 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   			triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+2].v;
   			triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+3].v;
   			break;
+      case 5:
+        // pentagon
+        ti+=3;
+        triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+        triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+1].v;
+        triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+2].v;
+        curr_idx++;
+        triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+        triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+2].v;
+        triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+3].v;
+        curr_idx++;
+        triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+        triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+3].v;
+        triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+4].v;
+        break;
+      case 6:
+        // hexagon
+        ti+=4;
+        triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+        triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+1].v;
+        triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+2].v;
+        curr_idx++;
+        triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+        triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+2].v;
+        triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+3].v;
+        curr_idx++;
+        triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart].v;
+        triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+3].v;
+        triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+5].v;
+        curr_idx++;
+        triangles[curr_idx].v0 = me->mloop[curr_mpoly->loopstart+5].v;
+        triangles[curr_idx].v1 = me->mloop[curr_mpoly->loopstart+3].v;
+        triangles[curr_idx].v2 = me->mloop[curr_mpoly->loopstart+4].v;
+        break;
   		default:
   			// ngon
+        ti+= curr_mpoly->totloop - 2;
+        for(uint i=0; i < (curr_mpoly->totloop - 2); i++) {
+          triangles[curr_idx+i].v0 = me->mloop[curr_mpoly->loopstart].v;
+          triangles[curr_idx+i].v1 = me->mloop[curr_mpoly->loopstart+i+1].v;
+          triangles[curr_idx+i].v2 = me->mloop[curr_mpoly->loopstart+i+2].v;
+        }
   			break; 
   	}
   }
@@ -321,6 +364,7 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
     ob_info->id = rtcAttachGeometry(evem_data.scene, geometry);
     memcpy(ob_info->xform, &ob_info->ob->obmat[0], sizeof(float)*16); 
   }
+
   rtcReleaseGeometry(geometry);
 
   _scene_is_empty = false;

@@ -17,6 +17,8 @@ typedef struct embree_trace_ray_stream_args {
 
 void embree_trace_ray_stream_worker(void *arg);
 
+void EEVEE_rtao_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow);
+
 void PVZ_occlusion_trace_buffers_init(uint w, uint h);
 void PVZ_occlusion_trace_compute_embree(void);
 void PVZ_occlusion_trace_build_prim_rays_cpu(void);

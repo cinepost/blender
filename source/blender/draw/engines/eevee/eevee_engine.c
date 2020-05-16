@@ -37,6 +37,7 @@
 #include "eevee_engine.h" /* own include */
 
 #include "eevee_embree.h"
+#include "eevee_occlusion_trace.h"
 
 #define EEVEE_ENGINE "BLENDER_EEVEE"
 
@@ -145,7 +146,10 @@ void EEVEE_cache_populate(void *vedata, Object *ob)
 
   if (DRW_object_is_renderable(ob) && (ob_visibility & OB_VISIBLE_SELF)) {
     if (ELEM(ob->type, OB_MESH, OB_CURVE, OB_SURF, OB_FONT, OB_MBALL)) {
+      
       EVEM_objects_cache_populate(vedata, sldata, ob, &cast_shadow);
+      EEVEE_rtao_cache_populate(vedata, sldata, ob, &cast_shadow);
+
       EEVEE_materials_cache_populate(vedata, sldata, ob, &cast_shadow);
     }
     else if (ob->type == OB_HAIR) {
@@ -310,8 +314,14 @@ static void eevee_draw_scene(void *vedata)
     /* Create minmax texture */
     DRW_stats_group_start("Main MinMax buffer");
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
+
     DRW_stats_group_end();
     if (_scene->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
+      /* Normal for embree AO on first viewport sample. kinda hack */
+      //if ((stl->effects->taa_current_sample == 1) && !DRW_state_is_image_render()) {
+        //DRW_draw_pass(psl->material_pass);
+      //}
+
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);

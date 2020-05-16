@@ -65,6 +65,12 @@ struct EeveeEmbreeData {
 };
 
 
+/* Macro's */
+#define pvz_max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
 /* Functions */
 void EVEM_init(void);
 void EVEM_print_capabilities(void);

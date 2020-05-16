@@ -303,13 +303,13 @@ typedef struct EEVEE_PassList {
 
 typedef struct EEVEE_FramebufferList {
   /* Effects */
-  struct GPUFrameBuffer *gtao_embree_fb;
-  struct GPUFrameBuffer *gtao_nd_fb;
+  struct GPUFrameBuffer *rtao_embree_fb;
+  struct GPUFrameBuffer *rtao_pos_norm_fb;
 
   struct GPUFrameBuffer *gtao_fb;
   struct GPUFrameBuffer *gtao_debug_fb;
-  struct GPUFrameBuffer *gtao_denoise_fb_1;
-  struct GPUFrameBuffer *gtao_denoise_fb_2;
+  struct GPUFrameBuffer *rtao_denoise_fb_1;
+  struct GPUFrameBuffer *rtao_denoise_fb_2;
 
   struct GPUFrameBuffer *downsample_fb;
   struct GPUFrameBuffer *bloom_blit_fb;
