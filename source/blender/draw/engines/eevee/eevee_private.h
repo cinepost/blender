@@ -623,10 +623,11 @@ typedef struct EEVEE_EffectsInfo {
   struct GPUTexture *gtao_horizons_debug;
 
   /* Ambient Occlusion RayTrace version (embree) */
-  struct GPUTexture *gtao_pos; /* world position for ambient occlusion trace*/
-  struct GPUTexture *gtao_nrm; /* worls normals for ambient occlusion trace */
-  struct GPUTexture *gtao_embree_final;
-  struct GPUTexture *gtao_embree_raw;
+  struct GPUTexture *rtao_pos; /* world position for ambient occlusion trace*/
+  struct GPUTexture *rtao_nrm; /* worls normals for ambient occlusion trace */
+  struct GPUTexture *rtao_embree_tx_1;
+  struct GPUTexture *rtao_embree_tx_2;
+  struct GPUTexture *rtao_embree_tx_final; /* final ao texture pointer copy*/
 
   /* Motion Blur */
   float current_world_to_ndc[4][4];

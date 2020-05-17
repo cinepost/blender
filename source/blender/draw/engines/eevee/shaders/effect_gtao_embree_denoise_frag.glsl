@@ -34,14 +34,13 @@ void main(void) {
     ivec2(-2, 1), ivec2(-1, 1), ivec2(0, 1), ivec2(1, 1), ivec2(2, 1),
     ivec2(-2, 2), ivec2(-1, 2), ivec2(0, 2), ivec2(1, 2), ivec2(2, 2) );
 
-  float sum = 0.0;
+  vec3 sum = vec3(0.0);
   ivec2 tx = ivec2(gl_FragCoord.xy);
   
-  float cval = texelFetch(aoEmbreeRawBuffer, tx, 0).r;
+  vec3 cval = vec3(1.0) * texelFetch(aoEmbreeRawBuffer, tx, 0).r;
   vec3 nval = texelFetch(wnormBuffer, tx, 0).xyz;
   vec3 pval = texelFetch(wposBuffer, tx, 0).xyz;
   
-
   float cum_w = 0.0;
   
   for(int i = 0; i < KERNEL_SIZE; i++) {
@@ -50,21 +49,23 @@ void main(void) {
     //  continue;
     
     // Color (ao)
-    float ctmp = texelFetch(aoEmbreeRawBuffer, crd, 0).r;
-    float t = cval - ctmp;
+    vec3 ctmp = vec3(1.0) * texelFetch(aoEmbreeRawBuffer, crd, 0).r;
+    vec3 t = cval - ctmp;
     float dist2 = dot(t, t);
     float c_w = min(exp(-(dist2)/c_phi), 1.0);
 
     // Normal
     vec3 ntmp = texelFetch(wnormBuffer, crd, 0).xyz;
-    vec3 t3 = nval - ntmp;
-    dist2 = max(dot(t3,t3)/(stepwidth*stepwidth),0.0);
+    t = nval - ntmp;
+    dist2 = max(dot(t,t)/(stepwidth*stepwidth),0.0);
+    //dist2 = dot(t,t);
     float n_w = min(exp(-(dist2)/n_phi), 1.0);
 
     // Pos
     vec3 ptmp = texelFetch(wposBuffer, crd, 0).xyz;
-    t3 = pval - ptmp;
-    dist2 = dot(t3,t3);
+    t = pval - ptmp;
+    //dist2 = dot(t,t);
+    dist2 = max(dot(t,t)/(stepwidth*stepwidth),0.0);
     float p_w = min(exp(-(dist2)/p_phi),1.0);
 
     float weight = c_w * n_w * p_w;
@@ -72,5 +73,5 @@ void main(void) {
     cum_w += weight * kernel[i];
   }
 
-  FragColor = vec4(1.0) * (sum/cum_w);
+  FragColor = vec4(sum/cum_w, 1.0);
 }
