@@ -77,14 +77,16 @@ static struct {
   struct GPUUniformBuffer *denoise_ubo;
 
   struct GPUTexture *dummy_tx;
+  struct GPUTexture *normals_tx; // normals texture pointer copy. on first sample we use own normals, other passes use ssr_normals
 
   Object *camera;
-  bool use_gpu_buff;
   float ao_dist;
   float gpu_bias;
   bool denoise;
   bool embree_mode;
-} e_data = {NULL, .denoise = false, .gpu_bias = 0.005, .embree_mode = true}; /* Engine data */
+  float sample_num;
+  float ao_use_bump;
+} e_data = {NULL, .denoise = false, .gpu_bias = 0.005, .embree_mode = true, .sample_num = 1.0f, .ao_use_bump = 0.0f}; /* Engine data */
 
 static struct {
   uint w, h; /* cpu buffer width, height*/
@@ -138,7 +140,6 @@ static void eevee_create_shader_occlusion_trace(void)
 
   e_data.gtao_sh = DRW_shader_create_fullscreen(frag_str, NULL);
   
-  //e_data.rtao_pos_norm_sh = DRW_shader_create_fullscreen(frag_str, "#define AO_TRACE_POS\n");
   e_data.rtao_pos_norm_sh = GPU_shader_create(vert_str, frag_str, NULL, NULL, "#define AO_TRACE_POS\n", "rtao_nd_shader");//__func__);
 
   e_data.gtao_debug_sh = DRW_shader_create_fullscreen(frag_str, "#define DEBUG_AO\n");
@@ -174,6 +175,9 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
   e_data.denoise = (scene_eval->eevee.flag & SCE_EEVEE_RTAO_DENOISE) ? true : false;
 
   e_data.embree_mode = false;
+  common_data->ao_embree = 0.0;
+  common_data->ao_use_bump = 0.0;
+  
   if ((scene_eval->eevee.flag & SCE_EEVEE_GTAO_ENABLED) && (scene_eval->eevee.flag & SCE_EEVEE_RTAO_ENABLED)) {
     e_data.embree_mode = true;
 
@@ -187,11 +191,6 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
     rtao_deonise_data.p_phi = scene_eval->eevee.rtao_denoise_p_phi;
 
     e_data.gpu_bias = scene_eval->eevee.rtao_gpubuff_bias;
-
-    /* Some usefull info*/
-    e_data.use_gpu_buff = false;
-    if(scene_eval->eevee.flag & SCE_EEVEE_RTAO_GPUBUFF)
-      e_data.use_gpu_buff = true;
 
     /* CPU buffers*/
     PVZ_occlusion_trace_buffers_init((uint)viewport_size[0], (uint)viewport_size[1]);
@@ -211,22 +210,23 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
       eevee_create_shader_occlusion_trace();
     }
 
+    effects->rtao_bent_normal = e_data.dummy_tx;
+
     /* Common ubo data */
-    common_data->ao_embree = 0.0f;
-    common_data->ao_dist = scene_eval->eevee.gtao_distance;
+    common_data->ao_embree = 1.0f;
     e_data.ao_dist = common_data->ao_dist / 2.0;
-    common_data->ao_factor = scene_eval->eevee.gtao_factor;
-    common_data->ao_quality = 1.0f - scene_eval->eevee.gtao_quality;
 
-    common_data->ao_settings = 1.0f; /* USE_AO */
-    if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BENT_NORMALS) {
-      common_data->ao_settings += 2.0f; /* USE_BENT_NORMAL */
-    }
-    if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BOUNCE) {
-      common_data->ao_settings += 4.0f; /* USE_DENOISE */
+    if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_BUMP) {
+      common_data->ao_use_bump = 1.0f; /* USE_BUMP */
     }
 
-    common_data->ao_bounce_fac = (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BOUNCE) ? 1.0f : 0.0f;
+    bool taa_use_reprojection = (stl->effects->enabled_effects & EFFECT_TAA_REPROJECT) != 0;
+    if (DRW_state_is_image_render() || taa_use_reprojection ||
+        ((stl->effects->enabled_effects & EFFECT_TAA) != 0)) {
+      e_data.sample_num = taa_use_reprojection ? stl->effects->taa_reproject_sample + 1 :
+                                        stl->effects->taa_current_sample;
+    }
+
 
     effects->rtao_embree_tx_1 = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_R8, &draw_engine_eevee_type);
     effects->rtao_embree_tx_2 = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_R8, &draw_engine_eevee_type);
@@ -261,6 +261,7 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
   effects->rtao_nrm = e_data.dummy_tx;
   effects->rtao_pos = e_data.dummy_tx;
   effects->rtao_embree_tx_final = e_data.dummy_tx;
+  effects->rtao_bent_normal = e_data.dummy_tx;
 
   /* Cleanup */
   GPU_FRAMEBUFFER_FREE_SAFE(fbl->rtao_pos_norm_fb);
@@ -308,7 +309,7 @@ void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *
     DRW_shgroup_uniform_texture_ref(grp, "maxzBuffer", &txl->maxzbuffer);
     DRW_shgroup_uniform_texture_ref(grp, "depthBuffer", &dtxl->depth);
     DRW_shgroup_uniform_texture_ref(grp, "normalBuffer", &effects->ssr_normal_input);
-    DRW_shgroup_uniform_texture_ref(grp, "aoEmbreeBuffer", &effects->rtao_embree_tx_final);
+    DRW_shgroup_uniform_texture_ref(grp, "embreeHitsBuffer", &effects->rtao_embree_tx_final);
     DRW_shgroup_uniform_block(grp, "common_block", sldata->common_ubo);
     DRW_shgroup_uniform_block(
         grp, "renderpass_block", EEVEE_material_default_render_pass_ubo_get(sldata));
@@ -345,19 +346,15 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
      *   lobe present in the shader using the correct normal.
      */
 
-    EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
-    common_data->ao_embree = 1.0f;
-
-    float sample_num = 0.0f;
-
     /* This pass is used to calculate ao rays positions on cpu */
     DRW_PASS_CREATE(psl->ao_trace_pos, DRW_STATE_WRITE_COLOR | DRW_STATE_WRITE_DEPTH | DRW_STATE_DEPTH_EQUAL | DRW_STATE_CLIP_PLANES | DRW_STATE_CULL_BACK);
     stl->g_data->rtao_shgrp = DRW_shgroup_create(e_data.rtao_pos_norm_sh, psl->ao_trace_pos);
     DRW_shgroup_uniform_texture(stl->g_data->rtao_shgrp, "utilTex", EEVEE_materials_get_util_tex());
     DRW_shgroup_uniform_block(stl->g_data->rtao_shgrp, "common_block", sldata->common_ubo);
-    DRW_shgroup_uniform_float(stl->g_data->rtao_shgrp, "sampleNum", &sample_num, 1);
+    DRW_shgroup_uniform_float(stl->g_data->rtao_shgrp, "sampleNum", &e_data.sample_num, 1);
+    DRW_shgroup_uniform_float(stl->g_data->rtao_shgrp, "aoUseBump", &e_data.ao_use_bump, 1);
     //DRW_shgroup_uniform_texture_ref(e_data.shgrp, "depthBuffer", &effects->ao_src_depth);
-    //DRW_shgroup_uniform_texture_ref(e_data.shgrp, "normalBuffer", &effects->ssr_normal_input); // we should calc world normals here on GPU it's faster
+    DRW_shgroup_uniform_texture_ref(stl->g_data->rtao_shgrp, "normalBuffer", &effects->ssr_normal_input); // use on samples starting from 1
     DRW_shgroup_uniform_block(
         stl->g_data->rtao_shgrp, "renderpass_block", EEVEE_material_default_render_pass_ubo_get(sldata));
 
@@ -370,7 +367,7 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
       DRW_shgroup_uniform_texture_ref(grp, "wposBuffer",  &effects->rtao_pos);
       DRW_shgroup_uniform_texture_ref(grp, "wnormBuffer", &effects->rtao_nrm);
       DRW_shgroup_uniform_texture_ref(grp, "aoEmbreeRawBuffer", &effects->rtao_embree_tx_1);
-      DRW_shgroup_uniform_float(grp, "sampleNum", &sample_num, 1);
+      DRW_shgroup_uniform_float(grp, "sampleNum", & e_data.sample_num, 1);
       //DRW_shgroup_uniform_ivec2(grp, "offset", &, 50);
       //DRW_shgroup_uniform_float(grp, "kernel", &, 25);
       DRW_shgroup_uniform_block(grp, "denoise_block", e_data.denoise_ubo);
@@ -381,7 +378,7 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
       DRW_shgroup_uniform_texture_ref(grp, "wposBuffer",  &effects->rtao_pos);
       DRW_shgroup_uniform_texture_ref(grp, "wnormBuffer", &effects->rtao_nrm);
       DRW_shgroup_uniform_texture_ref(grp, "aoEmbreeRawBuffer", &effects->rtao_embree_tx_2);
-      DRW_shgroup_uniform_float(grp, "sampleNum", &sample_num, 1);
+      DRW_shgroup_uniform_float(grp, "sampleNum", & e_data.sample_num, 1);
       //DRW_shgroup_uniform_ivec2(grp, "offset", &, 50);
       //DRW_shgroup_uniform_float(grp, "kernel", &, 25);
       DRW_shgroup_uniform_block(grp, "denoise_block", e_data.denoise_ubo);
@@ -586,7 +583,9 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
     
     /* use gpu generated buffers for world positions and normals*/
     GPU_framebuffer_bind(fbl->rtao_pos_norm_fb);
+
     DRW_draw_pass(psl->ao_trace_pos);
+    
     PVZ_read_gpu_buffers(vedata); // read world positions and normals from gpu
     PVZ_occlusion_trace_build_prim_rays_gpu();
 

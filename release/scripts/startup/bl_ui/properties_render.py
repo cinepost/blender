@@ -171,6 +171,7 @@ class RENDER_PT_eevee_rtao(RenderButtonsPanel, Panel):
         props = scene.eevee
 
         layout.active = props.use_rtao
+        layout.prop(props, "use_rtao_bump", text="Use bump")
         layout.prop(props, "rtao_gpubuff_bias", text="Bias")
 
 class RENDER_PT_eevee_rtao_denoise(RenderButtonsPanel, Panel):

@@ -4,7 +4,6 @@
  */
 
 uniform float rotationOffset;
-uniform float sampleNum;
 
 #ifdef AO_TRACE_POS
 
@@ -15,15 +14,29 @@ layout(location = 1) out highp vec3 outWPos;
 in vec4 rand;
 in vec4 uvcoordsvar;
 
+in vec3 viewPosition;
 in vec3 worldPosition;
 in vec3 worldNormal;
 in vec3 worldNormalFlat;
 
+uniform float sampleNum;
+uniform sampler2D normalBuffer; // ssr normal on samples > 0
+
 void main() {
+  //vec3 true_normal = normalize(cross(dFdx(viewPosition), dFdy(viewPosition)));
   vec4 rand = texelfetch_noise_tex(gl_FragCoord.xy);
+  
   //vec4 rand = texelFetch(utilTex, ivec3(ivec2(gl_FragCoord.xy) % LUT_SIZE, 2.0), 0);
 
-  outWNrm = randomHemispherePoint(rand.xyz, worldNormalFlat);
+  if ((sampleNum > 1) && (aoUseBump > 0)) {
+    // Using ssr normal
+    vec3 N = normal_decode(texelFetch(normalBuffer, ivec2(gl_FragCoord.xy), 0).rg, viewCameraVec);
+    vec3 nN = normalize(transform_direction(ViewMatrixInverse, N));
+    outWNrm = randomHemispherePoint(rand.xyz, nN);
+  } else {
+    // Using our normal
+    outWNrm = randomHemispherePoint(rand.xyz, worldNormalFlat);
+  }
   outWPos = worldPosition;
 }
 

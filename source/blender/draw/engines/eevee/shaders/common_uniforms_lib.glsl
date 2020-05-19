@@ -69,7 +69,7 @@ layout(std140) uniform common_block
 /* embree aoParameters */
 #define aoEmbree aoParameters[2].x
 #define aoEmbreeDenoise aoParameters[2].y 
-#define aoNoop1 aoParameters[2].z /* UNUSED */
+#define aoUseBump aoParameters[2].z
 #define aoNoop2 aoParameters[2].w /* UNUSED */
 
 /* ssrParameters */

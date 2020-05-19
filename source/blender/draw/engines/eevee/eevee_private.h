@@ -628,6 +628,7 @@ typedef struct EEVEE_EffectsInfo {
   struct GPUTexture *rtao_embree_tx_1;
   struct GPUTexture *rtao_embree_tx_2;
   struct GPUTexture *rtao_embree_tx_final; /* final ao texture pointer copy*/
+  struct GPUTexture *rtao_bent_normal;
 
   /* Motion Blur */
   float current_world_to_ndc[4][4];
@@ -697,7 +698,7 @@ typedef struct EEVEE_CommonUniformBuffer {
   /* -- 16 byte aligned -- */
   float ao_dist, pad1, ao_factor, pad2;                    /* vec4 */
   float ao_offset, ao_bounce_fac, ao_quality, ao_settings; /* vec4 */
-  float ao_embree, ao_embree_denoise, _lala, _lala2; /* vec4 */
+  float ao_embree, ao_embree_denoise, ao_use_bump, _lala2; /* vec4 */
   /* Volumetric */
   /* -- 16 byte aligned -- */
   int vol_tex_size[3], pad3;       /* ivec3 */

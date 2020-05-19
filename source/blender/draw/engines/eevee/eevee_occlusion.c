@@ -90,7 +90,6 @@ int EEVEE_occlusion_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
       eevee_create_shader_occlusion();
     }
 
-    common_data->ao_embree = 0.0f;
     common_data->ao_dist = scene_eval->eevee.gtao_distance;
     common_data->ao_factor = scene_eval->eevee.gtao_factor;
     common_data->ao_quality = 1.0f - scene_eval->eevee.gtao_quality;
@@ -100,7 +99,7 @@ int EEVEE_occlusion_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
       common_data->ao_settings += 2.0f; /* USE_BENT_NORMAL */
     }
     if (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BOUNCE) {
-      common_data->ao_settings += 4.0f; /* USE_DENOISE */
+      common_data->ao_settings += 4.0f; /* USE_BOUNCE */
     }
 
     common_data->ao_bounce_fac = (scene_eval->eevee.flag & SCE_EEVEE_GTAO_BOUNCE) ? 1.0f : 0.0f;

@@ -2390,8 +2390,8 @@ enum {
   SCE_EEVEE_OVERSCAN = (1 << 21),
 
   SCE_EEVEE_RTAO_ENABLED = (1 << 22),
-  SCE_EEVEE_RTAO_GPUBUFF = (1 << 23),
-  SCE_EEVEE_RTAO_DENOISE = (1 << 24),
+  SCE_EEVEE_RTAO_DENOISE = (1 << 23),
+  SCE_EEVEE_RTAO_BUMP = (1 << 24),
 };
 
 /* SceneEEVEE->shadow_method */

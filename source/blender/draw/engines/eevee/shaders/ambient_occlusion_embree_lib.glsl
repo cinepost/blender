@@ -1,10 +1,12 @@
 /* aoSettings flags */
 #define USE_AO_TRACE 8
 
-uniform sampler2D aoEmbreeBuffer;
+uniform sampler2D embreeNormalBuffer;
+uniform sampler2D embreeHitsBuffer;
 
 float embree_occlusion() {
-  return texelFetch(aoEmbreeBuffer, ivec2(gl_FragCoord.xy), 0).r;
+  return texelFetch(embreeHitsBuffer, ivec2(gl_FragCoord.xy), 0).r;
+  //return texelFetch(embreeNormalBuffer, ivec2(gl_FragCoord.xy), 0).r;
 }
 
 void gtao_deferred_embree(vec3 normal, vec4 noise, float frag_depth, out float visibility, out vec3 bent_normal)
