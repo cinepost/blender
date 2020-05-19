@@ -29,6 +29,8 @@ typedef struct {
 typedef struct {
   Object *ob;
 	uint id; // embree geometry id
+  RTCGeometry geometry;
+  bool is_rtc_instance;
 	bool is_visible;
   bool cast_shadow;
   RTCScene escene;

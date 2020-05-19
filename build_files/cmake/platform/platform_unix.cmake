@@ -379,7 +379,7 @@ if(WITH_OPENCOLORIO)
 endif()
 
 if(WITH_CYCLES_EMBREE)
-  find_package(Embree 3.8.0 REQUIRED)
+  find_package(Embree 3.10.0 REQUIRED)
 endif()
 
 if(WITH_OPENIMAGEDENOISE)

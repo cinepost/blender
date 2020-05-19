@@ -5,10 +5,9 @@ in vec3 nor;
 #endif
 
 out vec3 worldPosition;
-out vec3 viewPosition;
 
 out vec3 worldNormal;
-out vec3 viewNormal;
+out vec3 worldNormalFlat;
 
 #ifdef HAIR_SHADER
 out vec3 hairTangent;
@@ -47,10 +46,9 @@ void main()
   worldNormal = normalize(normal_object_to_world(nor));
 #endif
 
-  /* No need to normalize since this is just a rotation. */
-  viewNormal = normal_world_to_view(worldNormal);
+  /* Flat geometry normal  */
+  worldNormalFlat = worldNormal; // TODO: provide flat normal to get rid of edge artifacts
 
-  viewPosition = point_world_to_view(worldPosition);
   gl_Position = point_world_to_ndc(worldPosition);
 
   /* Used for planar reflections */

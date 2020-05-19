@@ -7042,8 +7042,8 @@ static void rna_def_scene_eevee(BlenderRNA *brna)
   RNA_def_property_update(prop, NC_SCENE | ND_RENDER_OPTIONS, NULL);
 
   /* Embree RTAO */
-  prop = RNA_def_property(srna, "use_rtao_trace", PROP_BOOLEAN, PROP_NONE);
-  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_RTAO_TRACE);
+  prop = RNA_def_property(srna, "use_rtao", PROP_BOOLEAN, PROP_NONE);
+  RNA_def_property_boolean_sdna(prop, NULL, "flag", SCE_EEVEE_RTAO_ENABLED);
   RNA_def_property_ui_text(
       prop, "Embree", "Compute ray traced occlusion");
   RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);

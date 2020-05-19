@@ -829,6 +829,7 @@ typedef struct EEVEE_Data {
 } EEVEE_Data;
 
 typedef struct EEVEE_PrivateData {
+  struct DRWShadingGroup *rtao_shgrp;
   struct DRWShadingGroup *shadow_shgrp;
   struct DRWShadingGroup *shadow_accum_shgrp;
   struct DRWShadingGroup *depth_shgrp;

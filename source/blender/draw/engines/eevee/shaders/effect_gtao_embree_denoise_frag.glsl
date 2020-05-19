@@ -52,7 +52,7 @@ void main(void) {
     vec3 ctmp = vec3(1.0) * texelFetch(aoEmbreeRawBuffer, crd, 0).r;
     vec3 t = cval - ctmp;
     float dist2 = dot(t, t);
-    float c_w = min(exp(-(dist2)/c_phi), 1.0);
+    float c_w = min(exp(-(dist2)/c_phi), 1.0); c_w = 1.0;
 
     // Normal
     vec3 ntmp = texelFetch(wnormBuffer, crd, 0).xyz;
@@ -60,6 +60,9 @@ void main(void) {
     dist2 = max(dot(t,t)/(stepwidth*stepwidth),0.0);
     //dist2 = dot(t,t);
     float n_w = min(exp(-(dist2)/n_phi), 1.0);
+    //n_w = max(0.0, dot(nval, ntmp)/(stepwidth*stepwidth));
+    //n_w *= n_w;
+    //n_w = 1.0;
 
     // Pos
     vec3 ptmp = texelFetch(wposBuffer, crd, 0).xyz;
@@ -68,10 +71,10 @@ void main(void) {
     dist2 = max(dot(t,t)/(stepwidth*stepwidth),0.0);
     float p_w = min(exp(-(dist2)/p_phi),1.0);
 
-    float weight = c_w * n_w * p_w;
+    float weight = c_w * min(n_w, p_w);
     sum += ctmp * weight * kernel[i];
     cum_w += weight * kernel[i];
   }
 
-  FragColor = vec4(sum/cum_w, 1.0);
+  FragColor = vec4(sum / cum_w, 1.0);
 }

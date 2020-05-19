@@ -47,8 +47,10 @@ extern struct EeveeEmbreeData evem_data;
 
 static void eevee_engine_init(void *ved)
 {
+  printf("________________________________________\n");
   printf("%s\n", "eevee_engine_init");
-  
+  printf("________________________________________\n");
+
   EEVEE_Data *vedata = (EEVEE_Data *)ved;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
@@ -118,7 +120,7 @@ static void eevee_cache_init(void *vedata)
 
   //EEVEE_screen_raytrace_cache_init(sldata, vedata);
 
-  if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
+  if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
     EVEM_init();
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
@@ -316,12 +318,8 @@ static void eevee_draw_scene(void *vedata)
     EEVEE_create_minmax_buffer(vedata, dtxl->depth, -1);
 
     DRW_stats_group_end();
-    if (_scene->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
-      /* Normal for embree AO on first viewport sample. kinda hack */
-      //if ((stl->effects->taa_current_sample == 1) && !DRW_state_is_image_render()) {
-        //DRW_draw_pass(psl->material_pass);
-      //}
 
+    if (_scene->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);

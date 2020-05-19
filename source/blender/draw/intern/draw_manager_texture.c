@@ -47,6 +47,7 @@ static bool drw_texture_format_supports_framebuffer(eGPUTextureFormat format)
     case GPU_RGBA8:
     case GPU_RGBA16:
     case GPU_RGBA16F:
+    case GPU_RGB32F: // pvz stuff
     case GPU_RGBA32F:
     case GPU_DEPTH_COMPONENT16:
     case GPU_DEPTH_COMPONENT24:

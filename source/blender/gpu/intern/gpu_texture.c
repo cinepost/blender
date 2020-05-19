@@ -168,6 +168,7 @@ static const char *gl_enum_to_str(GLenum e)
       ENUM_TO_STRING(RGBA16),
       ENUM_TO_STRING(RG32F),
       ENUM_TO_STRING(RGB16F),
+      ENUM_TO_STRING(RGB32F), // pvz stuff
       ENUM_TO_STRING(RG16F),
       ENUM_TO_STRING(RG16I),
       ENUM_TO_STRING(RG16),
@@ -207,6 +208,7 @@ static int gpu_get_component_count(eGPUTextureFormat format)
     case GPU_SRGB8_A8:
       return 4;
     case GPU_RGB16F:
+    case GPU_RGB32F: // pvz stuff
     case GPU_R11F_G11F_B10F:
       return 3;
     case GPU_RG8:
@@ -374,6 +376,8 @@ static uint gpu_get_bytesize(eGPUTextureFormat data_type)
   switch (data_type) {
     case GPU_RGBA32F:
       return 32;
+    case GPU_RGB32F: // pvz stuff
+      return 24;
     case GPU_RG32F:
     case GPU_RGBA16F:
     case GPU_RGBA16:
@@ -432,6 +436,8 @@ static GLenum gpu_format_to_gl_internalformat(eGPUTextureFormat format)
       return GL_RGBA32I;
     case GPU_RGBA32F:
       return GL_RGBA32F;
+    case GPU_RGB32F:  // pvz stuff
+      return GL_RGB32F;
     case GPU_RGBA16UI:
       return GL_RGBA16UI;
     case GPU_RGBA16I:

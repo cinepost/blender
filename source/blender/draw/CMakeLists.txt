@@ -413,7 +413,7 @@ endif()
 
 add_definitions(-DWITH_EMBREE)
 
-find_package(EMBREE 3.8.0 REQUIRED)
+find_package(EMBREE 3.10.0 REQUIRED)
 
 list(APPEND LIB
   ${EMBREE_LIBRARIES}

@@ -379,7 +379,7 @@ if(WITH_CYCLES_OSL)
 endif()
 
 if(WITH_CYCLES_EMBREE)
-  find_package(Embree 3.8.0 REQUIRED)
+  find_package(Embree 3.10.0 REQUIRED)
   set(PLATFORM_LINKFLAGS "${PLATFORM_LINKFLAGS} -Xlinker -stack_size -Xlinker 0x100000")
 endif()
 

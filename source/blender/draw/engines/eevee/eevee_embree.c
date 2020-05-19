@@ -107,6 +107,11 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_EffectsInfo *effects = stl->effects;
 
+  const DRWContextState *draw_ctx = DRW_context_state_get();
+  const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
+
+  if (!(scene_eval->eevee.flag & SCE_EEVEE_RTAO_ENABLED)) return;
+
   int sample = (DRW_state_is_image_render()) ? effects->taa_render_sample : effects->taa_current_sample;
   if (sample > 1) return; // create/update only on first sample
 
@@ -161,6 +166,7 @@ void EVEM_objects_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
   */
 
   rtcCommitScene(evem_data.scene);
+  _scene_is_empty = false;
   evem_data.update_tlas = false; // tlas already updated
 }
 
@@ -218,16 +224,14 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   printf("EVEM_mesh_object_create for ob_info->id: %u \n", ob_info->id);
 	clock_t tstart = clock();
 
-  if (!_scene_is_empty) {
-    if (!rtcGetGeometry(evem_data.scene, ob_info->id)) {
-      printf("%s\n", "Error can't create Embree geometry. Mesh object already created !");
-      return;
-    }
+  if (ob_info->geometry) {
+    printf("Warning! Embree geometry already created for Mesh object: %s\n", ob_info->ob->id.name);
+    return;
   }
 
   uint vtc_count = me->totvert;
   uint tri_count = poly_to_tri_count(me->totpoly, me->totloop );
-  
+
   /* unsupported mesh */
   if((tri_count < 1) || (vtc_count < 3)) return;
 
@@ -242,13 +246,14 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 
 	RTCGeometry geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_TRIANGLE); // embree geometry
 	rtcSetGeometryBuildQuality(geometry, RTC_BUILD_QUALITY_HIGH);
-  
+
   if(!USE_FLAT_SCENE) {
     rtcSetGeometryTimeStepCount(geometry,1);
     rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, (const float *)&ob_info->ob->obmat[0]);
   }
 
 	/* map triangle and vertex buffer */
+  
   EVEM_Vertex3f* vertices  = (EVEM_Vertex3f*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(EVEM_Vertex3f), vtc_count);
   EVEM_Triangle* triangles = (EVEM_Triangle*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EVEM_Triangle), tri_count);
 
@@ -273,7 +278,6 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 
   // fill triangles buffer
   int ti = 0; // triangles buffer index
-  
   MPoly *curr_mpoly;
   //#pragma omp parallel for num_threads(8) private(curr_mpoly)  reduction(+:ti)
   for (int i = 0; i < me->totpoly; i++) {
@@ -359,15 +363,16 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
     rtcCommitGeometry(inst);
     
     ob_info->id = rtcAttachGeometry(evem_data.scene, inst);
+    ob_info->geometry = inst;
     rtcReleaseGeometry(inst);
   } else {
     ob_info->id = rtcAttachGeometry(evem_data.scene, geometry);
+    ob_info->geometry = geometry;
     memcpy(ob_info->xform, &ob_info->ob->obmat[0], sizeof(float)*16); 
   }
 
   rtcReleaseGeometry(geometry);
 
-  _scene_is_empty = false;
   evem_data.update_tlas = true;
 
   clock_t tend = clock();

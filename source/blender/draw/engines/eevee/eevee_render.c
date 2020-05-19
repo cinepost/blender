@@ -166,7 +166,8 @@ bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *
   EEVEE_materials_cache_init(sldata, vedata);
   EEVEE_motion_blur_cache_init(sldata, vedata);
 
-  if (scene->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
+  if (scene->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
+    EVEM_init();
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
     EEVEE_occlusion_cache_init(sldata, vedata);
@@ -177,7 +178,6 @@ bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *
   EEVEE_temporal_sampling_cache_init(sldata, vedata);
   EEVEE_volumes_cache_init(sldata, vedata);
 
-printf("333\n");
   return true;
 }
 
@@ -488,6 +488,9 @@ static void eevee_render_draw_background(EEVEE_Data *vedata)
 
 void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl, const rcti *rect)
 {
+  printf("_________________________________________________\n");
+  printf("EEVEE_render_draw\n");
+  printf("_________________________________________________\n");
   const DRWContextState *draw_ctx = DRW_context_state_get();
   const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
   const char *viewname = RE_GetActiveRenderView(engine->re);
@@ -503,6 +506,7 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
   EEVEE_materials_cache_finish(sldata, vedata);
   EEVEE_lights_cache_finish(sldata, vedata);
   EEVEE_lightprobes_cache_finish(sldata, vedata);
+  EVEM_objects_cache_finish(sldata, vedata);
 
   EEVEE_effects_draw_init(sldata, vedata);
   EEVEE_volumes_draw_init(sldata, vedata);
@@ -594,7 +598,7 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
 
 
     /* Ambient occlusion */
-    if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
+    if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
       EEVEE_occlusion_trace_compute(sldata, vedata, dtxl->depth, -1);
     } else {
       EEVEE_occlusion_compute(sldata, vedata, dtxl->depth, -1);

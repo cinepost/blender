@@ -178,7 +178,8 @@ void EEVEE_renderpasses_output_init(EEVEE_ViewLayerData *sldata,
     if ((g_data->render_passes & EEVEE_RENDER_PASS_AO) != 0) {
       const DRWContextState *_draw_ctx = DRW_context_state_get();
       const Scene *_scene = _draw_ctx->scene;
-      if (_scene->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
+
+      if (_scene->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
         EEVEE_occlusion_trace_output_init(sldata, vedata, tot_samples);
       } else {
         EEVEE_occlusion_output_init(sldata, vedata, tot_samples);
@@ -358,7 +359,7 @@ void EEVEE_renderpasses_output_accumulate(EEVEE_ViewLayerData *sldata,
     if ((render_pass & EEVEE_RENDER_PASS_AO) != 0) {
       const DRWContextState *_draw_ctx = DRW_context_state_get();
       const Scene *_scene = _draw_ctx->scene;
-      if (_scene->eevee.flag & SCE_EEVEE_RTAO_TRACE) {
+      if (_scene->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
         EEVEE_occlusion_trace_output_accumulate(sldata, vedata);
       } else {
         EEVEE_occlusion_output_accumulate(sldata, vedata);

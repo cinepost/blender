@@ -77,6 +77,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
   new_item->info.ob = ob;
   new_item->info.is_visible = false;
   new_item->info.escene = NULL;
+  new_item->info.geometry = NULL;
   new_item->info.cast_shadow = true;
 
 	//

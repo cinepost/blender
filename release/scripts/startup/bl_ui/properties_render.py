@@ -161,7 +161,7 @@ class RENDER_PT_eevee_rtao(RenderButtonsPanel, Panel):
     def draw_header(self, context):
         scene = context.scene
         props = scene.eevee
-        self.layout.prop(props, "use_rtao_trace", text="")
+        self.layout.prop(props, "use_rtao", text="")
 
     def draw(self, context):
         layout = self.layout
@@ -170,8 +170,7 @@ class RENDER_PT_eevee_rtao(RenderButtonsPanel, Panel):
         scene = context.scene
         props = scene.eevee
 
-        layout.active = props.use_rtao_trace
-        layout.prop(props, "use_rtao_gpubuff", text="Use gpu buffers")
+        layout.active = props.use_rtao
         layout.prop(props, "rtao_gpubuff_bias", text="Bias")
 
 class RENDER_PT_eevee_rtao_denoise(RenderButtonsPanel, Panel):

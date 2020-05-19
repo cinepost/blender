@@ -2296,7 +2296,7 @@ void blo_do_versions_280(FileData *fd, Library *UNUSED(lib), Main *bmain)
         EEVEE_GET_FLOAT(props, gtao_quality);
 
         /* Embree rtao */
-        EEVEE_GET_BOOL(props, rtao_trace, SCE_EEVEE_RTAO_TRACE);
+        EEVEE_GET_BOOL(props, rtao_enable, SCE_EEVEE_RTAO_ENABLED);
         EEVEE_GET_BOOL(props, rtao_gpubuff, SCE_EEVEE_RTAO_GPUBUFF);
         EEVEE_GET_BOOL(props, rtao_denoise, SCE_EEVEE_RTAO_DENOISE);
         EEVEE_GET_INT(props,  rtao_denoise_iterations);
