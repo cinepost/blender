@@ -33,6 +33,7 @@ typedef struct {
   bool is_rtc_instance;
 	bool is_visible;
   bool cast_shadow;
+  bool delete_later;
   RTCScene escene;
   float xform[16];
 } ObjectInfo;

@@ -62,23 +62,27 @@ struct EeveeEmbreeData {
 
   bool update_tlas; // top level acceleration structure need to be updated
   bool update_blas; // bottom level acceleration structure need to be updated
+
+  // eevee related stuff
+  float sample_num;
+  bool  embree_enabled;
 };
 
 
 /* Macro's */
 #define pvz_max(a,b) \
    ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
+      __typeof__ (b) _b = (b); \
+      _a > _b ? _a : _b; })
 
 /* Functions */
-void EVEM_init(void);
-void EVEM_print_capabilities(void);
-void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
-void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow);
-void EVEM_objects_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+void EEVEE_embree_init(EEVEE_ViewLayerData *sldata);
+void EEVEE_embree_print_capabilities(void);
+void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
+void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool cast_shadow);
+void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 
-void EVEM_free(void);
+void EEVEE_embree_free(void);
 
 void EVEM_create_object(Object *ob, ObjectInfo *ob_info);
 void EVEM_update_object(Object *ob, ObjectInfo *ob_info);

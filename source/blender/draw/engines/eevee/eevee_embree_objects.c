@@ -79,6 +79,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
   new_item->info.escene = NULL;
   new_item->info.geometry = NULL;
   new_item->info.cast_shadow = true;
+  new_item->info.delete_later = false;
 
 	//
 	// tsearch searches for a node with a specific key.

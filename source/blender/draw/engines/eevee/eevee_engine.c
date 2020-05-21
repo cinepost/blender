@@ -95,6 +95,7 @@ static void eevee_engine_init(void *ved)
 
   /* `EEVEE_renderpasses_init` will set the active render passes used by `EEVEE_effects_init`.
    * `EEVEE_effects_init` needs to go second for TAA. */
+  EEVEE_embree_init(sldata);
   EEVEE_renderpasses_init(vedata);
   EEVEE_effects_init(sldata, vedata, camera, false);
   EEVEE_materials_init(sldata, stl, fbl);
@@ -120,8 +121,9 @@ static void eevee_cache_init(void *vedata)
 
   //EEVEE_screen_raytrace_cache_init(sldata, vedata);
 
+  EEVEE_embree_cache_init(sldata, vedata);
   if (scene_eval->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
-    EVEM_init();
+    
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
     EEVEE_occlusion_cache_init(sldata, vedata);
@@ -135,7 +137,6 @@ static void eevee_cache_init(void *vedata)
 
 void EEVEE_cache_populate(void *vedata, Object *ob)
 {
-  printf("%s\n", "EEVEE_cache_populate");
   EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();
 
   const DRWContextState *draw_ctx = DRW_context_state_get();
@@ -148,11 +149,10 @@ void EEVEE_cache_populate(void *vedata, Object *ob)
 
   if (DRW_object_is_renderable(ob) && (ob_visibility & OB_VISIBLE_SELF)) {
     if (ELEM(ob->type, OB_MESH, OB_CURVE, OB_SURF, OB_FONT, OB_MBALL)) {
-      
-      EVEM_objects_cache_populate(vedata, sldata, ob, &cast_shadow);
-      EEVEE_rtao_cache_populate(vedata, sldata, ob, &cast_shadow);
-
       EEVEE_materials_cache_populate(vedata, sldata, ob, &cast_shadow);
+
+      EEVEE_embree_cache_populate(vedata, sldata, ob, cast_shadow);
+      EEVEE_rtao_cache_populate(vedata, sldata, ob, cast_shadow);
     }
     else if (ob->type == OB_HAIR) {
       EEVEE_object_hair_cache_populate(vedata, sldata, ob, &cast_shadow);
@@ -194,7 +194,7 @@ static void eevee_cache_finish(void *vedata)
   EEVEE_materials_cache_finish(sldata, vedata);
   EEVEE_lights_cache_finish(sldata, vedata);
   EEVEE_lightprobes_cache_finish(sldata, vedata);
-  EVEM_objects_cache_finish(sldata, vedata);
+  EEVEE_embree_cache_finish(sldata, vedata);
 
   EEVEE_effects_draw_init(sldata, vedata);
   EEVEE_volumes_draw_init(sldata, vedata);
@@ -226,7 +226,7 @@ static uint _i = 0;
 static void eevee_draw_scene(void *vedata)
 {
   _i ++;
-  printf("%s %d\n____________________________\n", "eevee_draw_scene", _i);
+  printf("eevee_draw_scene %u\n____________________________\n", _i);
   EEVEE_PassList *psl = ((EEVEE_Data *)vedata)->psl;
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   EEVEE_FramebufferList *fbl = ((EEVEE_Data *)vedata)->fbl;
@@ -489,7 +489,7 @@ static void eevee_engine_free(void)
   EEVEE_volumes_free();
   EEVEE_renderpasses_free();
 
-  EVEM_free();
+  EEVEE_embree_free();
 }
 
 static const DrawEngineDataSize eevee_data_size = DRW_VIEWPORT_DATA_SIZE(EEVEE_Data);

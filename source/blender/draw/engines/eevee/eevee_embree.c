@@ -24,22 +24,32 @@
 
 /* embree scene */
 
-struct EeveeEmbreeData evem_data = {NULL, .update_tlas = false, .update_blas = false};
+struct EeveeEmbreeData evem_data = {NULL, .update_tlas = false, .update_blas = false, .sample_num = 1.0f, .embree_enabled=false};
 static bool _scene_is_empty = true; // HACK for being able to test geometry already sent to embree device.
 static bool _evem_inited = false;
 
 // USE_FLAT_SCENE means no instancing. all the geometries goes into evem_data.scene directtly
 #define USE_FLAT_SCENE true
 
-void EVEM_init(void) {
-	if (_evem_inited) return;
+void EEVEE_embree_init(EEVEE_ViewLayerData *sldata) {
+  if( _evem_inited ) return;
+
+  const DRWContextState *draw_ctx = DRW_context_state_get();
+  const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
+
+  if (!scene_eval->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
+    evem_data.embree_enabled = false;
+    return;
+  }
+
+  evem_data.embree_enabled = true;
 
   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
   _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
   if (!evem_data.device) {
     printf("%s\n", "create embree device");
-    evem_data.device = rtcNewDevice("threads=0,verbose=3");
+    evem_data.device = rtcNewDevice("threads=0");//,verbose=3");
     assert(evem_data.device && "Unable to create embree device !!!");
   }
 
@@ -55,7 +65,7 @@ void EVEM_init(void) {
   evem_data.RAY_STREAM_ON = rtcGetDeviceProperty(evem_data.device, RTC_DEVICE_PROPERTY_RAY_STREAM_SUPPORTED);
   evem_data.TASKING_SYSTEM = rtcGetDeviceProperty(evem_data.device, RTC_DEVICE_PROPERTY_TASKING_SYSTEM);
 
-  EVEM_print_capabilities();
+  EEVEE_embree_print_capabilities();
 
   EVEM_objects_map_init();
 
@@ -63,7 +73,7 @@ void EVEM_init(void) {
 
 }
 
-void EVEM_print_capabilities(void) {
+void EEVEE_embree_print_capabilities(void) {
 	if (!_evem_inited) return;
 	printf("Embree3 capabilities...\n_________________________\n");
 	printf("Embree3 native Ray4 %s\n", evem_data.NATIVE_RAY4_ON ? "ON":"OFF");
@@ -85,7 +95,7 @@ void EVEM_print_capabilities(void) {
 	}
 }
 
-void EVEM_free(void) {
+void EEVEE_embree_free(void) {
   EVEM_objects_map_free();
 	rtcReleaseScene(evem_data.scene);
 	rtcReleaseDevice(evem_data.device);
@@ -99,11 +109,29 @@ void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff){
   if(buff->rays)free(buff->rays);
 }
 
-void EVEM_objects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
-	printf("EVEM_objects_cache_init\n");
+void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
+  if (!evem_data.embree_enabled || (evem_data.sample_num > 1.0f)) return; // init only on first sample
+
+  printf("EEVEE_embree_cache_init\n");
+
+  ObjectInfo *ob_info = NULL;
+  
+  for(uint i=0; i < embree_objects_map.size; i++) {
+    ob_info = &embree_objects_map.items[i]->info;
+
+    /* hide all objects before populating cache amd mark them as candidates for later deletion */
+    printf("obj: %s\n", ob_info->ob->id.name );
+    if(ob_info->geometry) {
+      ob_info->delete_later = true;
+      rtcDisableGeometry(ob_info->geometry);
+    }
+  }
+  printf("done\n");
 }
 
-void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool *cast_shadow) {
+void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool cast_shadow) {
+  if (!evem_data.embree_enabled || (evem_data.sample_num > 1.0f)) return; // updates only on first sample
+
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_EffectsInfo *effects = stl->effects;
 
@@ -115,7 +143,7 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
   int sample = (DRW_state_is_image_render()) ? effects->taa_render_sample : effects->taa_current_sample;
   if (sample > 1) return; // create/update only on first sample
 
-  printf("EVEM_objects_cache_populate\n");
+  //printf("EVEM_objects_cache_populate\n");
   
 	if (!cast_shadow)
 		return;
@@ -131,37 +159,29 @@ void EVEM_objects_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
     EVEM_update_object(ob, ob_info);
   }
 
-  if(ob_info->cast_shadow != *cast_shadow) {
-    printf("cast shadow: %s\n", *cast_shadow ? "true" : "false");
-    EVEM_toggle_object_visibility(ob, ob_info);
-  }
+  /* make object visible */
+  if(ob_info->geometry)
+    rtcEnableGeometry(ob_info->geometry);
+
+  ob_info->delete_later = false; // we've got the object.. we good
+  evem_data.update_tlas = true;
 }
 
 /* here we acutally upate tlas */
-void EVEM_objects_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
-  if(!evem_data.update_tlas) return;
+void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
+  if(!evem_data.embree_enabled || !evem_data.update_tlas || (!evem_data.sample_num > 1.0f)) return;
   printf("EVEM_objects_cache_finish (update TLAS)\n");
-  
-  //if(!evem_data.scene) { // rtcReleaseScene(evem_data.scene);
-  //  evem_data.scene = rtcNewScene(evem_data.device);
-  //  rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST | RTC_SCENE_FLAG_DYNAMIC);
-  //  rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_LOW);
-  //}
 
+  /* check and possibly delete candidates */ 
+  ObjectInfo *ob_info = NULL;
+  
   /*
-  ObjectInfo *ob_info;
-  RTCGeometry geometry; 
-  for (uint i=0; i<embree_objects_map.size; i++) {
+  for(uint i=0; i < embree_objects_map.size; i++) {
     ob_info = &embree_objects_map.items[i]->info;
-    geometry = rtcNewGeometry(evem_data.device, RTC_GEOMETRY_TYPE_INSTANCE);
-    rtcSetGeometryBuildQuality(geometry, RTC_BUILD_QUALITY_HIGH);
-    rtcSetGeometryInstancedScene(geometry, ob_info->escene);
-    rtcSetGeometryTimeStepCount(geometry,1);
-    rtcSetGeometryTransform(geometry, 0, RTC_FORMAT_FLOAT4X4_COLUMN_MAJOR, (const float *)&ob_info->ob->obmat[0]);
-    rtcCommitGeometry(geometry);
-    
-    ob_info->id = rtcAttachGeometry(evem_data.scene, geometry);
-    rtcReleaseGeometry(geometry);
+    if (ob_info->delete_later && !ob_info->ob->data) {
+      // delete candidate that has no data (ob->data == NULL) 
+      printf("Delete object: \n", ob_info->ob->id.name);
+    }
   }
   */
 
@@ -451,9 +471,8 @@ void EVEM_instance_update_transform(Object *ob, ObjectInfo *ob_info) {
 }
 
 void EVEM_toggle_object_visibility(Object *ob, ObjectInfo *ob_info) {
-  return;
   printf("EVEM_toggle_object_visibility\n");
-  RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
+  RTCGeometry geometry = ob_info->geometry;
 
   ob_info->cast_shadow = !ob_info->cast_shadow;
 

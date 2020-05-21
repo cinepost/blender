@@ -2018,7 +2018,6 @@ void EEVEE_materials_cache_populate(EEVEE_Data *vedata,
                                     Object *ob,
                                     bool *cast_shadow)
 {
-  printf("%s\n", "EEVEE_materials_cache_populate");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_StorageList *stl = vedata->stl;
   const DRWContextState *draw_ctx = DRW_context_state_get();

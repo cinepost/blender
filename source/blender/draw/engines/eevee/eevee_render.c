@@ -47,6 +47,7 @@
 #include "eevee_private.h"
 
 #include "eevee_embree.h"
+#include "eevee_occlusion_trace.h"
 
 /* Return true if init properly. */
 bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *depsgraph)
@@ -151,6 +152,7 @@ bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *
 
   /* `EEVEE_renderpasses_init` will set the active render passes used by `EEVEE_effects_init`.
    * `EEVEE_effects_init` needs to go second for TAA. */
+  EEVEE_embree_init(sldata);
   EEVEE_renderpasses_init(vedata);
   EEVEE_effects_init(sldata, vedata, ob_camera_eval, false);
   EEVEE_materials_init(sldata, stl, fbl);
@@ -166,8 +168,8 @@ bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *
   EEVEE_materials_cache_init(sldata, vedata);
   EEVEE_motion_blur_cache_init(sldata, vedata);
 
+  EEVEE_embree_cache_init(sldata, vedata);
   if (scene->eevee.flag & SCE_EEVEE_RTAO_ENABLED) {
-    EVEM_init();
     EEVEE_occlusion_trace_cache_init(sldata, vedata);
   }else {
     EEVEE_occlusion_cache_init(sldata, vedata);
@@ -217,8 +219,10 @@ void EEVEE_render_cache(void *vedata,
 
   if (ob_visibility & OB_VISIBLE_SELF) {
     if (ELEM(ob->type, OB_MESH, OB_CURVE, OB_SURF, OB_FONT, OB_MBALL)) {
-      EVEM_objects_cache_populate(vedata, sldata, ob, &cast_shadow);
       EEVEE_materials_cache_populate(vedata, sldata, ob, &cast_shadow);
+      
+      EEVEE_embree_cache_populate(vedata, sldata, ob, cast_shadow);
+      EEVEE_rtao_cache_populate(vedata, sldata, ob, cast_shadow);
     }
     else if (ob->type == OB_HAIR) {
       EEVEE_object_hair_cache_populate(vedata, sldata, ob, &cast_shadow);
@@ -506,7 +510,7 @@ void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl
   EEVEE_materials_cache_finish(sldata, vedata);
   EEVEE_lights_cache_finish(sldata, vedata);
   EEVEE_lightprobes_cache_finish(sldata, vedata);
-  EVEM_objects_cache_finish(sldata, vedata);
+  EEVEE_embree_cache_finish(sldata, vedata);
 
   EEVEE_effects_draw_init(sldata, vedata);
   EEVEE_volumes_draw_init(sldata, vedata);

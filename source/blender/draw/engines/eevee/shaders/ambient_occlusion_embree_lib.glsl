@@ -6,17 +6,17 @@ uniform sampler2D embreeHitsBuffer;
 
 float embree_occlusion() {
   return texelFetch(embreeHitsBuffer, ivec2(gl_FragCoord.xy), 0).r;
-  //return texelFetch(embreeNormalBuffer, ivec2(gl_FragCoord.xy), 0).r;
 }
 
 void gtao_deferred_embree(vec3 normal, vec4 noise, float frag_depth, out float visibility, out vec3 bent_normal)
 {
   visibility = embree_occlusion();
-  bent_normal = normal;
+  bent_normal = mat3(ViewMatrix) * texelFetch(embreeNormalBuffer, ivec2(gl_FragCoord.xy), 0).xyz;
 }
 
 void gtao_embree(vec3 normal, vec3 position, vec4 noise, out float visibility, out vec3 bent_normal)
 {
+  /* It's mostly for alpha blended objects */
   visibility = embree_occlusion();
   bent_normal = normal;
 }
@@ -39,7 +39,7 @@ float occlusion_compute_embree(vec3 N, vec3 vpos, float user_occlusion, vec4 ran
 
     if ((int(aoSettings) & USE_BENT_NORMAL) != 0) {
       /* The bent normal will show the facet look of the mesh. Try to minimize this. */
-      float mix_fac = visibility * visibility * visibility;
+      float mix_fac = visibility * 0.5 + 0.5;
       bent_normal = normalize(mix(bent_normal, vnor, mix_fac));
 
       bent_normal = transform_direction(ViewMatrixInverse, bent_normal);
