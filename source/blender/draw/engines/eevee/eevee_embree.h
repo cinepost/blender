@@ -83,6 +83,9 @@ void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool cast_shadow);
 void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata);
 
+void EEVEE_embree_scene_init(void);
+void EEVEE_embree_scene_free(void);
+
 void EEVEE_embree_free(void);
 
 void EVEM_create_object(Object *ob, ObjectInfo *ob_info);

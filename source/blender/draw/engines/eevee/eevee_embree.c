@@ -50,10 +50,8 @@ void EEVEE_embree_init(EEVEE_ViewLayerData *sldata) {
     assert(evem_data.device && "Unable to create embree device !!!");
   }
 
-  if(!evem_data.scene) { // rtcReleaseScene(evem_data.scene);
-    evem_data.scene = rtcNewScene(evem_data.device);
-    rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST);// | RTC_SCENE_FLAG_DYNAMIC);
-    rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
+  if(!evem_data.scene) {
+    EEVEE_embree_scene_init();
   }
 
 	evem_data.NATIVE_RAY4_ON = rtcGetDeviceProperty(evem_data.device, RTC_DEVICE_PROPERTY_NATIVE_RAY4_SUPPORTED);
@@ -94,7 +92,7 @@ void EEVEE_embree_print_capabilities(void) {
 
 void EEVEE_embree_free(void) {
   EVEM_objects_map_free();
-	rtcReleaseScene(evem_data.scene);
+	EEVEE_embree_scene_free();
 	rtcReleaseDevice(evem_data.device);
 }
 
@@ -104,6 +102,17 @@ void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff){
   if(buff->rays8)free(buff->rays8);
   if(buff->rays4)free(buff->rays4);
   if(buff->rays)free(buff->rays);
+}
+
+void EEVEE_embree_scene_init() {
+  evem_data.scene = rtcNewScene(evem_data.device);
+  rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST);// | RTC_SCENE_FLAG_DYNAMIC);
+  rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
+}
+
+void EEVEE_embree_scene_free() {
+  if(evem_data.scene) rtcReleaseScene(evem_data.scene);
+  evem_data.scene = NULL; 
 }
 
 void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
@@ -118,25 +127,32 @@ void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
     /* If mode changed from viewport to image or other way it
     /* ooks like we need to rebuild obj map and clear scene */
     EVEM_objects_map_free();
+    EEVEE_embree_scene_free();
     EVEM_objects_map_init();
-    rtcReleaseScene(evem_data.scene);
-    evem_data.scene = rtcNewScene(evem_data.device);
-    rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST);// | RTC_SCENE_FLAG_DYNAMIC);
-    rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
+    EEVEE_embree_scene_init();
   }
 
 
   ObjectInfo *ob_info = NULL;
   
+  if(embree_objects_map.size == 0) return;
+
   for(uint i=0; i < embree_objects_map.size; i++) {
+    //if(!embree_objects_map.items[i]) continue;
+
+    printf("size %u i %u\n", embree_objects_map.size, i );
     ob_info = &embree_objects_map.items[i]->info;
+    printf("info addr %p\n", (void *)ob_info );
+    printf("info name %s\n", ob_info->ob->id.name);
+    printf("info del later  %s\n", ob_info->delete_later ? "yes" : "no" );
 
     // hide all objects before populating cache amd mark them as candidates for later deletion 
     if(ob_info->geometry) {
       ob_info->delete_later = true;
-      rtcDisableGeometry(ob_info->geometry);
+      //rtcDisableGeometry(ob_info->geometry);
     }
   }
+  printf("done\n");
 }
 
 void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool cast_shadow) {
@@ -185,6 +201,7 @@ void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
   /* check and possibly delete candidates */ 
   ObjectInfo *ob_info = NULL;
   
+  /*
   for(uint i=0; i < embree_objects_map.size; i++) {
     ob_info = &embree_objects_map.items[i]->info;
     if (ob_info->delete_later && !ob_info->ob->data) {
@@ -192,6 +209,7 @@ void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
       printf("Delete object: \n", ob_info->ob->id.name);
     }
   }
+  */
 
   rtcCommitScene(evem_data.scene);
   _scene_is_empty = false;
@@ -251,7 +269,7 @@ void EVEM_mesh_object_clear(Mesh *me) {
 }
 
 void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
-  printf("EVEM_mesh_object_create for ob_info->id: %u \n", ob_info->id);
+  printf("EVEM_mesh_object_create for object: %s \n", ob_info->ob->id.name);
 	clock_t tstart = clock();
 
   if (ob_info->geometry) {

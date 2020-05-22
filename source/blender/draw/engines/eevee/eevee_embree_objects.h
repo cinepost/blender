@@ -52,6 +52,7 @@ typedef struct {
 
 /* "private" functions */
 int _evem_ob_map_compare(const void *l, const void *r);
+int _evem_ob_map_compare_ob(const void *l, const void *r);
 void _evem_ob_free_item(void *node);
 
 /* Functions */

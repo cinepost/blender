@@ -158,9 +158,9 @@ static void eevee_create_shader_occlusion_trace(void)
 int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, Object *camera)
 {
   printf("%s\n", "EEVEE_occlusion_trace_init");
-  omp_set_num_threads(8);
-  //printf("OpenMP num threads: %d\n", omp_get_num_threads());
-  //printf("OpenMP max threads: %d\n", omp_get_max_threads());
+  omp_set_num_threads(16);
+  printf("OpenMP num threads: %d\n", omp_get_num_threads());
+  printf("OpenMP max threads: %d\n", omp_get_max_threads());
   e_data.camera = camera;
 
   EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
@@ -229,7 +229,6 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
     if (DRW_state_is_image_render() || taa_use_reprojection || ((stl->effects->enabled_effects & EFFECT_TAA) != 0)) {
       evem_data.sample_num = e_data.sample_num = taa_use_reprojection ? stl->effects->taa_reproject_sample + 1 : stl->effects->taa_current_sample;
     }
-
 
     effects->rtao_embree_tx_1 = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_R8, &draw_engine_eevee_type);
     effects->rtao_embree_tx_2 = DRW_texture_pool_query_2d(fs_size[0], fs_size[1], GPU_R8, &draw_engine_eevee_type);
