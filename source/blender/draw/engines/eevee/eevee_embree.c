@@ -138,18 +138,11 @@ void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
   if(embree_objects_map.size == 0) return;
 
   for(uint i=0; i < embree_objects_map.size; i++) {
-    //if(!embree_objects_map.items[i]) continue;
-
-    printf("size %u i %u\n", embree_objects_map.size, i );
     ob_info = &embree_objects_map.items[i]->info;
-    printf("info addr %p\n", (void *)ob_info );
-    printf("info name %s\n", ob_info->ob->id.name);
-    printf("info del later  %s\n", ob_info->delete_later ? "yes" : "no" );
-
     // hide all objects before populating cache amd mark them as candidates for later deletion 
     if(ob_info->geometry) {
       ob_info->delete_later = true;
-      //rtcDisableGeometry(ob_info->geometry);
+      rtcDisableGeometry(ob_info->geometry);
     }
   }
   printf("done\n");
