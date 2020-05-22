@@ -43,7 +43,7 @@ void _evem_ob_map_grow(void) {
 	if(!embree_objects_map.items || (embree_objects_map.size < embree_objects_map.alloc_size))
 		return;
 	
-	ObjectsMapItem *tmp = malloc(sizeof(ObjectsMapItem*) * embree_objects_map.size);
+	ObjectsMapItem **tmp = malloc(sizeof(ObjectsMapItem*) * embree_objects_map.size);
 	memcpy(tmp, embree_objects_map.items, sizeof(ObjectsMapItem*) * embree_objects_map.size);
 
 	free(embree_objects_map.items);
@@ -53,6 +53,7 @@ void _evem_ob_map_grow(void) {
 
 	embree_objects_map.alloc_size = embree_objects_map.size + EMEV_OBMAP_CHUNK_SIZE;
 };
+
 
 void EVEM_objects_map_init(void) {
 	if(embree_objects_map.items && (embree_objects_map.alloc_size != 0))
@@ -98,7 +99,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
   new_item->info.escene = NULL;
   new_item->info.geometry = NULL;
   new_item->info.cast_shadow = true;
-  new_item->info.delete_later = false;
+  new_item->info.deleted_or_hidden = false;
 
   ObjectsMapItem **item_in_tree = tsearch(new_item, &embree_objects_map.root, _evem_ob_map_compare);
 
@@ -119,7 +120,7 @@ ObjectInfo *EVEM_find_object_info(const Object *ob) {
   ObjectsMapItem **item_in_tree = tfind(ob, &embree_objects_map.root, _evem_ob_map_compare_ob);
   
   if (item_in_tree) {
-    printf("Found existing object %s info\n", ob->id.name);
+    //printf("Found existing object %s info\n", ob->id.name);
     return &(*item_in_tree)->info;
   } 
 

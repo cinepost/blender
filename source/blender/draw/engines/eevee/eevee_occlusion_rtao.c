@@ -349,7 +349,7 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
      */
 
     /* This pass is used to calculate ao rays positions on cpu */
-    DRW_PASS_CREATE(psl->ao_trace_pos, DRW_STATE_WRITE_COLOR | DRW_STATE_WRITE_DEPTH | DRW_STATE_DEPTH_EQUAL | DRW_STATE_CLIP_PLANES | DRW_STATE_CULL_BACK);
+    DRW_PASS_CREATE(psl->ao_trace_pos, DRW_STATE_WRITE_COLOR | DRW_STATE_WRITE_DEPTH | DRW_STATE_DEPTH_EQUAL | DRW_STATE_CLIP_PLANES);// | DRW_STATE_CULL_BACK);
     stl->g_data->rtao_shgrp = DRW_shgroup_create(e_data.rtao_pos_norm_sh, psl->ao_trace_pos);
     DRW_shgroup_uniform_texture(stl->g_data->rtao_shgrp, "utilTex", EEVEE_materials_get_util_tex());
     DRW_shgroup_uniform_block(stl->g_data->rtao_shgrp, "common_block", sldata->common_ubo);

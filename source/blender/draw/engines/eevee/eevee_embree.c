@@ -24,7 +24,9 @@
 
 /* embree scene */
 
-struct EeveeEmbreeData evem_data = {NULL, .update_tlas = false, .update_blas = false, .sample_num = 1.0f, .embree_enabled=false, .image_render_mode=false};
+struct EeveeEmbreeData evem_data = {NULL, .update_tlas = false, .update_blas = false, .sample_num = 1.0f, 
+  .embree_enabled=false, .image_render_mode=false};
+
 static bool _scene_is_empty = true; // HACK for being able to test geometry already sent to embree device.
 static bool _evem_inited = false;
 
@@ -104,15 +106,21 @@ void EVEM_rays_buffer_free(struct EeveeEmbreeRaysBuffer *buff){
   if(buff->rays)free(buff->rays);
 }
 
+static bool scene_commited = false;
+
 void EEVEE_embree_scene_init() {
+  if (evem_data.scene) return;
   evem_data.scene = rtcNewScene(evem_data.device);
-  rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST);// | RTC_SCENE_FLAG_DYNAMIC);
+  rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST);
   rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
+  scene_commited = false;
 }
 
 void EEVEE_embree_scene_free() {
-  if(evem_data.scene) rtcReleaseScene(evem_data.scene);
-  evem_data.scene = NULL; 
+  if(!evem_data.scene) return; 
+  rtcReleaseScene(evem_data.scene);
+  evem_data.scene = NULL;
+  scene_commited = false; 
 }
 
 void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
@@ -140,13 +148,14 @@ void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
   for(uint i=0; i < embree_objects_map.size; i++) {
     ob_info = &embree_objects_map.items[i]->info;
     // hide all objects before populating cache amd mark them as candidates for later deletion 
-    if(ob_info->geometry) {
-      ob_info->delete_later = true;
-      rtcDisableGeometry(ob_info->geometry);
+    if(ob_info->geometry) { // TODO: process all objects not only geometry
+      ob_info->deleted_or_hidden = true;
     }
   }
-  printf("done\n");
+
 }
+
+static uint populated_objects_num = 0;
 
 void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool cast_shadow) {
   if (!evem_data.embree_enabled || (evem_data.sample_num > 1.0f)) return; // updates only on first sample
@@ -162,10 +171,7 @@ void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
   int sample = (DRW_state_is_image_render()) ? effects->taa_render_sample : effects->taa_current_sample;
   if (sample > 1) return; // create/update only on first sample
 
-  printf("EVEM_objects_cache_populate\n");
-  
-	//if (!cast_shadow)
-	//	return;
+  //printf("EVEM_objects_cache_populate\n");
 
   ObjectInfo *ob_info = EVEM_find_object_info(ob);
   if(!ob_info) {
@@ -178,12 +184,9 @@ void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
     EVEM_update_object(ob, ob_info);
   }
 
-  /* make object visible */
-  if(ob_info->geometry)
-    rtcEnableGeometry(ob_info->geometry);
-
-  ob_info->delete_later = false; // we've got the object.. we good
+  ob_info->deleted_or_hidden = false; // we've got the object.. we good
   evem_data.update_tlas = true;
+  populated_objects_num += 1;
 }
 
 /* here we acutally upate tlas */
@@ -191,20 +194,51 @@ void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
   if(!evem_data.embree_enabled || !evem_data.update_tlas || (!evem_data.sample_num > 1.0f)) return;
   printf("EVEM_objects_cache_finish (update TLAS)\n");
 
-  /* check and possibly delete candidates */ 
-  ObjectInfo *ob_info = NULL;
-  
-  /*
-  for(uint i=0; i < embree_objects_map.size; i++) {
-    ob_info = &embree_objects_map.items[i]->info;
-    if (ob_info->delete_later && !ob_info->ob->data) {
-      // delete candidate that has no data (ob->data == NULL) 
-      printf("Delete object: \n", ob_info->ob->id.name);
-    }
-  }
-  */
+  if (populated_objects_num != embree_objects_map.size) {
 
-  rtcCommitScene(evem_data.scene);
+    /* check and possibly delete candidates */ 
+    ObjectInfo *ob_info = NULL;
+    uint temp_objs_num = 0;
+    ObjectsMapItem **tmp_objs = malloc(sizeof(ObjectsMapItem*) * embree_objects_map.size); // objects that are not deleted
+    
+    uint ii = 0;
+    for(uint i=0; i < embree_objects_map.size; i++) {
+      ob_info = &embree_objects_map.items[i]->info;
+      if (ob_info->ob) {
+        if(ob_info->ob->data){
+          tmp_objs[ii++] = embree_objects_map.items[i];
+          temp_objs_num += 1;
+        }
+      }
+    }
+    
+    if(temp_objs_num != 0) {
+      if(evem_data.scene) {
+        EEVEE_embree_scene_free();
+        EEVEE_embree_scene_init();
+      }
+      // remove deleted objects entries from objects map
+      memcpy(embree_objects_map.items, tmp_objs, sizeof(ObjectsMapItem*) * temp_objs_num);
+
+      embree_objects_map.size = temp_objs_num;
+
+      // fill up new scene
+      for(uint i=0; i < embree_objects_map.size; i++) {
+        ob_info = &embree_objects_map.items[i]->info;
+        if (!ob_info->deleted_or_hidden) {
+          ob_info->id = rtcAttachGeometry(evem_data.scene, ob_info->geometry);
+        }
+      }
+    }
+    
+    free(tmp_objs);
+  }
+
+  if (evem_data.update_tlas = true) {
+    rtcCommitScene(evem_data.scene);
+  }
+
+  populated_objects_num = 0;
   _scene_is_empty = false;
   evem_data.update_tlas = false; // tlas already updated
 }
@@ -262,7 +296,7 @@ void EVEM_mesh_object_clear(Mesh *me) {
 }
 
 void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
-  printf("EVEM_mesh_object_create for object: %s \n", ob_info->ob->id.name);
+  //printf("EVEM_mesh_object_create for object: %s \n", ob_info->ob->id.name);
 	clock_t tstart = clock();
 
   if (ob_info->geometry) {
@@ -412,7 +446,8 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
     memcpy(ob_info->xform, &ob_info->ob->obmat[0], sizeof(float)*16); 
   }
 
-  rtcReleaseGeometry(geometry);
+  rtcEnableGeometry(geometry);
+  //rtcReleaseGeometry(geometry);
 
   evem_data.update_tlas = true;
 
@@ -426,11 +461,12 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
 
   // return if object transform not changed and object not in edit mode
   bool is_edit_mode = false;
-  if(!memcmp((const void *)&ob_info->xform[0], (const void *)&ob->obmat[0], sizeof(float)*16)) {
+  if(memcmp((const void *)&ob_info->xform[0], (const void *)&ob->obmat[0], sizeof(float)*16) == 0) {
     // object thansform is the same. check if we in edit mode
     is_edit_mode = DRW_object_is_in_edit_mode(ob);
     if (!is_edit_mode) return; // same transform, not in edit mode. return
   }
+  memcpy(&ob_info->xform[0], (const void *)&ob->obmat[0], sizeof(float)*16);
 
 	RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
   
