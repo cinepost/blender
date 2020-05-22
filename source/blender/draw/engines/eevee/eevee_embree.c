@@ -24,7 +24,7 @@
 
 /* embree scene */
 
-struct EeveeEmbreeData evem_data = {NULL, .update_tlas = false, .update_blas = false, .sample_num = 1.0f, .embree_enabled=false};
+struct EeveeEmbreeData evem_data = {NULL, .update_tlas = false, .update_blas = false, .sample_num = 1.0f, .embree_enabled=false, .image_render_mode=false};
 static bool _scene_is_empty = true; // HACK for being able to test geometry already sent to embree device.
 static bool _evem_inited = false;
 
@@ -43,9 +43,6 @@ void EEVEE_embree_init(EEVEE_ViewLayerData *sldata) {
   }
 
   evem_data.embree_enabled = true;
-
-  _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-  _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
   if (!evem_data.device) {
     printf("%s\n", "create embree device");
@@ -74,7 +71,7 @@ void EEVEE_embree_init(EEVEE_ViewLayerData *sldata) {
 }
 
 void EEVEE_embree_print_capabilities(void) {
-	if (!_evem_inited) return;
+	if (_evem_inited) return;
 	printf("Embree3 capabilities...\n_________________________\n");
 	printf("Embree3 native Ray4 %s\n", evem_data.NATIVE_RAY4_ON ? "ON":"OFF");
 	printf("Embree3 native Ray8 %s\n", evem_data.NATIVE_RAY8_ON ? "ON":"OFF");
@@ -114,19 +111,32 @@ void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
 
   printf("EEVEE_embree_cache_init\n");
 
+  bool image_render_mode = DRW_state_is_image_render() ? true : false;
+
+  if (evem_data.image_render_mode != image_render_mode ) {
+    evem_data.image_render_mode = image_render_mode;
+    /* If mode changed from viewport to image or other way it
+    /* ooks like we need to rebuild obj map and clear scene */
+    EVEM_objects_map_free();
+    EVEM_objects_map_init();
+    rtcReleaseScene(evem_data.scene);
+    evem_data.scene = rtcNewScene(evem_data.device);
+    rtcSetSceneFlags(evem_data.scene, RTC_SCENE_FLAG_ROBUST);// | RTC_SCENE_FLAG_DYNAMIC);
+    rtcSetSceneBuildQuality(evem_data.scene, RTC_BUILD_QUALITY_HIGH);
+  }
+
+
   ObjectInfo *ob_info = NULL;
   
   for(uint i=0; i < embree_objects_map.size; i++) {
     ob_info = &embree_objects_map.items[i]->info;
 
-    /* hide all objects before populating cache amd mark them as candidates for later deletion */
-    printf("obj: %s\n", ob_info->ob->id.name );
+    // hide all objects before populating cache amd mark them as candidates for later deletion 
     if(ob_info->geometry) {
       ob_info->delete_later = true;
       rtcDisableGeometry(ob_info->geometry);
     }
   }
-  printf("done\n");
 }
 
 void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool cast_shadow) {
@@ -143,10 +153,10 @@ void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
   int sample = (DRW_state_is_image_render()) ? effects->taa_render_sample : effects->taa_current_sample;
   if (sample > 1) return; // create/update only on first sample
 
-  //printf("EVEM_objects_cache_populate\n");
+  printf("EVEM_objects_cache_populate\n");
   
-	if (!cast_shadow)
-		return;
+	//if (!cast_shadow)
+	//	return;
 
   ObjectInfo *ob_info = EVEM_find_object_info(ob);
   if(!ob_info) {
@@ -175,7 +185,6 @@ void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
   /* check and possibly delete candidates */ 
   ObjectInfo *ob_info = NULL;
   
-  /*
   for(uint i=0; i < embree_objects_map.size; i++) {
     ob_info = &embree_objects_map.items[i]->info;
     if (ob_info->delete_later && !ob_info->ob->data) {
@@ -183,7 +192,6 @@ void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
       printf("Delete object: \n", ob_info->ob->id.name);
     }
   }
-  */
 
   rtcCommitScene(evem_data.scene);
   _scene_is_empty = false;
@@ -191,8 +199,8 @@ void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
 }
 
 void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
+	//printf("EVEM_create_object: %s\n", ob->id.name);
 
-	printf("EVEM_create_object: %s\n", ob->id.name);
   struct Mesh *mesh_eval = NULL;
 	switch (ob->type) {
     case OB_MESH:
@@ -222,6 +230,8 @@ void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
 }
 
 void EVEM_update_object(Object *ob, ObjectInfo *ob_info) {
+  //printf("EVEM_update_object: %s\n", ob->id.name);
+
   switch (ob->type) {
     case OB_MESH:
       if(USE_FLAT_SCENE) {
@@ -396,12 +406,12 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   evem_data.update_tlas = true;
 
   clock_t tend = clock();
-  printf("Mesh geometry for object %s with embree id %u added in %f seconds\n",  ob_info->ob->id.name, ob_info->id, (double)(tend - tstart) / CLOCKS_PER_SEC);
+  //printf("Mesh geometry for object %s with embree id %u added in %f seconds\n",  ob_info->ob->id.name, ob_info->id, (double)(tend - tstart) / CLOCKS_PER_SEC);
 }
 
 void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
   if(_scene_is_empty)return;
-	printf("%s\n", "EVEM_mesh_object_update");
+	//printf("%s\n", "EVEM_mesh_object_update");
 
   // return if object transform not changed and object not in edit mode
   bool is_edit_mode = false;
@@ -439,7 +449,7 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
   }
 
   float *m = (const float *)&ob_info->ob->obmat[0];
-  #pragma omp parallel for num_threads(8) shared(m)
+  #pragma omp parallel for shared(m)
   // embree wants our geometry to be pre transformed
   for (int i = 0; i < me->totvert; i++) {
     vertices[i].x = m[0] * me->mvert[i].co[0] + m[4] * me->mvert[i].co[1] + m[8] * me->mvert[i].co[2] + m[12];

@@ -66,6 +66,7 @@ struct EeveeEmbreeData {
   // eevee related stuff
   float sample_num;
   bool  embree_enabled;
+  bool  image_render_mode;
 };
 
 

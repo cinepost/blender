@@ -47,7 +47,7 @@
 #include "eevee_private.h"
 
 #include "eevee_embree.h"
-#include "eevee_occlusion_trace.h"
+#include "eevee_occlusion_rtao.h"
 
 /* Return true if init properly. */
 bool EEVEE_render_init(EEVEE_Data *ved, RenderEngine *engine, struct Depsgraph *depsgraph)

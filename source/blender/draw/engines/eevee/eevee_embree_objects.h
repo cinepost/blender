@@ -20,7 +20,7 @@ extern "C" {
 enum { OBJECT_PERSISTENT_ID_SIZE = 16 };
 
 typedef struct {
-  void *ob;
+  Object *ob;
   void *parent;
   int id[OBJECT_PERSISTENT_ID_SIZE];
   bool use_particle_hair;

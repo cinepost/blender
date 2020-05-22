@@ -91,7 +91,7 @@ set(SRC
   engines/eevee/eevee_mist.c
   engines/eevee/eevee_motion_blur.c
   engines/eevee/eevee_occlusion.c
-  engines/eevee/eevee_occlusion_trace.c
+  engines/eevee/eevee_occlusion_rtao.c
   engines/eevee/eevee_render.c
   engines/eevee/eevee_renderpasses.c
   engines/eevee/eevee_sampling.c
@@ -170,7 +170,7 @@ set(SRC
   engines/basic/basic_engine.h
   engines/eevee/eevee_embree.h
   engines/eevee/eevee_embree_objects.h
-  engines/eevee/eevee_occlusion_trace.h
+  engines/eevee/eevee_occlusion_rtao.h
   engines/eevee/eevee_engine.h
   engines/eevee/eevee_lightcache.h
   engines/eevee/eevee_lut.h

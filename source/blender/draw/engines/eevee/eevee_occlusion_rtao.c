@@ -52,7 +52,7 @@
 
 #include "pthread.h"
 #include "eevee_embree.h"
-#include "eevee_occlusion_trace.h"
+#include "eevee_occlusion_rtao.h"
 
 typedef struct GPUTexture GPUTexture;
 
@@ -457,7 +457,9 @@ void PVZ_occlusion_trace_buffers_free(void) {
 
 void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
   struct RTCRay *rays = rtao_cpu_buffers.rays;
-  #pragma omp parallel for num_threads(8)
+  float ray_bias = pvz_max(EMBREE_TRACE_MIN_BIAS, e_data.gpu_bias);
+
+  #pragma omp parallel for shared(rays, ray_bias)
   for( uint i=0; i < rtao_cpu_buffers.w * rtao_cpu_buffers.h; i++){
     rays[i].id = i; // we need this as Embree might rearrange rays for better performance
 
@@ -465,7 +467,7 @@ void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
     rays[i].org_x = rtao_cpu_buffers.pos[i*3];
     rays[i].org_y = rtao_cpu_buffers.pos[i*3+1];
     rays[i].org_z = rtao_cpu_buffers.pos[i*3+2];
-    rays[i].tnear = pvz_max(EMBREE_TRACE_MIN_BIAS, e_data.gpu_bias);
+    rays[i].tnear = ray_bias;
 
     rays[i].dir_x = rtao_cpu_buffers.nrm[i*3];
     rays[i].dir_y = rtao_cpu_buffers.nrm[i*3+1];
@@ -497,7 +499,7 @@ void PVZ_occlusion_trace_compute_embree(void) {
   uint num_pixels = rtao_cpu_buffers.w * rtao_cpu_buffers.h;
 
   RTCScene scene = evem_data.scene;
-  #pragma omp parallel for num_threads(8) shared(scene, rays, ctx, rtao_cpu_buffers)
+  #pragma omp parallel for shared(scene, rays, ctx, rtao_cpu_buffers)
   for(uint i=0; i < num_pixels; i+=RAYS_STREAM_SIZE) {
     rtcOccluded1M(scene, &ctx, &rays[i], RAYS_STREAM_SIZE, sizeof(struct RTCRay));
     
@@ -518,14 +520,9 @@ void PVZ_occlusion_trace_compute_embree(void) {
   printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buffers.w*rtao_cpu_buffers.h);
 }
 
-#pragma GCC pop_options
-
 void EEVEE_occlusion_rtao_read_gpu_buffers(EEVEE_Data *vedata) {
   struct timeval t_start, t_end;
   double elapsed_time;
-
-  // start timer
-  gettimeofday(&t_start, NULL);
 
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
@@ -538,42 +535,29 @@ void EEVEE_occlusion_rtao_read_gpu_buffers(EEVEE_Data *vedata) {
   GPU_framebuffer_read_color(fb, 0, 0,rtao_cpu_buffers.w, rtao_cpu_buffers.h, 3, 1, rtao_cpu_buffers.pos);
 
   PVZ_occlusion_trace_build_prim_rays_gpu();
-
-  // stop timer
-  gettimeofday(&t_end, NULL);
-  elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
-  printf("GPU_framebuffer read in %f seconds\n", elapsed_time);
 }
 
-static GLuint pbo[2];
-static bool pbo_ready = false;
-
 void EEVEE_occlusion_rtao_read_gpu_buffers_fast(EEVEE_Data *vedata) {
-  struct timeval t_start, t_end;
-  double elapsed_time;
-
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_EffectsInfo *effects = stl->effects;
 
   struct RTCRay *rays = rtao_cpu_buffers.rays;
-
-  // start timer
-  gettimeofday(&t_start, NULL);
+  float ray_bias = pvz_max(EMBREE_TRACE_MIN_BIAS, e_data.gpu_bias);
 
   GPU_framebuffer_bind(fbl->rtao_pos_norm_fb);
   
-  uint buf_size = rtao_cpu_buffers.w * rtao_cpu_buffers.h * 3 * sizeof(float);
+  uint pbo_buff_size = rtao_cpu_buffers.w * rtao_cpu_buffers.h * 3 * sizeof(float);
  
-  // create pbo's
+  GLuint pbo[2];
   glGenBuffers(1, &pbo[0]);
   glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[0]);
-  glBufferData(GL_PIXEL_PACK_BUFFER, buf_size, NULL, GL_STREAM_COPY);
+  glBufferData(GL_PIXEL_PACK_BUFFER, pbo_buff_size, NULL, GL_STREAM_COPY);
   glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
   glGenBuffers(1, &pbo[1]);
   glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[1]);
-  glBufferData(GL_PIXEL_PACK_BUFFER, buf_size, NULL, GL_STREAM_COPY);
+  glBufferData(GL_PIXEL_PACK_BUFFER, pbo_buff_size, NULL, GL_STREAM_COPY);
   glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
   glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -590,34 +574,30 @@ void EEVEE_occlusion_rtao_read_gpu_buffers_fast(EEVEE_Data *vedata) {
   glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[1]);
   rtao_cpu_buffers.pos_ = (float *)glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
   if(rtao_cpu_buffers.nrm_) {
-    #pragma omp parallel for num_threads(8)
+    #pragma omp parallel for shared(rays, ray_bias)
     for( uint i=0; i < rtao_cpu_buffers.w * rtao_cpu_buffers.h; i++){
       rays[i].id = i; // we need this as Embree might rearrange rays for better performance
       rays[i].mask = 0xFFFFFFFF;
       rays[i].dir_x = rtao_cpu_buffers.nrm_[i*3];
       rays[i].dir_y = rtao_cpu_buffers.nrm_[i*3+1];
       rays[i].dir_z = rtao_cpu_buffers.nrm_[i*3+2];
-      rays[i].tnear = pvz_max(EMBREE_TRACE_MIN_BIAS, e_data.gpu_bias);
+      rays[i].tnear = ray_bias;
       rays[i].tfar = e_data.ao_dist;
       rays[i].time = 0.0f;
 
-       rays[i].org_x = rtao_cpu_buffers.pos_[i*3];
+      rays[i].org_x = rtao_cpu_buffers.pos_[i*3];
       rays[i].org_y = rtao_cpu_buffers.pos_[i*3+1];
       rays[i].org_z = rtao_cpu_buffers.pos_[i*3+2];
     }
   }
   glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
-  // stop timer
-  gettimeofday(&t_end, NULL);
-  elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
-
-  printf("GPU_framebuffer FAST read in %f seconds\n", elapsed_time);
-
   glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
   glDeleteBuffers(1, &pbo[0]);
   glDeleteBuffers(1, &pbo[1]);
 }
+
+#pragma GCC pop_options
 
 void EEVEE_occlusion_rtao_texture_update(GPUTexture *tex, eGPUDataFormat data_format, const void *pixels) {
   GLint alignment;

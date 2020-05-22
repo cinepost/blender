@@ -16,7 +16,6 @@ ObjectsMap embree_objects_map = {.root=NULL, .items=NULL, .size=0, .alloc_size=0
 int _evem_ob_map_compare(const void *l, const void *r) {
   const ObjectsMapItem *ll = (const ObjectsMapItem *)l;
   const ObjectsMapItem *rr = (const ObjectsMapItem *)r;
-  //return 0;
   return ll->key.ob - rr->key.ob;
 };
 
@@ -57,6 +56,8 @@ void EVEM_objects_map_free(void) {
 	}
 
 	free(embree_objects_map.items);
+	embree_objects_map.items = NULL;
+	embree_objects_map.root = NULL;
 	embree_objects_map.size = 0;
 	embree_objects_map.alloc_size = 0;
 };
@@ -68,10 +69,9 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
 	if(!ob || !embree_objects_map.items)
 		return NULL;
 
-	printf("EVEM_insert_object: %s\n", ob->id.name);
-	//
-	// Create the (new) item
-	//
+	//printf("EVEM_insert_object: %s\n", ob->id.name);
+	
+	/* Create the (new) item */
   ObjectsMapItem *new_item = malloc(sizeof(ObjectsMapItem));
   new_item->key.ob = ob;
   new_item->info.ob = ob;
@@ -88,7 +88,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
   ObjectsMapItem **item_in_tree = tsearch(new_item, &embree_objects_map.root, _evem_ob_map_compare);
 
   if (*item_in_tree != new_item) {
-	  printf("Object already inserted: %s, overriting\n", ob->id.name);
+	  //printf("Object already inserted: %s, overriting\n", ob->id.name);
 
     // Because the key was already inserted, we overwrite the
     // already inserted item's value with the new value
@@ -114,7 +114,7 @@ ObjectInfo *EVEM_find_object_info(const Object *ob) {
   free(tmp_item);
 
   if (item_in_tree) {
-    printf("Found existing object %s info\n", ob->id.name);
+    //printf("Found existing object %s info\n", ob->id.name);
     return &(*item_in_tree)->info;
   } 
 

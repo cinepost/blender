@@ -37,7 +37,7 @@
 #include "eevee_engine.h" /* own include */
 
 #include "eevee_embree.h"
-#include "eevee_occlusion_trace.h"
+#include "eevee_occlusion_rtao.h"
 
 #define EEVEE_ENGINE "BLENDER_EEVEE"
 
