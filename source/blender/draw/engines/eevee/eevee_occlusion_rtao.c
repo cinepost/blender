@@ -43,9 +43,13 @@
 
 #include <omp.h>
 #include <time.h>
+
+#ifndef _WIN32
 #include <unistd.h>
-#include <math.h>
 #include <sys/time.h>
+#endif
+
+#include <math.h>
 
 #include <xmmintrin.h>
 #include <pmmintrin.h>
@@ -349,8 +353,8 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
      */
 
     /* This pass is used to calculate ao rays positions on cpu */
-    DRW_PASS_CREATE(psl->ao_trace_pos, DRW_STATE_WRITE_COLOR | DRW_STATE_WRITE_DEPTH | DRW_STATE_DEPTH_EQUAL | DRW_STATE_CLIP_PLANES);// | DRW_STATE_CULL_BACK);
-    stl->g_data->rtao_shgrp = DRW_shgroup_create(e_data.rtao_pos_norm_sh, psl->ao_trace_pos);
+    DRW_PASS_CREATE((DRWPass *)psl->ao_trace_pos, DRW_STATE_WRITE_COLOR | DRW_STATE_WRITE_DEPTH | DRW_STATE_DEPTH_EQUAL | DRW_STATE_CLIP_PLANES);// | DRW_STATE_CULL_BACK);
+    stl->g_data->rtao_shgrp = DRW_shgroup_create(e_data.rtao_pos_norm_sh, (DRWPass *)psl->ao_trace_pos);
     DRW_shgroup_uniform_texture(stl->g_data->rtao_shgrp, "utilTex", EEVEE_materials_get_util_tex());
     DRW_shgroup_uniform_block(stl->g_data->rtao_shgrp, "common_block", sldata->common_ubo);
     DRW_shgroup_uniform_float(stl->g_data->rtao_shgrp, "sampleNum", &e_data.sample_num, 1);
@@ -410,8 +414,6 @@ void EEVEE_rtao_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, 
   //printf("%s\n", "EEVEE_rtao_cache_populate");
   //if(!cast_shadow) return; // don't draw pos/norm buffer for non shadow casters
 
-  EEVEE_PassList *psl = vedata->psl;
-
   struct GPUBatch *geom = NULL;
   geom = DRW_cache_object_surface_get(ob);
   DRW_shgroup_call(stl->g_data->rtao_shgrp, geom, ob);
@@ -458,8 +460,9 @@ void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
   struct RTCRay *rays = rtao_cpu_buffers.rays;
   float ray_bias = pvz_max(EMBREE_TRACE_MIN_BIAS, e_data.gpu_bias);
 
-  #pragma omp parallel for shared(rays, ray_bias)
-  for( uint i=0; i < rtao_cpu_buffers.w * rtao_cpu_buffers.h; i++){
+  int i;
+  #pragma omp parallel for shared(rays, ray_bias) private(i)
+  for(i=0; i < rtao_cpu_buffers.w * rtao_cpu_buffers.h; i++){
     rays[i].id = i; // we need this as Embree might rearrange rays for better performance
 
     rays[i].mask = 0xFFFFFFFF;
@@ -478,11 +481,13 @@ void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
 
 void PVZ_occlusion_trace_compute_embree(void) {
   printf("%s\n", "embree trace occlusion");
+
+  #ifndef _WIN32
   struct timeval t_start, t_end;
   double elapsed_time;
-
   // start timer
   gettimeofday(&t_start, NULL);
+  #endif
 
   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
   _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
@@ -497,32 +502,34 @@ void PVZ_occlusion_trace_compute_embree(void) {
 
   uint num_pixels = rtao_cpu_buffers.w * rtao_cpu_buffers.h;
 
+  int i;
   RTCScene scene = evem_data.scene;
-  #pragma omp parallel for shared(scene, rays, ctx, rtao_cpu_buffers)
-  for(uint i=0; i < num_pixels; i+=RAYS_STREAM_SIZE) {
+  #pragma omp parallel for shared(scene, rays, ctx, rtao_cpu_buffers) private(i)
+  for(i=0; i < num_pixels; i+=RAYS_STREAM_SIZE) {
     rtcOccluded1M(scene, &ctx, &rays[i], RAYS_STREAM_SIZE, sizeof(struct RTCRay));
     
     struct RTCRay *ray = NULL;
     
-    #pragma omp simd //private(i) //shared(rays, rtao_cpu_buffers)
+    #ifndef _WIN32
+    #pragma omp simd
+    #endif
+
     for(uint j=0; j < RAYS_STREAM_SIZE; j++){
       ray = &rays[i + j];
       rtao_cpu_buffers.hits[ray->id] = (ray->tfar >= 0.0f) ? 255 : 0;
     }
   }
   
+  #ifndef _WIN32
   // stop timer
   gettimeofday(&t_end, NULL);
   elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
-
   //free(ao_thread_data);
   printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buffers.w*rtao_cpu_buffers.h);
+  #endif
 }
 
 void EEVEE_occlusion_rtao_read_gpu_buffers(EEVEE_Data *vedata) {
-  struct timeval t_start, t_end;
-  double elapsed_time;
-
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_EffectsInfo *effects = stl->effects;
@@ -573,8 +580,9 @@ void EEVEE_occlusion_rtao_read_gpu_buffers_fast(EEVEE_Data *vedata) {
   glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[1]);
   rtao_cpu_buffers.pos_ = (float *)glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
   if(rtao_cpu_buffers.nrm_) {
-    #pragma omp parallel for shared(rays, ray_bias)
-    for( uint i=0; i < rtao_cpu_buffers.w * rtao_cpu_buffers.h; i++){
+    int i;
+    #pragma omp parallel for shared(rays, ray_bias) private(i)
+    for(i=0; i < rtao_cpu_buffers.w * rtao_cpu_buffers.h; i++){
       rays[i].id = i; // we need this as Embree might rearrange rays for better performance
       rays[i].mask = 0xFFFFFFFF;
       rays[i].dir_x = rtao_cpu_buffers.nrm_[i*3];
@@ -596,7 +604,9 @@ void EEVEE_occlusion_rtao_read_gpu_buffers_fast(EEVEE_Data *vedata) {
   glDeleteBuffers(1, &pbo[1]);
 }
 
+#ifndef _WIN32
 #pragma GCC pop_options
+#endif
 
 void EEVEE_occlusion_rtao_texture_update(GPUTexture *tex, eGPUDataFormat data_format, const void *pixels) {
   GLint alignment;
@@ -622,28 +632,30 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
   EEVEE_EffectsInfo *effects = stl->effects;
 
   if ( effects->enabled_effects & EFFECT_GTAO ) {
-    struct timeval t_start, t_end;
-    double elapsed_time;
-
     DRW_stats_group_start("GTAO Trace Hits");
     effects->ao_src_depth = depth_src;
     
     /* use gpu generated buffers for world positions and normals*/
     GPU_framebuffer_bind(fbl->rtao_pos_norm_fb);
 
-    DRW_draw_pass(psl->ao_trace_pos);
+    DRW_draw_pass((DRWPass *)psl->ao_trace_pos);
     
+    #ifndef _WIN32
+    struct timeval t_start, t_end;
+    double elapsed_time;
     // start timer
     gettimeofday(&t_start, NULL);
+    #endif
 
     //EEVEE_occlusion_rtao_read_gpu_buffers(vedata);
-
     EEVEE_occlusion_rtao_read_gpu_buffers_fast(vedata); // read world positions and normals from gpu
 
+    #ifndef _WIN32
     // stop timer
     gettimeofday(&t_end, NULL);
     elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
     printf("GPU_framebuffer FULL read in %f seconds\n", elapsed_time);
+    #endif
 
     PVZ_occlusion_trace_compute_embree();
     EEVEE_occlusion_rtao_texture_update(effects->rtao_embree_tx_1, GPU_R8, rtao_cpu_buffers.hits); // send ray hits back to gpu
@@ -692,7 +704,7 @@ void EEVEE_occlusion_trace_draw_debug(EEVEE_ViewLayerData *UNUSED(sldata), EEVEE
     DRW_stats_group_start("GTAO Debug");
 
     GPU_framebuffer_bind(fbl->rtao_pos_norm_fb);
-    DRW_draw_pass(psl->ao_trace_pos);
+    DRW_draw_pass((DRWPass *)psl->ao_trace_pos);
 
     //GPU_framebuffer_bind(fbl->gtao_debug_fb);
     //DRW_draw_pass(psl->ao_embree_debug);

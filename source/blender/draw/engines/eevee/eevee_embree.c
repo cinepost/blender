@@ -333,9 +333,10 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
   EVEM_Triangle* triangles = (EVEM_Triangle*) rtcSetNewGeometryBuffer(geometry, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(EVEM_Triangle), tri_count);
 
   // fill vertex buffer
+  int i;
   if(!USE_FLAT_SCENE) {
-    #pragma omp parallel for num_threads(8)
-    for (int i = 0; i < vtc_count; i++) {
+    #pragma omp parallel for num_threads(8) private(i)
+    for (i = 0; i < vtc_count; i++) {
   	 vertices[i].x = me->mvert[i].co[0];
   	 vertices[i].y = me->mvert[i].co[1];
   	 vertices[i].z = me->mvert[i].co[2];
@@ -343,8 +344,8 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 	} else {
     // pre transformed vertices for flat scene
     float *m = (const float *)&ob_info->ob->obmat[0];
-    #pragma omp parallel for num_threads(8) shared(m)
-    for (int i = 0; i < vtc_count; i++) {
+    #pragma omp parallel for num_threads(8) private(i) shared(m)
+    for (i = 0; i < vtc_count; i++) {
       vertices[i].x = m[0] * me->mvert[i].co[0] + m[4] * me->mvert[i].co[1] + m[8] * me->mvert[i].co[2] + m[12];
       vertices[i].y = m[1] * me->mvert[i].co[0] + m[5] * me->mvert[i].co[1] + m[9] * me->mvert[i].co[2] + m[13];
       vertices[i].z = m[2] * me->mvert[i].co[0] + m[6] * me->mvert[i].co[1] + m[10] * me->mvert[i].co[2] + m[14];
@@ -495,10 +496,11 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
     return false;
   }
 
+  int i;
   float *m = (const float *)&ob_info->ob->obmat[0];
-  #pragma omp parallel for shared(m)
+  #pragma omp parallel for shared(m) private(i)
   // embree wants our geometry to be pre transformed
-  for (int i = 0; i < me->totvert; i++) {
+  for (i = 0; i < me->totvert; i++) {
     vertices[i].x = m[0] * me->mvert[i].co[0] + m[4] * me->mvert[i].co[1] + m[8] * me->mvert[i].co[2] + m[12];
     vertices[i].y = m[1] * me->mvert[i].co[0] + m[5] * me->mvert[i].co[1] + m[9] * me->mvert[i].co[2] + m[13];
     vertices[i].z = m[2] * me->mvert[i].co[0] + m[6] * me->mvert[i].co[1] + m[10] * me->mvert[i].co[2] + m[14];

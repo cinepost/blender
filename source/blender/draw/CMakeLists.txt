@@ -91,7 +91,10 @@ set(SRC
   engines/eevee/eevee_mist.c
   engines/eevee/eevee_motion_blur.c
   engines/eevee/eevee_occlusion.c
+  
   engines/eevee/eevee_occlusion_rtao.c
+  engines/eevee/tq84-tsearch.c
+
   engines/eevee/eevee_render.c
   engines/eevee/eevee_renderpasses.c
   engines/eevee/eevee_sampling.c
@@ -411,7 +414,7 @@ if(WITH_XR_OPENXR)
   add_definitions(-DWITH_XR_OPENXR)
 endif()
 
-add_definitions(-DWITH_EMBREE)
+add_definitions(-DWITH_EMBREE -DWITH_TBB)
 
 find_package(EMBREE 3.10.0 REQUIRED)
 

@@ -71,10 +71,11 @@ struct EeveeEmbreeData {
 
 
 /* Macro's */
-#define pvz_max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-      __typeof__ (b) _b = (b); \
-      _a > _b ? _a : _b; })
+#ifdef _WIN32
+#define pvz_max(a,b) (a > b ? a : b)
+#else
+#define pvz_max(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
+#endif
 
 /* Functions */
 void EEVEE_embree_init(EEVEE_ViewLayerData *sldata);

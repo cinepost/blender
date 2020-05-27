@@ -11,6 +11,12 @@
 
 #include "eevee_private.h"
 
+#ifdef _WIN32
+#include "tq84-tsearch.h"
+#define tsearch(X, Y, Z) tq84_tsearch(X, Y, Z)
+#define tfind(X, Y, Z) tq84_tfind(X, Y, Z)
+#endif
+
 #ifdef  __cplusplus
 extern "C" {
 #endif

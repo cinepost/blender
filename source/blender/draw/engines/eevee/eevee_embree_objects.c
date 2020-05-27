@@ -7,7 +7,6 @@
 
 #include "eevee_embree_objects.h"
 
-
 /* embree scene */
 
 ObjectsMap embree_objects_map = {.root=NULL, .items=NULL, .size=0, .alloc_size=0};

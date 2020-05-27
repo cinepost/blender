@@ -30,3 +30,7 @@ set WITH_PYDEBUG=
 set PYDEBUG_CMAKE_ARGS=
 set FORMAT=
 set TEST=
+
+set WITH_TBB=ON
+set WITH_FFTW=ON
+
