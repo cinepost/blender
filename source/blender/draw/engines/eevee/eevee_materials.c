@@ -42,6 +42,7 @@
 
 #include "DEG_depsgraph_query.h"
 
+#include "debug.h"
 #include "eevee_engine.h"
 #include "eevee_lut.h"
 #include "eevee_private.h"
@@ -612,7 +613,7 @@ void EEVEE_materials_init(EEVEE_ViewLayerData *sldata,
                           EEVEE_StorageList *stl,
                           EEVEE_FramebufferList *fbl)
 {
-  printf("%s\n", "EEVEE_materials_init");
+  dbg_printf("%s\n", "EEVEE_materials_init");
   
   EEVEE_PrivateData *g_data = stl->g_data;
 
@@ -777,7 +778,7 @@ void EEVEE_materials_init(EEVEE_ViewLayerData *sldata,
       }
     }
   }
-  printf("EEVEE_materials_init done\n");
+  dbg_printf("EEVEE_materials_init done\n");
 }
 
 struct GPUMaterial *EEVEE_material_world_lightprobe_get(struct Scene *scene, World *wo)
@@ -1185,7 +1186,7 @@ static struct DRWShadingGroup *EEVEE_default_hair_render_pass_shading_group_get(
 
 void EEVEE_materials_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
-  printf("%s\n", "EEVEE_materials_cache_init");
+  dbg_printf("%s\n", "EEVEE_materials_cache_init");
   EEVEE_PassList *psl = ((EEVEE_Data *)vedata)->psl;
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   const DRWContextState *draw_ctx = DRW_context_state_get();
@@ -2229,7 +2230,7 @@ void EEVEE_object_hair_cache_populate(EEVEE_Data *vedata,
 
 void EEVEE_materials_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
-  printf("%s\n", "EEVEE_materials_cache_finish");
+  dbg_printf("%s\n", "EEVEE_materials_cache_finish");
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
 
   BLI_ghash_free(stl->g_data->material_hash, NULL, MEM_freeN);
@@ -2242,7 +2243,7 @@ void EEVEE_materials_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedat
 
 void EEVEE_materials_free(void)
 {
-  printf("%s\n", "EEVEE_materials_free");
+  dbg_printf("%s\n", "EEVEE_materials_free");
   for (int i = 0; i < VAR_MAT_MAX; i++) {
     DRW_SHADER_FREE_SAFE(e_data.default_lit[i]);
   }

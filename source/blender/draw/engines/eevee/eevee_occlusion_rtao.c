@@ -55,6 +55,8 @@
 #include <pmmintrin.h>
 
 #include "pthread.h"
+
+#include "debug.h"
 #include "eevee_embree.h"
 #include "eevee_occlusion_rtao.h"
 
@@ -161,10 +163,10 @@ static void eevee_create_shader_occlusion_trace(void)
 
 int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, Object *camera)
 {
-  printf("%s\n", "EEVEE_occlusion_trace_init");
+  dbg_printf("%s\n", "EEVEE_occlusion_trace_init");
   omp_set_num_threads(16);
-  printf("OpenMP num threads: %d\n", omp_get_num_threads());
-  printf("OpenMP max threads: %d\n", omp_get_max_threads());
+  dbg_printf("OpenMP num threads: %d\n", omp_get_num_threads());
+  dbg_printf("OpenMP max threads: %d\n", omp_get_max_threads());
   e_data.camera = camera;
 
   EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
@@ -279,7 +281,7 @@ int EEVEE_occlusion_trace_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, 
 
 void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata, uint tot_samples)
 {
-  printf("%s\n", "EEVEE_occlusion_trace_output_init");
+  dbg_printf("%s\n", "EEVEE_occlusion_trace_output_init");
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_StorageList *stl = vedata->stl;
@@ -330,7 +332,7 @@ void EEVEE_occlusion_trace_output_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *
 
 void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
-  printf("%s\n", "EEVEE_occlusion_trace_cache_init");
+  dbg_printf("%s\n", "EEVEE_occlusion_trace_cache_init");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_TextureList *txl = vedata->txl;
@@ -353,7 +355,7 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
      */
 
     /* This pass is used to calculate ao rays positions on cpu */
-    DRW_PASS_CREATE((DRWPass *)psl->ao_trace_pos, DRW_STATE_WRITE_COLOR | DRW_STATE_WRITE_DEPTH | DRW_STATE_DEPTH_EQUAL | DRW_STATE_CLIP_PLANES);// | DRW_STATE_CULL_BACK);
+    DRW_PASS_CREATE(psl->ao_trace_pos, DRW_STATE_WRITE_COLOR | DRW_STATE_WRITE_DEPTH | DRW_STATE_DEPTH_EQUAL | DRW_STATE_CLIP_PLANES);// | DRW_STATE_CULL_BACK);
     stl->g_data->rtao_shgrp = DRW_shgroup_create(e_data.rtao_pos_norm_sh, (DRWPass *)psl->ao_trace_pos);
     DRW_shgroup_uniform_texture(stl->g_data->rtao_shgrp, "utilTex", EEVEE_materials_get_util_tex());
     DRW_shgroup_uniform_block(stl->g_data->rtao_shgrp, "common_block", sldata->common_ubo);
@@ -411,7 +413,7 @@ void EEVEE_occlusion_trace_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *v
 void EEVEE_rtao_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata, Object *ob, bool cast_shadow) {
   EEVEE_StorageList *stl = vedata->stl;
   if(!stl->g_data->rtao_shgrp || !e_data.embree_mode) return;
-  //printf("%s\n", "EEVEE_rtao_cache_populate");
+  //dbg_printf("%s\n", "EEVEE_rtao_cache_populate");
   //if(!cast_shadow) return; // don't draw pos/norm buffer for non shadow casters
 
   struct GPUBatch *geom = NULL;
@@ -480,12 +482,12 @@ void PVZ_occlusion_trace_build_prim_rays_gpu(void) {
 }
 
 void PVZ_occlusion_trace_compute_embree(void) {
-  printf("%s\n", "embree trace occlusion");
+  dbg_printf("%s\n", "embree trace occlusion");
 
   #ifndef _WIN32
+  // start timer
   struct timeval t_start, t_end;
   double elapsed_time;
-  // start timer
   gettimeofday(&t_start, NULL);
   #endif
 
@@ -524,8 +526,7 @@ void PVZ_occlusion_trace_compute_embree(void) {
   // stop timer
   gettimeofday(&t_end, NULL);
   elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
-  //free(ao_thread_data);
-  printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buffers.w*rtao_cpu_buffers.h);
+  dbg_printf("test trace occlusion done in %f seconds with %u rays \n", elapsed_time, rtao_cpu_buffers.w*rtao_cpu_buffers.h);
   #endif
 }
 
@@ -625,7 +626,7 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
                              struct GPUTexture *depth_src,
                              int layer)
 {
-  printf("%s\n", "EEVEE_occlusion_trace_compute");
+  dbg_printf("%s\n", "EEVEE_occlusion_trace_compute");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_StorageList *stl = vedata->stl;
@@ -654,7 +655,7 @@ void EEVEE_occlusion_trace_compute(EEVEE_ViewLayerData *UNUSED(sldata),
     // stop timer
     gettimeofday(&t_end, NULL);
     elapsed_time = t_end.tv_sec + t_end.tv_usec / 1e6 - t_start.tv_sec - t_start.tv_usec / 1e6; // in seconds
-    printf("GPU_framebuffer FULL read in %f seconds\n", elapsed_time);
+    dbg_printf("GPU_framebuffer FULL read in %f seconds\n", elapsed_time);
     #endif
 
     PVZ_occlusion_trace_compute_embree();
@@ -718,7 +719,7 @@ void EEVEE_occlusion_trace_draw_debug(EEVEE_ViewLayerData *UNUSED(sldata), EEVEE
 
 void EEVEE_occlusion_trace_output_accumulate(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
-  printf("EEVEE_occlusion_trace_output_accumulate\n");
+  dbg_printf("EEVEE_occlusion_trace_output_accumulate\n");
   EEVEE_FramebufferList *fbl = vedata->fbl;
   EEVEE_PassList *psl = vedata->psl;
 
@@ -739,7 +740,7 @@ void EEVEE_occlusion_trace_output_accumulate(EEVEE_ViewLayerData *sldata, EEVEE_
 
 void EEVEE_occlusion_trace_free(void)
 {
-  printf("EEVEE_occlusion_trace_free\n");
+  dbg_printf("EEVEE_occlusion_trace_free\n");
   
   e_data.embree_mode = false; // this might be needed to avoid unneccessary cache populate when engine switched
 

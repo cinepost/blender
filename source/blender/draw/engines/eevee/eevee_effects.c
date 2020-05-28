@@ -34,6 +34,8 @@
 #include "GPU_texture.h"
 #include "eevee_private.h"
 
+#include "debug.h"
+
 static struct {
   /* Downsample Depth */
   struct GPUShader *minz_downlevel_sh;
@@ -132,7 +134,7 @@ void EEVEE_effects_init(EEVEE_ViewLayerData *sldata,
                         Object *camera,
                         const bool minimal)
 {
-  printf("%s\n", "EEVEE_effects_init");
+  dbg_printf("%s\n", "EEVEE_effects_init");
   EEVEE_CommonUniformBuffer *common_data = &sldata->common_data;
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_FramebufferList *fbl = vedata->fbl;
@@ -272,7 +274,7 @@ void EEVEE_effects_init(EEVEE_ViewLayerData *sldata,
 
 void EEVEE_effects_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata)
 {
-  printf("%s\n", "EEVEE_effects_cache_init");
+  dbg_printf("%s\n", "EEVEE_effects_cache_init");
   EEVEE_PassList *psl = vedata->psl;
   EEVEE_TextureList *txl = vedata->txl;
   EEVEE_StorageList *stl = vedata->stl;

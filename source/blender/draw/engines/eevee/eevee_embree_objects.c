@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
-#include <search.h>
 
 #include <omp.h>
 
+#include "debug.h"
+#include "tq84-tsearch.h"
 #include "eevee_embree_objects.h"
 
 /* embree scene */
@@ -87,7 +88,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
 	if(!ob) return NULL; // early termination
 	if(EVEM_find_object_info(ob)) return NULL; // object already presented in map
 
-	//printf("EVEM_insert_object: %s\n", ob->id.name);
+	//dbg_printf("EVEM_insert_object: %s\n", ob->id.name);
 	
 	/* Create the (new) item */
   ObjectsMapItem *new_item = malloc(sizeof(ObjectsMapItem));
@@ -100,7 +101,7 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
   new_item->info.cast_shadow = true;
   new_item->info.deleted_or_hidden = false;
 
-  ObjectsMapItem **item_in_tree = tsearch(new_item, &embree_objects_map.root, _evem_ob_map_compare);
+  ObjectsMapItem **item_in_tree = tq84_tsearch(new_item, &embree_objects_map.root, _evem_ob_map_compare);
 
   if (!item_in_tree) return NULL; // we shouldn't be here but ....
   
@@ -116,10 +117,10 @@ ObjectInfo *EVEM_insert_object(const Object *ob) {
 ObjectInfo *EVEM_find_object_info(const Object *ob) {
 	if(!ob || (embree_objects_map.size == 0 )) return NULL; // early termination
 
-  ObjectsMapItem **item_in_tree = tfind(ob, &embree_objects_map.root, _evem_ob_map_compare_ob);
+  ObjectsMapItem **item_in_tree = tq84_tfind(ob, &embree_objects_map.root, _evem_ob_map_compare_ob);
   
   if (item_in_tree) {
-    //printf("Found existing object %s info\n", ob->id.name);
+    //dbg_printf("Found existing object %s info\n", ob->id.name);
     return &(*item_in_tree)->info;
   } 
 

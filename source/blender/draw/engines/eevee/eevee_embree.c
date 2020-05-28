@@ -20,6 +20,7 @@
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 
+#include "debug.h"
 #include "eevee_embree.h"
 
 /* embree scene */
@@ -47,7 +48,7 @@ void EEVEE_embree_init(EEVEE_ViewLayerData *sldata) {
   evem_data.embree_enabled = true;
 
   if (!evem_data.device) {
-    printf("%s\n", "create embree device");
+    dbg_printf("%s\n", "create embree device");
     evem_data.device = rtcNewDevice("threads=0");//,verbose=3");
     assert(evem_data.device && "Unable to create embree device !!!");
   }
@@ -72,11 +73,11 @@ void EEVEE_embree_init(EEVEE_ViewLayerData *sldata) {
 
 void EEVEE_embree_print_capabilities(void) {
 	if (_evem_inited) return;
-	printf("Embree3 capabilities...\n_________________________\n");
-	printf("Embree3 native Ray4 %s\n", evem_data.NATIVE_RAY4_ON ? "ON":"OFF");
-	printf("Embree3 native Ray8 %s\n", evem_data.NATIVE_RAY8_ON ? "ON":"OFF");
-	printf("Embree3 native Ray16 %s\n", evem_data.NATIVE_RAY16_ON ? "ON":"OFF");
-	printf("Embree3 Ray stream %s\n", evem_data.RAY_STREAM_ON ? "ON":"OFF");
+	dbg_printf("Embree3 capabilities...\n_________________________\n");
+	dbg_printf("Embree3 native Ray4 %s\n", evem_data.NATIVE_RAY4_ON ? "ON":"OFF");
+	dbg_printf("Embree3 native Ray8 %s\n", evem_data.NATIVE_RAY8_ON ? "ON":"OFF");
+	dbg_printf("Embree3 native Ray16 %s\n", evem_data.NATIVE_RAY16_ON ? "ON":"OFF");
+	dbg_printf("Embree3 Ray stream %s\n", evem_data.RAY_STREAM_ON ? "ON":"OFF");
 
 	printf("Embree3 Tasking system: ");
 	switch(evem_data.TASKING_SYSTEM) {
@@ -126,7 +127,7 @@ void EEVEE_embree_scene_free() {
 void EEVEE_embree_cache_init(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
   if (!evem_data.embree_enabled || (evem_data.sample_num > 1.0f)) return; // init only on first sample
 
-  printf("EEVEE_embree_cache_init\n");
+  dbg_printf("EEVEE_embree_cache_init\n");
 
   bool image_render_mode = DRW_state_is_image_render() ? true : false;
 
@@ -192,7 +193,7 @@ void EEVEE_embree_cache_populate(EEVEE_Data *vedata, EEVEE_ViewLayerData *sldata
 /* here we acutally upate tlas */
 void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) {
   if(!evem_data.embree_enabled || !evem_data.update_tlas || (!evem_data.sample_num > 1.0f)) return;
-  printf("EVEM_objects_cache_finish (update TLAS)\n");
+  dbg_printf("EVEM_objects_cache_finish (update TLAS)\n");
 
   if (populated_objects_num != embree_objects_map.size) {
 
@@ -244,7 +245,7 @@ void EEVEE_embree_cache_finish(EEVEE_ViewLayerData *sldata, EEVEE_Data *vedata) 
 }
 
 void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
-	//printf("EVEM_create_object: %s\n", ob->id.name);
+	//dbg_printf("EVEM_create_object: %s\n", ob->id.name);
 
   struct Mesh *mesh_eval = NULL;
 	switch (ob->type) {
@@ -275,7 +276,7 @@ void EVEM_create_object(Object *ob, ObjectInfo *ob_info) {
 }
 
 void EVEM_update_object(Object *ob, ObjectInfo *ob_info) {
-  //printf("EVEM_update_object: %s\n", ob->id.name);
+  //dbg_printf("EVEM_update_object: %s\n", ob->id.name);
 
   switch (ob->type) {
     case OB_MESH:
@@ -296,11 +297,14 @@ void EVEM_mesh_object_clear(Mesh *me) {
 }
 
 void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
-  //printf("EVEM_mesh_object_create for object: %s \n", ob_info->ob->id.name);
+  //dbg_printf("EVEM_mesh_object_create for object: %s \n", ob_info->ob->id.name);
+
+  #ifndef _WIN32
 	clock_t tstart = clock();
+  #endif
 
   if (ob_info->geometry) {
-    printf("Warning! Embree geometry already created for Mesh object: %s\n", ob_info->ob->id.name);
+    dbg_printf("Warning! Embree geometry already created for Mesh object: %s\n", ob_info->ob->id.name);
     return;
   }
 
@@ -452,13 +456,15 @@ void EVEM_mesh_object_create(Mesh *me, ObjectInfo *ob_info) {
 
   evem_data.update_tlas = true;
 
+  #ifndef _WIN32
   clock_t tend = clock();
-  //printf("Mesh geometry for object %s with embree id %u added in %f seconds\n",  ob_info->ob->id.name, ob_info->id, (double)(tend - tstart) / CLOCKS_PER_SEC);
+  dbg_printf("Mesh geometry for object %s with embree id %u added in %f seconds\n",  ob_info->ob->id.name, ob_info->id, (double)(tend - tstart) / CLOCKS_PER_SEC);
+  #endif
 }
 
 void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
   if(_scene_is_empty)return;
-	//printf("%s\n", "EVEM_mesh_object_update");
+	//dbg_printf("%s\n", "EVEM_mesh_object_update");
 
   // return if object transform not changed and object not in edit mode
   bool is_edit_mode = false;
@@ -472,7 +478,7 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
 	RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
   
   if (!geometry) {
-    printf("%s\n", "Error can't update missing Embree geometry !");
+    dbg_printf("%s\n", "Error can't update missing Embree geometry !");
     return;
   }
 
@@ -512,12 +518,12 @@ void EVEM_mesh_object_update(Object *ob, ObjectInfo *ob_info) {
   
   evem_data.update_tlas = true;
 
-  printf("%s\n", "embree object updated");
+  dbg_printf("%s\n", "embree object updated");
 }
 
 void EVEM_instance_update_transform(Object *ob, ObjectInfo *ob_info) {
   if(_scene_is_empty)return;
-  printf("%s\n", "EVEM_instance_update_transform");
+  dbg_printf("%s\n", "EVEM_instance_update_transform");
 
   RTCGeometry geometry = rtcGetGeometry(evem_data.scene, ob_info->id);
   if(!geometry) return;
@@ -530,7 +536,7 @@ void EVEM_instance_update_transform(Object *ob, ObjectInfo *ob_info) {
 }
 
 void EVEM_toggle_object_visibility(Object *ob, ObjectInfo *ob_info) {
-  printf("EVEM_toggle_object_visibility\n");
+  dbg_printf("EVEM_toggle_object_visibility\n");
   RTCGeometry geometry = ob_info->geometry;
 
   ob_info->cast_shadow = !ob_info->cast_shadow;

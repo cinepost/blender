@@ -39,6 +39,8 @@
 #include "eevee_embree.h"
 #include "eevee_occlusion_rtao.h"
 
+#include "debug.h"
+
 #define EEVEE_ENGINE "BLENDER_EEVEE"
 
 extern struct EeveeEmbreeData evem_data;
@@ -47,9 +49,9 @@ extern struct EeveeEmbreeData evem_data;
 
 static void eevee_engine_init(void *ved)
 {
-  printf("________________________________________\n");
-  printf("%s\n", "eevee_engine_init");
-  printf("________________________________________\n");
+  dbg_printf("________________________________________\n");
+  dbg_printf("%s\n", "eevee_engine_init");
+  dbg_printf("________________________________________\n");
 
   EEVEE_Data *vedata = (EEVEE_Data *)ved;
   EEVEE_TextureList *txl = vedata->txl;
@@ -105,7 +107,7 @@ static void eevee_engine_init(void *ved)
 
 static void eevee_cache_init(void *vedata)
 {
-  printf("%s\n", "eevee_cache_init");
+  dbg_printf("%s\n", "eevee_cache_init");
   const DRWContextState *draw_ctx = DRW_context_state_get();
   const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
 
@@ -183,7 +185,7 @@ void EEVEE_cache_populate(void *vedata, Object *ob)
 
 static void eevee_cache_finish(void *vedata)
 {
-  printf("%s\n", "eevee_cache_finish");
+  dbg_printf("%s\n", "eevee_cache_finish");
   EEVEE_ViewLayerData *sldata = EEVEE_view_layer_data_ensure();
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   EEVEE_PrivateData *g_data = stl->g_data;
@@ -226,7 +228,7 @@ static uint _i = 0;
 static void eevee_draw_scene(void *vedata)
 {
   _i ++;
-  printf("eevee_draw_scene %u\n____________________________\n", _i);
+  dbg_printf("eevee_draw_scene %u\n____________________________\n", _i);
   EEVEE_PassList *psl = ((EEVEE_Data *)vedata)->psl;
   EEVEE_StorageList *stl = ((EEVEE_Data *)vedata)->stl;
   EEVEE_FramebufferList *fbl = ((EEVEE_Data *)vedata)->fbl;
@@ -472,7 +474,7 @@ static void eevee_render_to_image(void *vedata,
 
 static void eevee_engine_free(void)
 {
-  printf("%s\n", "eevee_engine_free");
+  dbg_printf("%s\n", "eevee_engine_free");
   EEVEE_shaders_free();
   EEVEE_bloom_free();
   EEVEE_depth_of_field_free();

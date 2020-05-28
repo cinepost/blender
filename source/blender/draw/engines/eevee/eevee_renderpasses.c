@@ -33,6 +33,8 @@
 
 #include "eevee_private.h"
 
+#include "debug.h"
+
 extern char datatoc_common_view_lib_glsl[];
 extern char datatoc_common_uniforms_lib_glsl[];
 extern char datatoc_bsdf_common_lib_glsl[];
@@ -81,7 +83,7 @@ bool EEVEE_renderpasses_only_first_sample_pass_active(EEVEE_Data *vedata)
 
 void EEVEE_renderpasses_init(EEVEE_Data *vedata)
 {
-  printf("%s\n", "EEVEE_renderpasses_init");
+  dbg_printf("%s\n", "EEVEE_renderpasses_init");
   const DRWContextState *draw_ctx = DRW_context_state_get();
   EEVEE_StorageList *stl = vedata->stl;
   EEVEE_PrivateData *g_data = stl->g_data;

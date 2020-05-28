@@ -46,6 +46,7 @@
 
 #include "eevee_private.h"
 
+#include "debug.h"
 #include "eevee_embree.h"
 #include "eevee_occlusion_rtao.h"
 
@@ -492,9 +493,9 @@ static void eevee_render_draw_background(EEVEE_Data *vedata)
 
 void EEVEE_render_draw(EEVEE_Data *vedata, RenderEngine *engine, RenderLayer *rl, const rcti *rect)
 {
-  printf("_________________________________________________\n");
-  printf("EEVEE_render_draw\n");
-  printf("_________________________________________________\n");
+  dbg_printf("_________________________________________________\n");
+  dbg_printf("EEVEE_render_draw\n");
+  dbg_printf("_________________________________________________\n");
   const DRWContextState *draw_ctx = DRW_context_state_get();
   const Scene *scene_eval = DEG_get_evaluated_scene(draw_ctx->depsgraph);
   const char *viewname = RE_GetActiveRenderView(engine->re);

@@ -26,6 +26,7 @@
 #ifndef TQ84_SEARCH_H
 #define	TQ84_SEARCH_H 1
 
+#ifdef _WIN32
 typedef enum
 {
   preorder,
@@ -34,6 +35,9 @@ typedef enum
   leaf
 }
 VISIT;
+#else
+#include <search.h>
+#endif
 
 typedef int (*tq84__compar_fn_t) (const void *, const void *);
 
